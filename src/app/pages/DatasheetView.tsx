@@ -182,7 +182,7 @@ export default function DatasheetView() {
               className="mb-3 rounded-lg border border-emerald-500/20 bg-gradient-to-br from-stone-900 to-stone-950 p-4"
             >
               <h3 className="text-sm font-bold text-emerald-400 mb-2">{ability[0]}</h3>
-              <p className="text-xs text-stone-300 leading-relaxed whitespace-pre-line">{ability[1]}</p>
+              <FormattedRuleText text={ability[1]} className="text-xs" />
             </div>
           ))}
         </div>
@@ -260,7 +260,7 @@ export default function DatasheetView() {
       </div>
 
       {/* Sticky Add to Roster Button */}
-      <div className="fixed bottom-6 left-0 right-0 z-20 px-6">
+      <div className="fixed bottom-16 left-0 right-0 z-20 px-6">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={handleAddToRoster}

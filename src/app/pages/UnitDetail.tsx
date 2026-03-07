@@ -1,14 +1,15 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
-import { ArrowLeft, Shield, Edit, Plus, Award, AlertTriangle, Skull, ChevronDown, ChevronUp, Star, Trash2 } from "lucide-react";
+import { ArrowLeft, Shield, Edit, Plus, Award, AlertTriangle, Skull, ChevronDown, ChevronUp, Star, Trash2, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFactionName } from "../../lib/factions";
 import { getRankFromXP, getRankColor } from "../../lib/ranks";
-import { getUnitsForFaction } from "../../data";
+import { getUnitsForFaction, getRulesForFaction } from "../../data";
 import type { Datasheet } from "../../types";
 import WeaponStatTable from "../components/WeaponStatTable";
 import WargearOptionsPanel, { WargearAbilitiesPanel } from "../components/WargearOptionsPanel";
+import { FormattedRuleText } from "../../lib/formatText";
 
 export default function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -17,6 +18,8 @@ export default function UnitDetail() {
     campaign,
     currentPlayer,
     units,
+    updateUnit,
+    awardXP,
     addBattleHonour,
     addBattleScar,
     markDestroyed,
@@ -27,6 +30,12 @@ export default function UnitDetail() {
   const [showAbilities, setShowAbilities] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showDestroyConfirm, setShowDestroyConfirm] = useState(false);
+  const [showSpendXP, setShowSpendXP] = useState(false);
+  const [xpAmount, setXpAmount] = useState(1);
+  const [editName, setEditName] = useState("");
+  const [editPoints, setEditPoints] = useState(0);
+  const [editNotes, setEditNotes] = useState("");
+  const [showEnhancementPicker, setShowEnhancementPicker] = useState(false);
 
   // If no campaign, redirect to /home
   useEffect(() => {
@@ -43,6 +52,20 @@ export default function UnitDetail() {
     const factionUnits = getUnitsForFaction(currentPlayer.faction_id);
     return factionUnits.find((ds) => ds.name === unit.datasheet_name);
   }, [currentPlayer, unit]);
+
+  // Load faction enhancements from all detachments
+  const factionEnhancements = useMemo(() => {
+    if (!currentPlayer) return [];
+    const rules = getRulesForFaction(currentPlayer.faction_id);
+    if (!rules) return [];
+    const enhancements: { detachment: string; name: string; cost: string; text: string }[] = [];
+    for (const det of rules.detachments) {
+      for (const enh of det.enhancements) {
+        enhancements.push({ detachment: det.name, ...enh });
+      }
+    }
+    return enhancements;
+  }, [currentPlayer]);
 
   if (!campaign || !currentPlayer) return null;
 
@@ -99,6 +122,17 @@ export default function UnitDetail() {
     toast.success("Battle Honor added!");
   };
 
+  const handleAssignEnhancement = (enh: { detachment: string; name: string; cost: string; text: string }) => {
+    addBattleHonour(unit.id, {
+      id: crypto.randomUUID(),
+      type: "weapon_enhancement",
+      name: enh.name,
+      description: `${enh.text} (${enh.detachment} — ${enh.cost} pts)`,
+    });
+    setShowEnhancementPicker(false);
+    toast.success(`${enh.name} assigned!`);
+  };
+
   const handleAddBattleScar = () => {
     addBattleScar(unit.id, {
       id: crypto.randomUUID(),
@@ -109,7 +143,28 @@ export default function UnitDetail() {
   };
 
   const handleSpendXP = () => {
-    toast.success("XP spent - Unit ranked up!");
+    if (xpAmount < 1) return;
+    awardXP(unit.id, xpAmount);
+    toast.success(`+${xpAmount} XP awarded!`);
+    setShowSpendXP(false);
+    setXpAmount(1);
+  };
+
+  const handleStartEdit = () => {
+    setEditName(unit.custom_name);
+    setEditPoints(unit.points_cost);
+    setEditNotes(unit.notes);
+    setIsEditing(true);
+  };
+
+  const handleSaveEdit = () => {
+    updateUnit(unit.id, {
+      custom_name: editName || unit.datasheet_name,
+      points_cost: editPoints,
+      notes: editNotes,
+    });
+    setIsEditing(false);
+    toast.success("Unit updated!");
   };
 
   const handleMarkDestroyed = () => {
@@ -162,7 +217,7 @@ export default function UnitDetail() {
                 {unit.points_cost} pts
               </div>
               <button
-                onClick={() => setIsEditing(!isEditing)}
+                onClick={handleStartEdit}
                 className="text-xs text-emerald-500/70 hover:text-emerald-500 transition-colors flex items-center gap-1 mt-1"
               >
                 <Edit className="w-3 h-3" />
@@ -229,7 +284,18 @@ export default function UnitDetail() {
         {/* Wargear Options */}
         {datasheet?.wargear_options && datasheet.wargear_options.length > 0 && (
           <div className="mb-6">
-            <WargearOptionsPanel options={datasheet.wargear_options} />
+            <WargearOptionsPanel
+              options={datasheet.wargear_options}
+              selectable
+              selectedOptions={unit.equipment ? unit.equipment.split(", ").filter(Boolean) : []}
+              onToggleOption={(option) => {
+                const current = unit.equipment ? unit.equipment.split(", ").filter(Boolean) : [];
+                const updated = current.includes(option)
+                  ? current.filter((o) => o !== option)
+                  : [...current, option];
+                updateUnit(unit.id, { equipment: updated.join(", ") });
+              }}
+            />
           </div>
         )}
 
@@ -339,13 +405,24 @@ export default function UnitDetail() {
                 <Award className="w-4 h-4 text-amber-400" />
                 Battle Honors
               </h3>
-              <button
-                onClick={handleAddBattleHonor}
-                className="text-xs text-emerald-500/70 hover:text-emerald-500 transition-colors flex items-center gap-1"
-              >
-                <Plus className="w-3 h-3" />
-                Add
-              </button>
+              <div className="flex items-center gap-3">
+                {factionEnhancements.length > 0 && (
+                  <button
+                    onClick={() => setShowEnhancementPicker(true)}
+                    className="text-xs text-purple-400/70 hover:text-purple-400 transition-colors flex items-center gap-1"
+                  >
+                    <Sparkles className="w-3 h-3" />
+                    Enhancement
+                  </button>
+                )}
+                <button
+                  onClick={handleAddBattleHonor}
+                  className="text-xs text-emerald-500/70 hover:text-emerald-500 transition-colors flex items-center gap-1"
+                >
+                  <Plus className="w-3 h-3" />
+                  Add
+                </button>
+              </div>
             </div>
             <div className="space-y-2">
               {unit.battle_honours.map((honor, idx) => (
@@ -403,6 +480,20 @@ export default function UnitDetail() {
             </div>
           </div>
 
+          {/* Notes */}
+          {unit.notes && (
+            <div className="mb-4">
+              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
+                Notes
+              </h3>
+              <div className="relative overflow-hidden rounded-lg border border-stone-700/40 bg-gradient-to-br from-stone-900 to-stone-950 p-3">
+                <p className="text-xs text-stone-400 leading-relaxed whitespace-pre-line">
+                  {unit.notes}
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* Equipment / Relics */}
           {unit.equipment && (
             <div className="mb-4">
@@ -421,7 +512,7 @@ export default function UnitDetail() {
 
           {/* Action Button */}
           <button
-            onClick={handleSpendXP}
+            onClick={() => setShowSpendXP(true)}
             className="w-full relative overflow-hidden group mb-3"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" />
@@ -430,7 +521,7 @@ export default function UnitDetail() {
             <div className="relative px-6 py-3 flex items-center justify-center gap-2">
               <Star className="w-5 h-5 text-black" strokeWidth={2} />
               <span className="text-base font-bold text-black tracking-wide">
-                Spend XP
+                Award XP
               </span>
             </div>
           </button>
@@ -460,6 +551,164 @@ export default function UnitDetail() {
           </button>
         </div>
       </div>
+
+      {/* Edit Unit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <div className="w-full max-w-sm relative overflow-hidden rounded-lg border border-emerald-500/30 bg-gradient-to-br from-stone-900 to-stone-950 p-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent" />
+            <div className="relative">
+              <h3 className="text-lg font-bold text-stone-100 mb-4">Edit Unit</h3>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-xs text-stone-400 uppercase tracking-wider mb-1">Custom Name</label>
+                  <input
+                    type="text"
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    className="w-full bg-stone-950 border border-emerald-500/20 rounded-lg px-3 py-2 text-stone-100 text-sm focus:border-emerald-500/40 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-stone-400 uppercase tracking-wider mb-1">Points Cost</label>
+                  <input
+                    type="number"
+                    value={editPoints}
+                    onChange={(e) => setEditPoints(Number(e.target.value))}
+                    min="0"
+                    className="w-full bg-stone-950 border border-emerald-500/20 rounded-lg px-3 py-2 text-stone-100 text-sm focus:border-emerald-500/40 focus:outline-none"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs text-stone-400 uppercase tracking-wider mb-1">Notes</label>
+                  <textarea
+                    value={editNotes}
+                    onChange={(e) => setEditNotes(e.target.value)}
+                    rows={3}
+                    placeholder="Battle notes, lore, etc."
+                    className="w-full bg-stone-950 border border-emerald-500/20 rounded-lg px-3 py-2 text-stone-100 text-sm focus:border-emerald-500/40 focus:outline-none resize-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setIsEditing(false)}
+                  className="flex-1 px-4 py-2 rounded-lg border border-emerald-500/20 bg-gradient-to-br from-stone-900 to-stone-950 text-stone-300 font-semibold hover:border-emerald-500/40 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSaveEdit}
+                  className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold transition-all"
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhancement Picker Modal */}
+      {showEnhancementPicker && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <div className="w-full max-w-sm relative overflow-hidden rounded-lg border border-purple-500/30 bg-gradient-to-br from-stone-900 to-stone-950 p-6 max-h-[80vh] overflow-y-auto">
+            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent" />
+            <div className="relative">
+              <div className="flex justify-center mb-4">
+                <Sparkles className="w-12 h-12 text-purple-400" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-lg font-bold text-stone-100 text-center mb-2">
+                Assign Enhancement
+              </h3>
+              <p className="text-sm text-stone-400 text-center mb-4">
+                Select an enhancement from your detachment
+              </p>
+
+              <div className="space-y-3">
+                {factionEnhancements.map((enh, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleAssignEnhancement(enh)}
+                    className="w-full text-left relative overflow-hidden rounded-lg border border-purple-500/20 bg-gradient-to-br from-purple-950/20 to-stone-950 p-3 hover:border-purple-500/40 transition-all"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-1">
+                      <h4 className="text-sm font-semibold text-purple-300">{enh.name}</h4>
+                      <span className="text-xs font-bold text-purple-400 font-mono flex-shrink-0">{enh.cost} pts</span>
+                    </div>
+                    <p className="text-[10px] text-stone-500 mb-1">{enh.detachment}</p>
+                    <FormattedRuleText text={enh.text} className="text-xs" />
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setShowEnhancementPicker(false)}
+                className="w-full mt-4 px-4 py-2 rounded-lg border border-purple-500/20 bg-gradient-to-br from-stone-900 to-stone-950 text-stone-300 font-semibold hover:border-purple-500/40 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Award XP Modal */}
+      {showSpendXP && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
+          <div className="w-full max-w-sm relative overflow-hidden rounded-lg border border-emerald-500/30 bg-gradient-to-br from-stone-900 to-stone-950 p-6">
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent" />
+            <div className="relative">
+              <div className="flex justify-center mb-4">
+                <Star className="w-12 h-12 text-emerald-500" strokeWidth={1.5} />
+              </div>
+              <h3 className="text-lg font-bold text-stone-100 text-center mb-2">
+                Award Experience
+              </h3>
+              <p className="text-sm text-stone-400 text-center mb-4">
+                Current XP: <span className="text-emerald-400 font-mono">{unit.experience_points}</span> &middot; Rank: <span className={rankColor}>{rank}</span>
+              </p>
+
+              <div className="flex items-center justify-center gap-4 mb-6">
+                <button
+                  onClick={() => setXpAmount(Math.max(1, xpAmount - 1))}
+                  className="w-10 h-10 rounded-lg border border-emerald-500/30 bg-stone-950 text-emerald-400 font-bold text-lg hover:bg-stone-900 transition-colors"
+                >
+                  -
+                </button>
+                <div className="text-3xl font-bold text-emerald-400 font-mono w-16 text-center">
+                  {xpAmount}
+                </div>
+                <button
+                  onClick={() => setXpAmount(xpAmount + 1)}
+                  className="w-10 h-10 rounded-lg border border-emerald-500/30 bg-stone-950 text-emerald-400 font-bold text-lg hover:bg-stone-900 transition-colors"
+                >
+                  +
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => { setShowSpendXP(false); setXpAmount(1); }}
+                  className="flex-1 px-4 py-2 rounded-lg border border-emerald-500/20 bg-gradient-to-br from-stone-900 to-stone-950 text-stone-300 font-semibold hover:border-emerald-500/40 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSpendXP}
+                  className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold transition-all"
+                >
+                  Award +{xpAmount} XP
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Destroy Confirmation Modal */}
       {showDestroyConfirm && (

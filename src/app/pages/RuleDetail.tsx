@@ -74,26 +74,27 @@ function lookupRule(
   return null;
 }
 
-// Parse section text into displayable paragraphs, splitting on bullet points
-function parseRuleText(text: string): { paragraphs: string[]; bullets: string[] } {
+// Clean rules text: remove [TABLE:...] blocks & [Section] refs, split into paragraphs/bullets
+function cleanRuleText(text: string): { paragraphs: string[]; bullets: string[] } {
   if (!text) return { paragraphs: [], bullets: [] };
+
+  // Remove [TABLE: ...] blocks (nested brackets)
+  let cleaned = text.replace(/\[TABLE:\s*\[[\s\S]*?\]\]\s*/g, '');
+  // Remove section references like [Unit Coherency]
+  cleaned = cleaned.replace(/\[([A-Za-z][A-Za-z\s&,]+)\]\s*/g, '');
+  // Clean up multiple spaces
+  cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
 
   const paragraphs: string[] = [];
   const bullets: string[] = [];
 
   // Split on " - " at the beginning of lines for bullet points
-  const lines = text.split(/\n|(?= - )/);
+  const lines = cleaned.split(/\n|(?= - )/);
   for (const line of lines) {
     const trimmed = line.trim();
     if (!trimmed) continue;
     if (trimmed.startsWith('- ')) {
       bullets.push(trimmed.slice(2));
-    } else if (trimmed.startsWith('[TABLE:')) {
-      // Skip embedded table data in display for now
-      continue;
-    } else if (trimmed.startsWith('[') && trimmed.endsWith(']')) {
-      // Skip section references like [Heading]
-      continue;
     } else {
       paragraphs.push(trimmed);
     }
@@ -165,7 +166,7 @@ export default function RuleDetail() {
 
   // Render a general rules section (core or crusade)
   const renderSection = (section: RulesSection) => {
-    const parsed = parseRuleText(section.text);
+    const parsed = cleanRuleText(section.text);
     return (
       <div className="space-y-6">
         {/* Main text content */}

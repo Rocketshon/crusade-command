@@ -280,16 +280,11 @@ export default function CampaignHubActive() {
       {/* Floating Action Button - Log Battle */}
       <button
         onClick={handleLogBattle}
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:shadow-[0_0_35px_rgba(16,185,129,0.6)] z-20 flex items-center justify-center group"
+        className="fixed bottom-20 right-6 w-14 h-14 rounded-full bg-emerald-600 hover:bg-emerald-500 transition-all shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:shadow-[0_0_35px_rgba(16,185,129,0.6)] z-20 flex items-center justify-center group"
       >
         <Plus className="w-6 h-6 text-black group-hover:rotate-90 transition-transform duration-300" strokeWidth={2.5} />
         <div className="absolute inset-0 rounded-full bg-emerald-400/20 blur-md" />
       </button>
-
-      {/* Tooltip for FAB */}
-      <div className="fixed bottom-24 right-6 bg-stone-900 border border-emerald-500/30 px-3 py-1.5 rounded-md text-xs text-stone-300 opacity-0 hover:opacity-0 pointer-events-none z-20">
-        Log Battle
-      </div>
     </div>
   );
 }
