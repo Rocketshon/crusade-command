@@ -62,8 +62,15 @@ export interface ChapterMeta {
   detachments: number;
 }
 
+// Map chapter IDs to the data faction key they use for unit lookups
+const CHAPTER_DATA_MAP = new Map<string, FactionId>();
+
+export function getDataFactionId(factionId: FactionId): FactionId {
+  return (CHAPTER_DATA_MAP.get(factionId) as FactionId) ?? factionId;
+}
+
 export const SPACE_MARINE_CHAPTERS: ChapterMeta[] = [
-  { id: 'space_wolves', name: 'Space Wolves', icon: '🐺', parentFactionId: 'space_wolves', uniqueDatasheets: 12, detachments: 4 },
+  { id: 'space_wolves', name: 'Space Wolves', icon: '🐺', parentFactionId: 'space_marines', uniqueDatasheets: 12, detachments: 4 },
   { id: 'blood_angels', name: 'Blood Angels', icon: '🩸', parentFactionId: 'space_marines', uniqueDatasheets: 8, detachments: 3 },
   { id: 'dark_angels', name: 'Dark Angels', icon: '🗡️', parentFactionId: 'space_marines', uniqueDatasheets: 10, detachments: 4 },
   { id: 'black_templars', name: 'Black Templars', icon: '✝️', parentFactionId: 'space_marines', uniqueDatasheets: 5, detachments: 2 },
@@ -75,3 +82,8 @@ export const SPACE_MARINE_CHAPTERS: ChapterMeta[] = [
   { id: 'raven_guard', name: 'Raven Guard', icon: '🐦‍⬛', parentFactionId: 'space_marines', uniqueDatasheets: 2, detachments: 1 },
   { id: 'white_scars', name: 'White Scars', icon: '🏇', parentFactionId: 'space_marines', uniqueDatasheets: 2, detachments: 1 },
 ];
+
+// Populate chapter -> data faction mapping
+for (const ch of SPACE_MARINE_CHAPTERS) {
+  CHAPTER_DATA_MAP.set(ch.id, ch.parentFactionId);
+}
