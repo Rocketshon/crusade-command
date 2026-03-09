@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
-import { ArrowLeft, Shield, Edit, Plus, Award, AlertTriangle, Skull, ChevronDown, ChevronUp, Star, Trash2, Sparkles } from "lucide-react";
+import { ArrowLeft, Shield, Edit, Plus, Award, AlertTriangle, Skull, ChevronDown, ChevronUp, Star, Trash2, Sparkles, Zap } from "lucide-react";
 import { toast } from "sonner";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFactionName } from "../../lib/factions";
@@ -97,6 +97,47 @@ export default function UnitDetail() {
       });
     });
   }, [factionEnhancements, datasheet]);
+
+  const [showStratagems, setShowStratagems] = useState(false);
+
+  // Match stratagems whose target field references this unit's keywords
+  const matchingStratagems = useMemo(() => {
+    if (!currentPlayer || !datasheet) return [];
+    const rules = getRulesForFaction(currentPlayer.faction_id);
+    if (!rules) return [];
+
+    // Collect unit keywords (uppercase)
+    const unitKeywords = [
+      ...datasheet.keywords,
+      datasheet.name, // also match on datasheet name itself
+    ].map(k => k.toUpperCase());
+
+    // Skip overly generic keywords that would match every stratagem
+    const genericKeywords = new Set([
+      'IMPERIUM', 'CHAOS', 'XENOS', 'TYRANIDS', 'ORKS', 'AELDARI',
+      'DRUKHARI', 'NECRONS', 'T\'AU EMPIRE', 'LEAGUES OF VOTANN',
+    ]);
+
+    const results: { detachment: string; name: string; cp: string; type: string; when: string; target: string; effect: string; restrictions?: string }[] = [];
+
+    for (const det of rules.detachments) {
+      for (const strat of det.stratagems) {
+        const targetUpper = strat.target.toUpperCase();
+
+        const matched = unitKeywords.some(kw => {
+          if (genericKeywords.has(kw)) return false;
+          if (kw.length < 3) return false; // skip trivially short keywords
+          return targetUpper.includes(kw);
+        });
+
+        if (matched) {
+          results.push({ detachment: det.name, ...strat });
+        }
+      }
+    }
+
+    return results;
+  }, [currentPlayer, datasheet]);
 
   if (!campaign || !currentPlayer) return null;
 
@@ -364,6 +405,57 @@ export default function UnitDetail() {
                     <p className="text-xs text-stone-400 leading-relaxed">
                       {ability.description}
                     </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Applicable Stratagems */}
+        {matchingStratagems.length > 0 && (
+          <div className="mb-6">
+            <button
+              onClick={() => setShowStratagems(!showStratagems)}
+              className="w-full flex items-center justify-between text-sm font-semibold text-stone-300 uppercase tracking-wider mb-3 hover:text-emerald-400 transition-colors"
+            >
+              <span className="flex items-center gap-2">
+                <Zap className="w-4 h-4 text-amber-500" />
+                Stratagems ({matchingStratagems.length})
+              </span>
+              {showStratagems ? (
+                <ChevronUp className="w-5 h-5 text-emerald-500" />
+              ) : (
+                <ChevronDown className="w-5 h-5 text-emerald-500" />
+              )}
+            </button>
+            {showStratagems && (
+              <div className="space-y-2">
+                {matchingStratagems.map((strat, idx) => (
+                  <div
+                    key={idx}
+                    className="relative overflow-hidden rounded-lg border border-amber-500/20 bg-gradient-to-br from-amber-950/10 to-stone-950 p-3"
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <h4 className="text-sm font-semibold text-amber-400">
+                        {strat.name}
+                      </h4>
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        <span className="text-[10px] text-stone-500 uppercase">{strat.type}</span>
+                        <span className="text-xs font-bold text-amber-500 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded">
+                          {strat.cp}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-stone-500 mb-1">{strat.detachment}</p>
+                    <div className="space-y-1 text-xs text-stone-400 leading-relaxed">
+                      <p><span className="text-stone-500 font-medium">When:</span> {strat.when}</p>
+                      <p><span className="text-stone-500 font-medium">Target:</span> {strat.target}</p>
+                      <p><span className="text-stone-500 font-medium">Effect:</span> {strat.effect}</p>
+                      {strat.restrictions && (
+                        <p><span className="text-red-400/70 font-medium">Restrictions:</span> {strat.restrictions}</p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

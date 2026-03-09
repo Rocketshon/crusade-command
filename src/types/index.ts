@@ -81,6 +81,7 @@ export interface CrusadeUnit {
   crusade_points: number;
   battles_played: number;
   battles_survived: number;
+  model_count?: number;
   equipment: string;
   battle_honours: BattleHonour[];
   battle_scars: BattleScar[];

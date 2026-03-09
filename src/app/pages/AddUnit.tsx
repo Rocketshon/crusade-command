@@ -17,6 +17,7 @@ export default function AddUnit() {
   const [selectedUnit, setSelectedUnit] = useState<Datasheet | null>(null);
   const [customName, setCustomName] = useState("");
   const [customPoints, setCustomPoints] = useState(0);
+  const [selectedModelTier, setSelectedModelTier] = useState(0);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
 
   // If no campaign, redirect to /home
@@ -48,9 +49,23 @@ export default function AddUnit() {
   const handleUnitSelect = (unit: Datasheet) => {
     setSelectedUnit(unit);
     setCustomName(unit.name);
+    setSelectedModelTier(0);
     const baseCost = unit.points[0]?.cost ? parseInt(unit.points[0].cost, 10) : 0;
     setCustomPoints(baseCost);
     setSelectedEquipment([]);
+  };
+
+  const handleModelTierChange = (tierIndex: number) => {
+    if (!selectedUnit) return;
+    setSelectedModelTier(tierIndex);
+    const cost = parseInt(selectedUnit.points[tierIndex]?.cost ?? '0', 10);
+    setCustomPoints(cost);
+  };
+
+  /** Parse "5 models" → 5 from the points tier string */
+  const parseModelCount = (modelsStr: string): number | undefined => {
+    const match = modelsStr.match(/(\d+)\s*model/i);
+    return match ? parseInt(match[1], 10) : undefined;
   };
 
   const handleEquipmentToggle = (option: string) => {
@@ -72,7 +87,8 @@ export default function AddUnit() {
       return;
     }
 
-    addUnit(selectedUnit.name, customName, customPoints, selectedEquipment.join(", "));
+    const modelCount = parseModelCount(selectedUnit.points[selectedModelTier]?.models ?? '');
+    addUnit(selectedUnit.name, customName, customPoints, selectedEquipment.join(", "), modelCount);
 
     toast.success(`${customName} added to roster!`, {
       duration: 3000,
@@ -233,6 +249,40 @@ export default function AddUnit() {
                     <p className="text-xs text-stone-300 leading-relaxed">
                       {selectedUnit.unit_composition}
                     </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Model Count / Points Tier Selector */}
+              {selectedUnit.points.length > 1 && (
+                <div>
+                  <label className="block text-sm font-medium text-stone-300 mb-2 tracking-wide flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-emerald-500/70" />
+                    Unit Size
+                  </label>
+                  <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(selectedUnit.points.length, 3)}, 1fr)` }}>
+                    {selectedUnit.points.map((tier, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => handleModelTierChange(idx)}
+                        className={`relative overflow-hidden rounded-lg border p-3 text-center transition-all ${
+                          selectedModelTier === idx
+                            ? "border-emerald-500/50 bg-emerald-500/10"
+                            : "border-emerald-500/20 bg-gradient-to-br from-stone-900 to-stone-950 hover:border-emerald-500/30"
+                        }`}
+                      >
+                        <div className="text-sm font-bold text-stone-100 font-mono mb-0.5">
+                          {tier.models}
+                        </div>
+                        <div className={`text-xs font-mono ${selectedModelTier === idx ? "text-emerald-400" : "text-stone-500"}`}>
+                          {tier.cost} pts
+                        </div>
+                        {selectedModelTier === idx && (
+                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500" />
+                        )}
+                      </button>
+                    ))}
                   </div>
                 </div>
               )}

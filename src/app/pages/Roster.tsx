@@ -216,6 +216,11 @@ export default function Roster() {
                         <div className="text-sm font-bold text-emerald-500 font-mono mb-0.5">
                           {unit.points_cost} pts
                         </div>
+                        {unit.model_count && (
+                          <div className="text-xs text-stone-400 font-mono mb-0.5">
+                            {unit.model_count} models
+                          </div>
+                        )}
                         <div className="text-xs text-stone-500 font-mono">
                           {unit.experience_points} XP
                         </div>

@@ -20,7 +20,7 @@ interface CrusadeState {
 
   // Actions — Roster
   units: CrusadeUnit[];
-  addUnit: (datasheetName: string, customName: string, pointsCost: number, equipment: string) => void;
+  addUnit: (datasheetName: string, customName: string, pointsCost: number, equipment: string, modelCount?: number) => void;
   updateUnit: (unitId: string, updates: Partial<CrusadeUnit>) => void;
   removeUnit: (unitId: string) => void;
 
@@ -153,13 +153,14 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
     storage.clearCampaign();
   }, [campaign, currentPlayer]);
 
-  const addUnitFn = useCallback((datasheetName: string, customName: string, pointsCost: number, equipment: string) => {
+  const addUnitFn = useCallback((datasheetName: string, customName: string, pointsCost: number, equipment: string, modelCount?: number) => {
     const unit: CrusadeUnit = {
       id: storage.generateId(),
       player_id: currentPlayer?.id ?? '',
       datasheet_name: datasheetName,
       custom_name: customName || datasheetName,
       points_cost: pointsCost,
+      model_count: modelCount,
       rank: 'Battle-ready',
       experience_points: 0,
       crusade_points: 0,
