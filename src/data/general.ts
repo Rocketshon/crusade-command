@@ -8,7 +8,7 @@ export const CORE_RULES: GeneralRulesDocument | null = {
   "sections": [
     {
       "name": "Introduction",
-      "text": "",
+      "text": "[Welcome to CrusadeCommand]\nYour tactical companion for Warhammer 40,000 Crusade campaigns. Use these Core Rules to quickly reference any rule during your games — from army building and movement to shooting, fighting, and terrain.\n\n[About Warhammer 40,000]\nWarhammer 40,000 is a tabletop war game in which players command armies of Citadel miniatures and attempt to defeat their opponent through a mixture of skill, tactics and luck. Storytelling is at the core of Warhammer 40,000, with the rules designed to bring to life the epic conflicts between the forces of Mankind, aliens and daemons in the grim darkness of the far future.\n\n[How to Use These Rules]\nBrowse the sections below to find the rule you need. Each section is organized with headers so you can quickly scan for the specific rule. Tap any section to expand it. Use the search or browse by category to find what you need fast.",
       "subsections": []
     },
     {

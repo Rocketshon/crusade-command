@@ -117,7 +117,8 @@ function parseTextWithSectionHeaders(text: string): { header?: string; text: str
   if (!text) return [];
 
   // Split on [SectionName] patterns, keeping the section name
-  const parts = text.split(/\[([A-Z][A-Za-z\s&,'-]+)\]/);
+  // Matches headers like [Hit Roll Mechanics], [1. Select Battle Size], [CORE CONCEPTS], [Hints and TipsWobbly Models]
+  const parts = text.split(/\[([A-Za-z0-9][A-Za-z0-9\s&,.'()\-–]+)\]/);
   const result: { header?: string; text: string }[] = [];
 
   for (let i = 0; i < parts.length; i++) {
@@ -216,34 +217,77 @@ export default function RuleDetail() {
   };
 
   // Render a general rules section (core or crusade)
+  // Parses [Section Headers] into separate visual cards instead of one big text block
   const renderSection = (section: RulesSection) => {
-    const parsed = cleanRuleText(section.text);
-    return (
-      <div className="space-y-6">
-        {/* Main text content */}
-        {parsed.paragraphs.length > 0 && (
-          <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4">
-            <div className="relative space-y-2">
-              {parsed.paragraphs.map((p, idx) => (
-                <p key={idx} className="text-stone-300 leading-relaxed">{p}</p>
-              ))}
-            </div>
-          </div>
-        )}
+    const text = section.text || '';
 
-        {/* Bullet points */}
-        {parsed.bullets.length > 0 && (
-          <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4">
-            <ul className="relative space-y-2">
-              {parsed.bullets.map((item, idx) => (
-                <li key={idx} className="flex items-start gap-3 text-stone-300">
-                  <span className="text-emerald-500 mt-1.5">&#8226;</span>
-                  <span className="flex-1 leading-relaxed">{item}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+    // Remove [TABLE:...] blocks first
+    const withoutTables = text.replace(/\[TABLE:\s*\[[\s\S]*?\]\]\s*/g, '');
+
+    // Parse into sections using [Header] markers
+    const hasSectionHeaders = /\[([A-Za-z0-9][A-Za-z0-9\s&,.'()\-–]+)\]/.test(withoutTables);
+    const sections = hasSectionHeaders
+      ? parseTextWithSectionHeaders(withoutTables)
+      : [{ text: withoutTables.replace(/\[|\]/g, '').trim() }];
+
+    return (
+      <div className="space-y-4">
+        {/* Sectioned content — each [Header] becomes its own card */}
+        {sections.map((block, idx) => {
+          if (!block.text && !block.header) return null;
+
+          // Split text into bullet items and paragraphs
+          const lines = block.text.split(/(?= - )/);
+          const bullets: string[] = [];
+          const paragraphs: string[] = [];
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+            if (trimmed.startsWith('- ')) {
+              bullets.push(trimmed.slice(2));
+            } else {
+              paragraphs.push(trimmed);
+            }
+          }
+
+          // Skip empty blocks
+          if (paragraphs.length === 0 && bullets.length === 0 && !block.header) return null;
+
+          return (
+            <div
+              key={idx}
+              className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4"
+            >
+              {/* Section header */}
+              {block.header && (
+                <h3 className="text-sm font-bold text-emerald-400 mb-3 tracking-wide uppercase border-b border-emerald-500/20 pb-2">
+                  {block.header}
+                </h3>
+              )}
+
+              {/* Paragraphs */}
+              {paragraphs.length > 0 && (
+                <div className="space-y-2 mb-2">
+                  {paragraphs.map((p, pIdx) => (
+                    <p key={pIdx} className="text-stone-300 text-sm leading-relaxed">{p}</p>
+                  ))}
+                </div>
+              )}
+
+              {/* Bullet/numbered items */}
+              {bullets.length > 0 && (
+                <ol className="space-y-1.5 list-decimal list-inside">
+                  {bullets.map((item, bIdx) => (
+                    <li key={bIdx} className="text-stone-300 text-sm leading-relaxed marker:text-emerald-500">
+                      {item}
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </div>
+          );
+        })}
 
         {/* Subsections — expandable/collapsible */}
         {section.subsections.length > 0 && (
@@ -255,7 +299,6 @@ export default function RuleDetail() {
               {section.subsections.map((sub, idx) => {
                 const key = `sub-${idx}`;
                 const isExpanded = expandedSubsections.has(key);
-                // Find the text for this subsection from the parent section text
                 const subText = extractSubsectionText(section.text, sub);
                 return (
                   <div key={idx} className={idx !== section.subsections.length - 1 ? "border-b border-stone-800/60" : ""}>
