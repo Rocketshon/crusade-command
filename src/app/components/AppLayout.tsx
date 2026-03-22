@@ -36,6 +36,7 @@ function SplashOverlay({ onDone }: { onDone: () => void }) {
         muted
         playsInline
         onEnded={handleComplete}
+        onError={handleComplete}
         className="absolute inset-0 w-full h-full object-cover"
       />
       <button

@@ -1,0 +1,158 @@
+{
+  "core": [
+    {
+      "section": "Introduction",
+      "issue": "Empty section with no subsections and no text content",
+      "severity": "medium"
+    },
+    {
+      "section": "Missions",
+      "issue": "Empty section with no subsections and no text content",
+      "severity": "medium"
+    },
+    {
+      "section": "Craters and Rubble",
+      "issue": "Empty section with no subsections and no text content",
+      "severity": "medium"
+    },
+    {
+      "section": "Battlefield Debris and Statuary",
+      "issue": "Empty section with no subsections and no text content",
+      "severity": "medium"
+    },
+    {
+      "section": "Hills, Industrial Structures, Sealed Buildings and Armoured Containers",
+      "issue": "Empty section with no subsections and no text content",
+      "severity": "medium"
+    },
+    {
+      "section": "Woods",
+      "issue": "Empty section with no subsections and no text content",
+      "severity": "medium"
+    },
+    {
+      "section": "1. Fights First",
+      "issue": "Empty section with no subsections and no text content",
+      "severity": "medium"
+    },
+    {
+      "section": "1. Hit Roll",
+      "issue": "Missing actual damage values in Wound Roll table - contains only '+' symbols instead of specific numbers",
+      "severity": "high"
+    },
+    {
+      "section": "2. Wound Roll",
+      "issue": "Missing actual damage values in Wound Roll table - contains only '+' symbols instead of specific numbers (e.g., '2+', '3+', '4+', '5+', '6+')",
+      "severity": "high"
+    },
+    {
+      "section": "Measuring Distances",
+      "issue": "Subsection '[Hints and Tips Wobbly Models]' appears to be a marker with no actual content following it",
+      "severity": "medium"
+    },
+    {
+      "section": "Dice",
+      "issue": "Subsection '[Hints and Tips Dice Rolling]' appears to be a marker with no actual content following it",
+      "severity": "medium"
+    },
+    {
+      "section": "Sequencing",
+      "issue": "Subsection markers present but with no content: '[The Battle Round]', '[Persisting Effects]', '[Out-of-Phase Rules]', '[COMMAND PHASE]'",
+      "severity": "medium"
+    },
+    {
+      "section": "Battlefield",
+      "issue": "Subsection '[Terrain Features]' is marked but has no content following it",
+      "severity": "medium"
+    }
+  ],
+  "crusade": [
+    {
+      "section": "Battle Traits",
+      "issue": "EMPTY SECTION: Section has no subsections and empty text content",
+      "severity": "high"
+    },
+    {
+      "section": "Order of Battle",
+      "issue": "DUPLICATE SECTIONS: Two sections with identical name 'Order of Battle' (appears at index 2 and index 4)",
+      "severity": "high"
+    },
+    {
+      "section": "Out of Action",
+      "issue": "TRUNCATED TEXT: Section text only contains subsection references '[1. Devastating Blow] [2. Battle Scar]' with no actual content",
+      "severity": "high"
+    },
+    {
+      "section": "Weapon Modifications",
+      "issue": "MALFORMED TABLES: Duplicate table definitions with broken structure - contains two nearly identical [TABLE: ...] markers with complex nested arrays",
+      "severity": "medium"
+    },
+    {
+      "section": "Crusade Relics",
+      "issue": "MALFORMED TABLES: Duplicate table definitions - contains two [TABLE: ...] markers with the same data repeated",
+      "severity": "medium"
+    },
+    {
+      "section": "Battle Scars",
+      "issue": "MALFORMED TABLES: Duplicate table definitions - contains two nearly identical [TABLE: ...] markers with complex nested arrays",
+      "severity": "medium"
+    },
+    {
+      "section": "Attached Units",
+      "issue": "MALFORMED TABLES: Multiple duplicate table definitions throughout the section with broken formatting and nested arrays",
+      "severity": "medium"
+    },
+    {
+      "section": "Attached Units",
+      "issue": "TRUNCATED/GARBLED TEXT: Section contains excessive repetition of Battle Honours/Ranks rules that appear out of context and end with incomplete table markers containing '+' symbols instead of dice values",
+      "severity": "high"
+    }
+  ],
+  "commentary": [
+    {
+      "section": "Introduction",
+      "issue": "Empty section with no text and no subsections - useless entry",
+      "severity": "medium"
+    },
+    {
+      "section": "Out-of-Phase Rules",
+      "issue": "Empty section with no text content - subsection listed but no body text",
+      "severity": "medium"
+    },
+    {
+      "section": "Priority of Rules",
+      "issue": "Empty section with no text content - subsection listed but no body text",
+      "severity": "medium"
+    },
+    {
+      "section": "Duplicated Core Abilities",
+      "issue": "Empty section with no text content - subsection listed but no body text",
+      "severity": "medium"
+    },
+    {
+      "section": "Books - Wound Roll Table",
+      "issue": "Malformed table with repeated/duplicate table entries showing identical wound roll information multiple times",
+      "severity": "medium"
+    },
+    {
+      "section": "Books - Engagement Range/Model Type Table",
+      "issue": "Malformed table with duplicate entries - the same pivot value table appears twice consecutively",
+      "severity": "low"
+    },
+    {
+      "section": "Books - Visibility Examples",
+      "issue": "Multiple duplicate [TABLE] markers with nearly identical visibility examples (A, B, C scenarios repeated 4 times with slight variations)",
+      "severity": "medium"
+    },
+    {
+      "section": "Books - Within/Wholly Within Table",
+      "issue": "Malformed table with duplicate entries - the same within/wholly within example appears twice",
+      "severity": "low"
+    }
+  ],
+  "cost": 0.048197,
+  "tokens": {
+    "input": 40412,
+    "output": 1557
+  }
+}

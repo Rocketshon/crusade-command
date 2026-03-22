@@ -37,7 +37,8 @@ export default function BottomNav() {
         location.pathname.startsWith('/roster') ||
         location.pathname.startsWith('/add-unit') ||
         location.pathname.startsWith('/unit') ||
-        location.pathname.startsWith('/cheat-sheet')
+        location.pathname === '/cheat-sheet' ||
+        location.pathname.startsWith('/cheat-sheet/')
       );
     }
     if (item.path === '/codex') {
@@ -71,6 +72,8 @@ export default function BottomNav() {
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
+              aria-label={item.label}
+              aria-current={isActive ? 'page' : undefined}
               className={`relative flex flex-col items-center gap-0.5 px-3 py-2 rounded-lg transition-colors ${
                 isActive
                   ? 'text-emerald-400'

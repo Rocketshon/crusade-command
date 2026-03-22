@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Search, X, Check } from "lucide-react";
 import { FACTIONS } from "../../lib/factions";
 import type { FactionId } from "../../types";
@@ -27,6 +27,12 @@ export default function FactionPicker({
   const [searchQuery, setSearchQuery] = useState("");
   const [tempSelectedId, setTempSelectedId] = useState(selectedFactionId || "");
 
+  useEffect(() => {
+    if (isOpen) {
+      setTempSelectedId(selectedFactionId || "");
+    }
+  }, [isOpen, selectedFactionId]);
+
   if (!isOpen) return null;
 
   const filteredFactions = FACTIONS.filter((faction) =>
@@ -35,9 +41,8 @@ export default function FactionPicker({
 
   const handleConfirm = () => {
     const selectedFaction = FACTIONS.find((f) => f.id === tempSelectedId);
-    if (selectedFaction) {
-      onSelect(selectedFaction.id, selectedFaction.name, selectedFaction.icon);
-    }
+    if (!selectedFaction) return;
+    onSelect(selectedFaction.id, selectedFaction.name, selectedFaction.icon);
     onClose();
   };
 
@@ -46,15 +51,21 @@ export default function FactionPicker({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center p-0 sm:p-6">
+    <div
+      className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-end sm:items-center justify-center p-0 sm:p-6"
+      onClick={onClose}
+    >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="faction-picker-title"
         className="relative w-full max-w-2xl rounded-t-2xl sm:rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-stone-900 to-stone-950 shadow-2xl flex flex-col max-h-[90vh] sm:max-h-[80vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="border-b border-emerald-500/20 p-6 pb-4">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold text-stone-100 tracking-wider drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+            <h2 id="faction-picker-title" className="text-2xl font-bold text-stone-100 tracking-wider drop-shadow-[0_0_10px_rgba(16,185,129,0.3)]">
               {title}
             </h2>
             <button

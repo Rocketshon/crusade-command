@@ -1,0 +1,223 @@
+{
+  "timestamp": "2026-03-22T18:02:44.058Z",
+  "totalFindings": 18,
+  "bySeverity": {
+    "critical": 0,
+    "high": 5,
+    "medium": 7,
+    "low": 6
+  },
+  "byCategory": {
+    "bug": 9,
+    "ux": 5,
+    "performance": 0,
+    "data-display": 0,
+    "code-quality": 1
+  },
+  "autoFixable": 10,
+  "findings": [
+    {
+      "file": "src/app/components/AppLayout.tsx",
+      "line": 22,
+      "category": "bug",
+      "severity": "high",
+      "title": "Stale closure in splash timeout — handleComplete never re-runs if fadeOut changes",
+      "description": "The useEffect captures handleComplete at mount time. Because handleComplete reads the fadeOut state via closure and the dependency array is empty ([]), if fadeOut somehow becomes true before the 8-second timer fires, handleComplete will still run a second time (calling setFadeOut(true) again and setting sessionStorage/calling onDone a second time). More importantly, the ESLint exhaustive-deps rule would flag this — the missing dependency means the timer always calls the stale first version of handleComplete, which is harmless only because fadeOut starts false, but it is fragile.",
+      "suggestedFix": "Use a ref flag to prevent double-firing, or restructure: move the guard into the effect itself. Simplest fix:\n```tsx\nuseEffect(() => {\n  const timer = setTimeout(() => {\n    setFadeOut(true);\n    sessionStorage.setItem(SPLASH_KEY, '1');\n    setTimeout(onDone, 600);\n  }, 8000);\n  return () => clearTimeout(timer);\n}, [onDone]);\n```\nAnd in handleComplete use a ref guard instead of reading state:\n```tsx\nconst doneRef = useRef(false);\nconst handleComplete = () => {\n  if (doneRef.current) return;\n  doneRef.current = true;\n  setFadeOut(true);\n  sessionStorage.setItem(SPLASH_KEY, '1');\n  setTimeout(onDone, 600);\n};\n```",
+      "autoFixable": false,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/AppLayout.tsx",
+      "line": 46,
+      "category": "ux",
+      "severity": "medium",
+      "title": "Page content is rendered and interactive behind the splash overlay",
+      "description": "The Outlet (page content) and BottomNav render immediately regardless of showSplash. While the overlay is visually on top (z-[100]), users on slow devices or assistive technology can interact with the underlying page content during the splash. Tab order also reaches the page behind the overlay.",
+      "suggestedFix": "Conditionally render the page content only after splash is dismissed, or add aria-hidden and inert to the content div while splash is showing:\n```tsx\n<div className=\"pb-20\" aria-hidden={showSplash} inert={showSplash ? '' : undefined}>\n  <Outlet />\n</div>\n```",
+      "autoFixable": false,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/AppLayout.tsx",
+      "line": 9,
+      "category": "ux",
+      "severity": "low",
+      "title": "No fallback if both splash videos fail to load",
+      "description": "If the video files are missing (e.g. not included in the build, or slow network), the video element shows nothing and the user stares at a black screen for up to 8 seconds. The onEnded event never fires for a failed video, so only the timer saves them.",
+      "suggestedFix": "Add an onError handler to the video element that calls handleComplete immediately:\n```tsx\n<video\n  ref={videoRef}\n  src={SPLASH_VIDEOS[videoIndex]}\n  autoPlay\n  muted\n  playsInline\n  onEnded={handleComplete}\n  onError={handleComplete}\n  className=\"absolute inset-0 w-full h-full object-cover\"\n/>\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/BottomNav.tsx",
+      "line": 37,
+      "category": "bug",
+      "severity": "high",
+      "title": "'/settings' path match falls through to default equality check — always inactive",
+      "description": "The NAV_ITEMS loop uses early returns for '/home', '/codex', '/rules', and '/tracker', but the '/settings' item has no explicit handler and falls through to `return location.pathname === item.path`. This logic is actually correct for '/settings' since it uses the default equality check. However, the activeTab fallback defaults to '/home' if no item matches at all, meaning any unrecognised path silently highlights Campaign. More critically, the logic for '/tracker' only matches exact '/tracker' — any sub-routes like '/tracker/something' will not highlight Tracker. Verify if tracker has sub-routes.",
+      "suggestedFix": "Make the tracker match consistent with others if sub-routes exist:\n```tsx\nif (item.path === '/tracker') {\n  return (\n    location.pathname === '/tracker' ||\n    location.pathname.startsWith('/tracker/')\n  );\n}\n```\nAlso add '/settings' explicit handling if settings has sub-routes.",
+      "autoFixable": false,
+      "needsResearch": true
+    },
+    {
+      "file": "src/app/components/BottomNav.tsx",
+      "line": 57,
+      "category": "accessibility",
+      "severity": "high",
+      "title": "Nav buttons have no aria-label — icon-only buttons are inaccessible",
+      "description": "The nav buttons render an icon and a small text label. The text label is 10px and visually present, but each button element itself has no aria-label or role='link' annotation. Screen readers will read out the icon's aria (none, since Lucide SVGs default to aria-hidden) and the text span. While the text span helps, the button should have an explicit accessible name and aria-current for the active item.",
+      "suggestedFix": "Add aria-label and aria-current to each button:\n```tsx\n<button\n  key={item.path}\n  onClick={() => navigate(item.path)}\n  aria-label={item.label}\n  aria-current={isActive ? 'page' : undefined}\n  className={...}\n>\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/BottomNav.tsx",
+      "line": 31,
+      "category": "bug",
+      "severity": "medium",
+      "title": "'/cheat-sheet' path prefix check collides with any future '/cheat-*' routes not in Campaign",
+      "description": "The Campaign tab uses `location.pathname.startsWith('/cheat-sheet')` which is fine for a single route. However startsWith('/cheat-sheet') would also match '/cheat-sheet-advanced' or similar. This is low risk now but fragile. More importantly, the check uses the full string '/cheat-sheet' inside startsWith which is redundant — startsWith already handles it. No real bug today but worth hardening.",
+      "suggestedFix": "Change to an exact match or add trailing slash:\n```tsx\nlocation.pathname === '/cheat-sheet' ||\nlocation.pathname.startsWith('/cheat-sheet/')\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/FactionPicker.tsx",
+      "line": 30,
+      "category": "bug",
+      "severity": "high",
+      "title": "tempSelectedId state not reset when selectedFactionId prop changes",
+      "description": "tempSelectedId is initialised once from selectedFactionId via useState. If the parent re-opens the picker with a different selectedFactionId (e.g. after clearing the selection), tempSelectedId will still hold the previous value because useState initial values are only used on first mount. The picker will show the old selection highlighted.",
+      "suggestedFix": "Add a useEffect to sync tempSelectedId when the picker opens or selectedFactionId changes:\n```tsx\nuseEffect(() => {\n  if (isOpen) {\n    setTempSelectedId(selectedFactionId || '');\n  }\n}, [isOpen, selectedFactionId]);\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/FactionPicker.tsx",
+      "line": 40,
+      "category": "bug",
+      "severity": "medium",
+      "title": "handleConfirm closes modal even when no faction is selected",
+      "description": "handleConfirm calls onClose() unconditionally after the if-block. If tempSelectedId is empty (no selection), the modal closes without calling onSelect — which may be intentional — but the Confirm button is disabled when !tempSelectedId so this path should be unreachable. However, if the button's disabled state is bypassed (e.g. keyboard submit, or a future code change), onClose fires silently without feedback.",
+      "suggestedFix": "Add an early return guard for clarity and safety:\n```tsx\nconst handleConfirm = () => {\n  const selectedFaction = FACTIONS.find((f) => f.id === tempSelectedId);\n  if (!selectedFaction) return; // guard: no selection\n  onSelect(selectedFaction.id, selectedFaction.name, selectedFaction.icon);\n  onClose();\n};\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/FactionPicker.tsx",
+      "line": 55,
+      "category": "accessibility",
+      "severity": "high",
+      "title": "Modal has no focus trap or initial focus management",
+      "description": "When FactionPicker opens, focus is not moved into the modal. Users relying on keyboard navigation cannot easily reach the modal content without tabbing through everything behind it. There is also no focus trap, so Tab can exit the modal while it's open. The backdrop click is handled via stopPropagation on the inner div but clicking outside the inner div does not close the modal.",
+      "suggestedFix": "Use the Radix Dialog primitive (already available in the project at src/app/components/ui/dialog.tsx) which provides built-in focus trap, aria-modal, and initial focus. Alternatively, use the `focus-trap-react` library or implement a manual focus trap with useEffect.",
+      "autoFixable": false,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/FactionPicker.tsx",
+      "line": 55,
+      "category": "ux",
+      "severity": "medium",
+      "title": "Clicking backdrop does not close the FactionPicker",
+      "description": "The outer div has `bg-black/80 backdrop-blur-sm` and the inner div calls `e.stopPropagation()`. However, there is no onClick handler on the outer div to close the modal when clicking the backdrop. Users expect clicking outside a modal to dismiss it.",
+      "suggestedFix": "Add an onClick handler to the outer backdrop div:\n```tsx\n<div\n  className=\"fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] ...\"\n  onClick={onClose}\n>\n  <div\n    className=\"relative w-full ...\"\n    onClick={(e) => e.stopPropagation()}\n  >\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/FactionPicker.tsx",
+      "line": 55,
+      "category": "accessibility",
+      "severity": "medium",
+      "title": "Modal missing role='dialog' and aria-modal='true'",
+      "description": "The FactionPicker modal overlay has no ARIA role or aria-modal attribute. Screen readers will not announce this as a dialog and may not restrict virtual cursor to the modal content.",
+      "suggestedFix": "Add role, aria-modal, and aria-labelledby to the inner container div:\n```tsx\n<div\n  role=\"dialog\"\n  aria-modal=\"true\"\n  aria-labelledby=\"faction-picker-title\"\n  className=\"relative w-full max-w-2xl ...\"\n  onClick={(e) => e.stopPropagation()}\n>\n```\nAnd add id=\"faction-picker-title\" to the h2 element.",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/FactionPicker.tsx",
+      "line": 60,
+      "category": "ux",
+      "severity": "low",
+      "title": "Faction count badge overlaps the close button on small screens",
+      "description": "The faction count badge is positioned `absolute top-6 right-16` which puts it between the title and the close button (positioned at top-right). On narrow screens (< ~320px) these elements may overlap. The close button is at `p-2` inside the flex row, and the badge is absolutely positioned relative to the modal container.",
+      "suggestedFix": "Move the faction count into the header flex row as a regular flow element rather than an absolutely positioned badge, e.g. place it inline next to the title or remove the absolute positioning and include it in the header layout.",
+      "autoFixable": false,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/AppLayout.tsx",
+      "line": 1,
+      "category": "ux",
+      "severity": "low",
+      "title": "Splash video autoplay may be blocked by browser autoplay policy",
+      "description": "While the video has muted and playsInline attributes (which satisfy Chrome/Safari autoplay policy for muted videos), some stricter browser configurations or enterprise environments may still block autoplay. If the video doesn't play, onEnded never fires. The 8-second fallback timer handles this, but the user will see a black screen.",
+      "suggestedFix": "After setting the video ref, attempt play() programmatically and catch any DOMException to call handleComplete immediately on failure:\n```tsx\nuseEffect(() => {\n  if (videoRef.current) {\n    videoRef.current.play().catch(() => handleComplete());\n  }\n}, []);\n```",
+      "autoFixable": false,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/ui/form.tsx",
+      "line": 44,
+      "category": "bug",
+      "severity": "medium",
+      "title": "useFormField null check for fieldContext occurs after it is already used",
+      "description": "In useFormField(), fieldContext is destructured on line ~38 (`const fieldContext = React.useContext(FormFieldContext)`), then used immediately to call `getFieldState(fieldContext.name, ...)` before the null check `if (!fieldContext)` is reached. If fieldContext is the empty object default `{} as FormFieldContextValue`, fieldContext.name is undefined, and `getFieldState(undefined, ...)` may throw or return unexpected results before the error is caught.",
+      "suggestedFix": "Move the null/empty check before any usage of fieldContext:\n```tsx\nconst useFormField = () => {\n  const fieldContext = React.useContext(FormFieldContext);\n  if (!fieldContext?.name) {\n    throw new Error('useFormField should be used within <FormField>');\n  }\n  const itemContext = React.useContext(FormItemContext);\n  const { getFieldState } = useFormContext();\n  const formState = useFormState({ name: fieldContext.name });\n  ...\n```",
+      "autoFixable": false,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/ui/carousel.tsx",
+      "line": 115,
+      "category": "bug",
+      "severity": "low",
+      "title": "Carousel cleanup only removes 'select' listener, not 'reInit' listener",
+      "description": "In the useEffect that sets up carousel event listeners, both `api.on('reInit', onSelect)` and `api.on('select', onSelect)` are registered, but the cleanup function only calls `api?.off('select', onSelect)`. The 'reInit' listener is never removed, causing a potential memory leak if the Carousel component unmounts and remounts.",
+      "suggestedFix": "Add the missing cleanup for the reInit listener:\n```tsx\nreturn () => {\n  api?.off('select', onSelect);\n  api?.off('reInit', onSelect);\n};\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/ui/chart.tsx",
+      "line": 222,
+      "category": "bug",
+      "severity": "low",
+      "title": "ChartTooltipContent: item.value of 0 is not rendered due to falsy check",
+      "description": "In ChartTooltipContent, the value is rendered conditionally with `{item.value && (...)}`. If item.value is 0 (a valid numeric value, e.g. zero kills, zero points), this falsy check will prevent it from rendering, showing nothing instead of '0'.",
+      "suggestedFix": "Change the condition to an explicit undefined/null check:\n```tsx\n{item.value !== undefined && item.value !== null && (\n  <span className=\"text-foreground font-mono font-medium tabular-nums\">\n    {item.value.toLocaleString()}\n  </span>\n)}\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/CampaignHub.tsx",
+      "line": 76,
+      "category": "bug",
+      "severity": "medium",
+      "title": "Decorative corner elements positioned relative to wrong container",
+      "description": "The four decorative corner `<div>` elements (top-8 left-8, top-8 right-8, etc.) are placed inside the `relative z-10` inner div but use `absolute` positioning. However they are not marked absolute — they use Tailwind positioning classes like `absolute top-8 left-8` but are actually rendered as `absolute` children of the `relative z-10 w-full max-w-md` div. This means they position relative to that inner div, not the full-screen container. On small screens or when the content div doesn't span the full viewport, the corners will not appear at the screen corners as likely intended.",
+      "suggestedFix": "Move the corner decorations to be children of the outermost `relative overflow-hidden` div, or make them children of a full-width/height absolute positioned container:\n```tsx\n{/* Move these outside the z-10 content div, as direct children of the outer div */}\n<div className=\"absolute top-8 left-8 w-12 h-12 border-l-2 border-t-2 border-emerald-900/30 rounded-tl\" />\n...\n```",
+      "autoFixable": false,
+      "needsResearch": false
+    },
+    {
+      "file": "src/app/components/ui/collapsible.tsx",
+      "line": 3,
+      "category": "code-quality",
+      "severity": "low",
+      "title": "Missing React import for implicit JSX type usage",
+      "description": "The collapsible.tsx file uses React.ComponentProps<...> type annotations in function parameter destructuring but does not import React. While modern JSX transform (React 17+) doesn't require React in scope for JSX, the ComponentProps type reference requires the React namespace to be in scope for TypeScript. This likely works due to tsconfig settings but is inconsistent with all other ui components that explicitly import React.",
+      "suggestedFix": "Add the React import for consistency and to avoid potential issues with strict TypeScript configurations:\n```tsx\nimport * as React from 'react';\n```",
+      "autoFixable": true,
+      "needsResearch": false
+    }
+  ],
+  "cost": {
+    "input": 192306,
+    "output": 36564,
+    "dollars": 1.125378
+  }
+}
