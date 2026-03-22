@@ -2369,7 +2369,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "FANGS OF THE BROOD",
           "cp": "1CP",
-          "type": "Serpent’s Brood – Stratagem",
+          "type": "Serpent’s Brood – Strategic Ploy Stratagem",
           "when": "Start of the Fight phase .",
           "target": "One TROUPE unit from your army.",
           "effect": "Until the end of the phase, when using your unit’s Dance of Death ability, you can select three of the abilities for your unit to gain, instead of one."
@@ -2377,7 +2377,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "VENOMOUS WRATH",
           "cp": "1CP",
-          "type": "Serpent’s Brood – Stratagem",
+          "type": "Serpent’s Brood – Strategic Ploy Stratagem",
           "when": "Your Shooting phase .",
           "target": "One HARLEQUINS VEHICLE unit from your army that has not been selected to shoot this phase.",
           "effect": "After your unit has shot, if it is not within Engagement Range of one or more enemy units, it can make a Normal move of up to 6\". Until the end of the turn, your unit is not eligible to declare a charge ."
@@ -2385,7 +2385,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "STRIKING STRIDE",
           "cp": "1CP",
-          "type": "Serpent’s Brood – Stratagem",
+          "type": "Serpent’s Brood – Strategic Ploy Stratagem",
           "when": "Your Charge phase .",
           "target": "One HARLEQUINS unit from your army.",
           "effect": "Until the end of the phase, your unit is eligible to declare a charge in a turn in which it Advanced ."
@@ -2393,7 +2393,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "WEAVERS’ COILS",
           "cp": "1CP",
-          "type": "Serpent’s Brood – Stratagem",
+          "type": "Serpent’s Brood – Strategic Ploy Stratagem",
           "when": "End of your Fight phase .",
           "target": "One HARLEQUINS MOUNTED unit from your army that was eligible to fight this phase.",
           "effect": "If your unit is not within Engagement Range of one or more enemy units, it can make a Normal move . Otherwise, your unit can make a Fall Back move of up to 6\"."
@@ -2401,7 +2401,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "WEAVING STRIDE",
           "cp": "1CP",
-          "type": "Serpent’s Brood – Stratagem",
+          "type": "Serpent’s Brood – Strategic Ploy Stratagem",
           "when": "Your opponent’s Movement phase , just after an enemy unit ends a Normal , Advance or Fall Back move .",
           "target": "One HARLEQUINS INFANTRY unit from your army that is within 9\" of that enemy unit.",
           "effect": "Your unit can make a Normal move of up to 6\"."
@@ -2409,7 +2409,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "SKYWARD LUNGE",
           "cp": "1CP",
-          "type": "Serpent’s Brood – Stratagem",
+          "type": "Serpent’s Brood – Strategic Ploy Stratagem",
           "when": "End of your opponent’s Fight phase .",
           "target": "One HARLEQUINS VEHICLE or HARLEQUINS MOUNTED unit from your army.",
           "effect": "If your unit is not within Engagement Range of one or more enemy units, you can remove it from the battlefield and place it into Strategic Reserves ."
@@ -3184,7 +3184,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "SNAP TO IT",
           "cp": "1CP",
-          "type": "Grizzled Company – Stratagem",
+          "type": "Grizzled Company – Strategic Ploy Stratagem",
           "when": "Start of any phase.",
           "target": "One ASTRA MILITARUM OFFICER unit from your army.",
           "effect": "Your unit’s OFFICER model can issue 1 Order as if it were your Command phase ."
@@ -3192,7 +3192,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "NO RETREAT!",
           "cp": "1CP",
-          "type": "Grizzled Company – Stratagem",
+          "type": "Grizzled Company – Strategic Ploy Stratagem",
           "when": "Your Command phase .",
           "target": "One ASTRA MILITARUM unit from your army affected by the Duty and Honour! Order.",
           "effect": "If your unit is within range of an objective marker you control, that objective marker remains under your control, even if you have no models within range of it, until your opponent controls it at the start or end of a phase."
@@ -3200,7 +3200,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "VETERAN SHARPSHOOTERS",
           "cp": "1CP",
-          "type": "Grizzled Company – Stratagem",
+          "type": "Grizzled Company – Strategic Ploy Stratagem",
           "when": "Your Shooting phase .",
           "target": "One ASTRA MILITARUM unit from your army that has not been selected to shoot this phase.",
           "effect": "Until the end of the phase, ranged weapons equipped by models in your unit have the [IGNORES COVER] ability."
@@ -3208,7 +3208,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "PURGING FIRE",
           "cp": "1CP",
-          "type": "Grizzled Company – Stratagem",
+          "type": "Grizzled Company – Strategic Ploy Stratagem",
           "when": "Your Shooting phase .",
           "target": "One ASTRA MILITARUM unit from your army affected by an Order that has not been selected to shoot this phase.",
           "effect": "If your unit is within range of an objective marker , until the end of the phase, ranged weapons equipped by models in your unit have the [LETHAL HITS] ability."
@@ -3216,7 +3216,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "MORDIAN MINUTE",
           "cp": "1CP",
-          "type": "Grizzled Company – Stratagem",
+          "type": "Grizzled Company – Strategic Ploy Stratagem",
           "when": "Your Shooting phase .",
           "target": "One ASTRA MILITARUM INFANTRY unit from your army affected by the First Rank, Fire! Second Rank, Fire! Order.",
           "effect": "Until the end of the phase, each time a model in your unit makes an attack, improve the Strength characteristic of that attack by 1."
@@ -3224,7 +3224,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "ADDITIONAL ARMOUR",
           "cp": "1CP",
-          "type": "Grizzled Company – Stratagem",
+          "type": "Grizzled Company – Strategic Ploy Stratagem",
           "when": "Your opponent’s Shooting phase , just after an enemy unit has selected its targets.",
           "target": "One ASTRA MILITARUM unit from your army that was selected as the target of one or more of the attacking unit’s attacks.",
           "effect": "Until the attacking unit has finished making its attacks, each time an attack targets your unit, worsen the Armour Penetration characteristic of that attack by 1."
@@ -5124,7 +5124,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "TALONS SUNK DEEP",
           "cp": "1CP",
-          "type": "Nightmare Hunt – Stratagem",
+          "type": "Nightmare Hunt – Strategic Ploy Stratagem",
           "when": "Your Shooting phase or the Fight phase .",
           "target": "One HERETIC ASTARTES INFANTRY unit from your army that has not been selected to shoot or fight this phase.",
           "effect": "Until the end of the phase, each time a model in your unit makes an attack that targets a unit that is Battle-shocked and/or Below Half-strength , improve the Armour Penetration characteristic of that attack by 1."
@@ -5132,7 +5132,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "PREY ON THE WEAK",
           "cp": "1CP",
-          "type": "Nightmare Hunt – Stratagem",
+          "type": "Nightmare Hunt – Strategic Ploy Stratagem",
           "when": "Your Shooting phase or the Fight phase .",
           "target": "One HERETIC ASTARTES INFANTRY unit from your army that has not been selected to shoot or fight this phase.",
           "effect": "Until the end of the phase, each time a model in your unit makes an attack that targets a unit that is Battle-shocked and/or Below Half-strength , you can re-roll the Hit roll ."
@@ -5140,7 +5140,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "SADISTIC DISPLAY",
           "cp": "1CP",
-          "type": "Nightmare Hunt – Stratagem",
+          "type": "Nightmare Hunt – Strategic Ploy Stratagem",
           "when": "Fight phase , just after a HERETIC ASTARTES unit from your army destroys an enemy unit.",
           "target": "That HERETIC ASTARTES unit.",
           "effect": "Each enemy unit within 6\" of and visible to your unit (excluding MONSTER and VEHICLE units) must take a Battle-shock test ."
@@ -5148,7 +5148,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "MALICIOUS SURGE",
           "cp": "1CP",
-          "type": "Nightmare Hunt – Stratagem",
+          "type": "Nightmare Hunt – Strategic Ploy Stratagem",
           "when": "Your Charge phase .",
           "target": "One HERETIC ASTARTES INFANTRY unit from your army.",
           "effect": "Until the end of the phase, your unit is eligible to declare a charge in a turn in which it Advanced ."
@@ -5156,7 +5156,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "RELENTLESS TERROR",
           "cp": "1CP",
-          "type": "Nightmare Hunt – Stratagem",
+          "type": "Nightmare Hunt – Strategic Ploy Stratagem",
           "when": "Your Movement phase , just after a HERETIC ASTARTES INFANTRY unit from your army Falls Back .",
           "target": "That HERETIC ASTARTES unit.",
           "effect": "Until the end of the turn, your unit is eligible to shoot and declare a charge in a turn in which it Fell Back."
@@ -5164,7 +5164,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "HORRIFIC INCURSION",
           "cp": "1CP",
-          "type": "Nightmare Hunt – Stratagem",
+          "type": "Nightmare Hunt – Strategic Ploy Stratagem",
           "when": "Your Movement phase .",
           "target": "One HERETIC ASTARTES unit from your army that arrived from Reserves this turn.",
           "effect": "Select one enemy unit (excluding MONSTER and VEHICLE units) within 12\" of and visible to your unit: that unit must take a Battle-shock test , subtracting 1 from the result."
@@ -7093,7 +7093,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "CONTEMPTUOUS DISREGARD",
           "cp": "1CP",
-          "type": "Court of the Phoenician – Stratagem",
+          "type": "Court of the Phoenician – Strategic Ploy Stratagem",
           "when": "Your opponent’s Shooting phase or the Fight phase .",
           "target": "One EMPEROR’S CHILDREN unit from your army.",
           "effect": "Until the end of the phase, each time an attack targets your unit, if the Strength characteristic of that attack is greater than the Toughness characteristic of your unit, subtract 1 from the Wound roll ."
@@ -7101,7 +7101,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "PRIDEFUL SUPERIORITY",
           "cp": "2CP",
-          "type": "Court of the Phoenician – Stratagem",
+          "type": "Court of the Phoenician – Strategic Ploy Stratagem",
           "when": "Fight phase .",
           "target": "One EMPEROR’S CHILDREN unit from your army that has not been selected to fight this phase.",
           "effect": "Until the end of the phase, each time a model in your unit makes an attack that targets a CHARACTER unit, you can re-roll the Hit roll and you can re-roll the Wound roll ."
@@ -7109,7 +7109,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "SINUOUS BREACH",
           "cp": "1CP",
-          "type": "Court of the Phoenician – Stratagem",
+          "type": "Court of the Phoenician – Strategic Ploy Stratagem",
           "when": "Your Movement phase or your Charge phase .",
           "target": "One EMPEROR’S CHILDREN DAEMON unit from your army that has not been selected to move or charge this phase.",
           "effect": "Until the end of the phase, each time your unit makes a Normal , Advance or Charge move , it can move horizontally through terrain features ."
@@ -7117,7 +7117,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "CLOSE-QUARTERS EXCRUCIATION",
           "cp": "1CP",
-          "type": "Court of the Phoenician – Stratagem",
+          "type": "Court of the Phoenician – Strategic Ploy Stratagem",
           "when": "Your Shooting phase .",
           "target": "One EMPEROR’S CHILDREN unit from your army that has not been selected to shoot this phase.",
           "effect": "Until the end of the phase, each time an EMPEROR’S CHILDREN model in your unit makes an attack that targets an eligible unit within 12\", improve the Strength and Armour Penetration characteristics of that attack by 1."
@@ -7125,7 +7125,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "EUPHORIC INSPIRATION",
           "cp": "1CP",
-          "type": "Court of the Phoenician – Stratagem",
+          "type": "Court of the Phoenician – Strategic Ploy Stratagem",
           "when": "Your Charge phase .",
           "target": "One EMPEROR’S CHILDREN DAEMON unit from your army.",
           "effect": "Until the end of the phase, you can re-roll Charge rolls for friendly EMPEROR’S CHILDREN units within 6\" of your unit."
@@ -7133,7 +7133,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "CATALYTIC STIMULUS",
           "cp": "1CP",
-          "type": "Court of the Phoenician – Stratagem",
+          "type": "Court of the Phoenician – Strategic Ploy Stratagem",
           "when": "Your opponent’s Shooting phase , just after an enemy unit has shot.",
           "target": "One EMPEROR’S CHILDREN unit from your army that lost one or more wounds as a result of those attacks.",
           "effect": "Your unit can make a Stimulus move. To do so, roll one D6: models in your unit move a number of inches up to the result, but your unit must end that move as close as possible to the closest enemy unit (excluding AIRCRAFT ). When doing so, those models can be moved within Engagement Range of that enemy unit."
@@ -13435,7 +13435,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "A GRIM WARNING",
           "cp": "1CP",
-          "type": "Rage-cursed Onslaught – Stratagem",
+          "type": "Rage-cursed Onslaught – Strategic Ploy Stratagem",
           "when": "Any phase.",
           "target": "One BLOOD ANGELS unit from your army that was just destroyed while it was within range of one or more objective markers you controlled at the end of the previous phase. You can use this Stratagem on that unit even though it was just destroyed.",
           "effect": "Select one of those objective markers. That objective marker remains under your control until your opponent’s Level of Control over that objective marker is greater than yours at the end of a phase."
@@ -13443,7 +13443,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "ARMOUR OF CONTEMPT",
           "cp": "1CP",
-          "type": "Rage-cursed Onslaught – Stratagem",
+          "type": "Rage-cursed Onslaught – Strategic Ploy Stratagem",
           "when": "Your opponent’s Shooting phase or the Fight phase , just after an enemy unit has selected its targets.",
           "target": "One ADEPTUS ASTARTES unit from your army that was selected as the target of one or more of the attacking unit’s attacks.",
           "effect": "Until the attacking unit has finished making its attacks, each time an attack targets your unit, worsen the Armour Penetration characteristic of that attack by 1."
@@ -13451,7 +13451,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "INSENSATE RAMPAGE",
           "cp": "1CP",
-          "type": "Rage-cursed Onslaught – Stratagem",
+          "type": "Rage-cursed Onslaught – Strategic Ploy Stratagem",
           "when": "Your opponent’s Shooting phase or the Fight phase , just after an enemy unit has selected its targets.",
           "target": "One DEATH COMPANY unit from your army that was selected as the target of one or more of the attacking unit’s attacks.",
           "effect": "Until the end of the phase, models in your unit have the Feel No Pain 5+ ability."
@@ -13459,7 +13459,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "LIMB FROM LIMB",
           "cp": "1CP",
-          "type": "Rage-cursed Onslaught – Stratagem",
+          "type": "Rage-cursed Onslaught – Strategic Ploy Stratagem",
           "when": "Fight phase .",
           "target": "One ADEPTUS ASTARTES unit from your army that made a Charge move this turn.",
           "effect": "Select either the Strength or Armour Penetration characteristic of melee weapons equipped by models in your unit. Until the end of the phase, add 1 to the selected characteristic. You can instead choose for your unit to give in to the Red Thirst; if it does, it becomes Battle-shocked (but the effects of this Stratagem still apply to it), and until the end of the phase, add 1 to the Strength and Armour Penetration characteristics of melee weapons equipped by models in your unit."
@@ -13467,7 +13467,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "DEATHLESS DUTY",
           "cp": "2CP",
-          "type": "Rage-cursed Onslaught – Stratagem",
+          "type": "Rage-cursed Onslaught – Strategic Ploy Stratagem",
           "when": "Fight phase , just after an enemy unit has selected its targets.",
           "target": "One DEATH COMPANY unit from your army that was selected as the target of one or more of the attacking unit’s attacks.",
           "effect": "Until the end of the phase, each time a model in your unit is destroyed, if that model has not fought this phase, do not remove it from play. The destroyed model can fight after the attacking unit has finished making its attacks, and is then removed from play."
@@ -13475,7 +13475,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "RED WRATH",
           "cp": "1CP",
-          "type": "Rage-cursed Onslaught – Stratagem",
+          "type": "Rage-cursed Onslaught – Strategic Ploy Stratagem",
           "when": "Your Movement phase , just after an ADEPTUS ASTARTES unit from your army Advances .",
           "target": "That ADEPTUS ASTARTES unit.",
           "effect": "Until the end of the turn, your unit is eligible to either shoot or declare a charge in a turn in which it Advanced. You can instead choose for your unit to give in to the Red Thirst; if it does, it becomes Battle-shocked (but the effects of this Stratagem still apply to it), and until the end of the turn, your unit is eligible to shoot and declare a charge in a turn in which it Advanced."
@@ -14353,7 +14353,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "THE FOE FORESEEN",
           "cp": "1CP",
-          "type": "Saga of the Great Wolf – Stratagem",
+          "type": "Saga of the Great Wolf – Strategic Ploy Stratagem",
           "when": "Your opponent’s Shooting phase or the Fight phase , just after an enemy unit has selected its targets.",
           "target": "One ADEPTUS ASTARTES unit from your army that was selected as the target of one or more of the attacking unit’s attacks.",
           "effect": "Until the attacking unit has finished making its attacks, each time an attack targets your unit, worsen the Armour Penetration characteristic of that attack by 1."
@@ -14361,7 +14361,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "GRIMNAR’S COMMAND",
           "cp": "1CP",
-          "type": "Saga of the Great Wolf – Stratagem",
+          "type": "Saga of the Great Wolf – Strategic Ploy Stratagem",
           "when": "Your Command phase .",
           "target": "One ADEPTUS ASTARTES unit from your army.",
           "effect": "Select one Hunting Pack from the Master of Wolves Detachment rule. Until the start of your next Command phase, that Hunting Pack is active for your unit instead of any other Hunting Pack that is active, even if you have already selected that Hunting Pack this battle."
@@ -14369,7 +14369,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "FENRISIAN FEROCITY",
           "cp": "1CP",
-          "type": "Saga of the Great Wolf – Stratagem",
+          "type": "Saga of the Great Wolf – Strategic Ploy Stratagem",
           "when": "Your Movement phase or your Charge phase .",
           "target": "One ADEPTUS ASTARTES MOUNTED or ADEPTUS ASTARTES WALKER unit from your army that has not been selected to move or charge this phase.",
           "effect": "Until the end of the phase, each time a model in your unit makes a Normal , Advance , Fall Back or Charge move , it can move horizontally through models (excluding TITANIC models) and terrain features . When doing so, it can move within Engagement Range of enemy models, but cannot end a Normal, Advance or Fall Back move within Engagement Range of them."
@@ -14377,7 +14377,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "UNRELENTING HUNTERS",
           "cp": "1CP",
-          "type": "Saga of the Great Wolf – Stratagem",
+          "type": "Saga of the Great Wolf – Strategic Ploy Stratagem",
           "when": "Your Movement phase .",
           "target": "One ADEPTUS ASTARTES unit from your army that has not been selected to move this phase.",
           "effect": "Until the end of the turn, your unit is eligible to declare a charge in a turn in which it Fell Back . If your unit is a SPACE WOLVES unit, until the end of the turn, it is eligible to declare a charge in a turn in which it Advanced or Fell Back."
@@ -14385,7 +14385,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "EYE OF THE PACK",
           "cp": "1CP",
-          "type": "Saga of the Great Wolf – Stratagem",
+          "type": "Saga of the Great Wolf – Strategic Ploy Stratagem",
           "when": "Your Shooting phase .",
           "target": "One ADEPTUS ASTARTES unit from your army that has not been selected to shoot this phase.",
           "effect": "Until the end of the phase, each time a model in your unit makes an attack, you can add 1 to the Wound roll ."
@@ -14393,7 +14393,7 @@ const _factionRules: Record<string, FactionRulesData> = {
         {
           "name": "BATTLE INSTINCTS",
           "cp": "1CP",
-          "type": "Saga of the Great Wolf – Stratagem",
+          "type": "Saga of the Great Wolf – Strategic Ploy Stratagem",
           "when": "Your opponent’s Shooting phase , just after an enemy unit has shot.",
           "target": "One SPACE WOLVES unit from your army that was selected as the target of one or more of the attacking unit’s attacks.",
           "effect": "Your unit can make a Normal move of up to D6\"."
@@ -15140,22 +15140,22 @@ const _factionRules: Record<string, FactionRulesData> = {
         },
         {
           "name": "Target Optimisation Microdrones",
-          "cost": "",
+          "cost": "0",
           "text": "CADRE FIREBLADE model only. Once per turn, in your Shooting phase , when a friendly FIRE WARRIOR , PATHFINDER TEAM or CADRE FIREBLADE unit within 6\" of the bearer is selected to shoot, the bearer can use this Enhancement. If it does, until the end of the phase, improve the Armour Penetration characteristic of ranged weapons equipped by models in that unit by 1."
         },
         {
           "name": "Duty’s Echo",
-          "cost": "",
+          "cost": "0",
           "text": "ETHEREAL model only. At the end of your Shooting phase , you can select one friendly FIRE WARRIOR or PATHFINDER TEAM unit within 6\" of the bearer. If you do, that unit can make a Normal move of up to 3\" and then counts as having performed the Set Overwatch Tactical Manoeuvre this turn."
         },
         {
           "name": "Experienced Leader",
-          "cost": "",
+          "cost": "0",
           "text": "At the start of the first battle round , select one enemy unit on the battlefield. Until the end of the battle, each time a KROOT model from your army makes an attack that targets that enemy unit, if the bearer is on the battlefield, you can re-roll the Wound roll ."
         },
         {
           "name": "Quill Marker",
-          "cost": "",
+          "cost": "0",
           "text": "At the start of your Charge phase , select one enemy unit within 12\" of the bearer. Until the end of the phase, each time a KROOT unit from your army declares a charge , if it is within 6\" of that enemy unit, it can include that enemy unit as a target of that charge, even if it is not visible to it."
         }
       ],

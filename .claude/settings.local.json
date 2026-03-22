@@ -51,7 +51,10 @@
       "WebFetch(domain:www.rosterforge.com)",
       "WebFetch(domain:www.40k.app)",
       "Bash(mv C:/Users/dshon/Projects/CrusadeCommand/scripts/fix-aircraft-stats.js C:/Users/dshon/Projects/CrusadeCommand/scripts/fix-aircraft-stats.cjs)",
-      "Bash(node scripts/fix-aircraft-stats.cjs)"
+      "Bash(node scripts/fix-aircraft-stats.cjs)",
+      "Bash(git checkout:*)",
+      "Bash(grep -iE '[A-Z]{2,}\\(WOUNDS|HITS|FIRE|LINKED|COVER|SHOT|ATTACKS\\)')",
+      "Bash(node scripts/fix-remaining.cjs)"
     ]
   }
 }

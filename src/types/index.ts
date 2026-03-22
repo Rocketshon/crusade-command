@@ -159,7 +159,7 @@ export interface DatasheetAbilities {
 export interface Datasheet {
   name: string;
   legends: boolean;
-  base_size: string;
+  base_size?: string;
   faction: string;
   faction_id: FactionId;
   stats: Partial<UnitStats>;
