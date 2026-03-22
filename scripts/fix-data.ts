@@ -49,106 +49,241 @@ function log(category: string, msg: string) {
 
 // ─── Fix weapon names with concatenated traits ─────────────────────────────
 
+//
+// Trait classification:
+//
+// SAFE traits: multi-word or very distinctive — never appear as weapon name words.
+//   These can be matched case-insensitively (e.g. "lethalHits", "devastatingWounds").
+//
+// AMBIGUOUS traits: single words that ARE common in weapon names (lance, melta, heavy,
+//   blast, psychic, precision, torrent). These are ONLY treated as traits when:
+//   - They appear in ALL-CAPS concatenated to the name (e.g. "BlasterASSAULT")
+//   - They appear in ALL-CAPS after a space (e.g. "weapon HEAVY")
+//   - NOT when lowercase after a space (e.g. "Bright lance" is a weapon name)
+//
+
+// Safe (unambiguous) trait patterns — matched case-insensitively
+const SAFE_TRAIT_PATTERNS = [
+  { re: /Anti-(?:Infantry|Vehicle|Monster|Fly|Titanic|Walker)\s*\d[+]?/i, fmt: (s: string) => s.replace(/anti-/gi, 'Anti-').replace(/([a-z])(\d)/i, '$1 $2') },
+  { re: /Sustained\s*Hits\s*\d+/i, fmt: (s: string) => { const m = s.match(/\d+/); return m ? `Sustained Hits ${m[0]}` : 'Sustained Hits'; } },
+  { re: /Sustained\s*Hits/i, fmt: () => 'Sustained Hits' },
+  { re: /Lethal\s*Hits/i, fmt: () => 'Lethal Hits' },
+  { re: /Devastating\s*Wounds/i, fmt: () => 'Devastating Wounds' },
+  { re: /Rapid\s*Fire\s*\d*/i, fmt: (s: string) => { const m = s.match(/\d+/); return m ? `Rapid Fire ${m[0]}` : 'Rapid Fire'; } },
+  { re: /Extra\s*Attacks?/i, fmt: () => 'Extra Attacks' },
+  { re: /Ignores?\s*Cover/i, fmt: () => 'Ignores Cover' },
+  { re: /Indirect\s*Fire/i, fmt: () => 'Indirect Fire' },
+  { re: /Twin-Linked/i, fmt: () => 'Twin-linked' },
+  { re: /One\s*Shot/i, fmt: () => 'One Shot' },
+];
+
+// Ambiguous trait patterns — only matched when ALL-CAPS (concatenated or after space)
+const AMBIGUOUS_TRAIT_PATTERNS = [
+  { re: /MELTA\s*\d*/i, fmt: () => 'Melta', capsOnly: true },
+  { re: /HAZARDOUS/i, fmt: () => 'Hazardous', capsOnly: true },
+  { re: /PRECISION/i, fmt: () => 'Precision', capsOnly: true },
+  { re: /PSYCHIC/i, fmt: () => 'Psychic', capsOnly: true },
+  { re: /TORRENT/i, fmt: () => 'Torrent', capsOnly: true },
+  { re: /ASSAULT/i, fmt: () => 'Assault', capsOnly: true },
+  { re: /PISTOL/i, fmt: () => 'Pistol', capsOnly: true },
+  { re: /BLAST/i, fmt: () => 'Blast', capsOnly: true },
+  { re: /HEAVY/i, fmt: () => 'Heavy', capsOnly: true },
+  { re: /LANCE/i, fmt: () => 'Lance', capsOnly: true },
+];
+
+const ALL_TRAIT_PATTERNS = [...SAFE_TRAIT_PATTERNS, ...AMBIGUOUS_TRAIT_PATTERNS];
+
+/**
+ * Try to extract traits from a suffix string, consuming it left-to-right.
+ * For ambiguous single-word traits (lance, melta, heavy, etc.), they must be
+ * ALL-CAPS in the original text to be treated as traits.
+ * Returns extracted traits only if the ENTIRE suffix is consumed.
+ */
+function extractTraitsFromSuffix(suffix: string): string[] {
+  const traits: string[] = [];
+  let rest = suffix.replace(/^\s+/, '');
+
+  while (rest.length > 0) {
+    // Skip whitespace between traits
+    const wsMatch = rest.match(/^\s+/);
+    if (wsMatch) rest = rest.slice(wsMatch[0].length);
+    if (rest.length === 0) break;
+
+    let matched = false;
+
+    // Try safe traits first (case-insensitive)
+    for (const { re, fmt } of SAFE_TRAIT_PATTERNS) {
+      const localPat = new RegExp('^' + re.source, 'i');
+      const tm = rest.match(localPat);
+      if (tm) {
+        const formatted = fmt(tm[0]).trim();
+        if (formatted && !traits.includes(formatted)) traits.push(formatted);
+        rest = rest.slice(tm[0].length);
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched) {
+      // Try ambiguous traits — must be ALL-CAPS in original text
+      for (const { re } of AMBIGUOUS_TRAIT_PATTERNS) {
+        // Match case-insensitively, then verify mostly caps
+        const capsSource = re.source;
+        const localPat = new RegExp('^' + capsSource, 'i');
+        const tm = rest.match(localPat);
+        if (tm) {
+          // Verify the matched text is mostly all-caps (allow 1 typo char)
+          const alphaChars = tm[0].replace(/[^a-zA-Z]/g, '');
+          const upperCount = (alphaChars.match(/[A-Z]/g) || []).length;
+          const lowerCount = (alphaChars.match(/[a-z]/g) || []).length;
+          if (lowerCount <= 1 && upperCount >= 2) {
+            let formatted = tm[0]
+              .replace(/^ANTI-/g, 'Anti-')
+              .replace(/^MELTA\s*(\d+)/g, 'Melta $1')
+              .replace(/^MELTA$/g, 'Melta')
+              .replace(/^HAZARDOUS/g, 'Hazardous')
+              .replace(/^PRECISION/g, 'Precision')
+              .replace(/^PSYCHIC/g, 'Psychic')
+              .replace(/^TORRENT/g, 'Torrent')
+              .replace(/^ASSAULT/g, 'Assault')
+              .replace(/^PISTOL/g, 'Pistol')
+              .replace(/^BLAST/g, 'Blast')
+              .replace(/^HEAVY/g, 'Heavy')
+              .replace(/^LANCE/g, 'Lance')
+              .trim();
+            // Ensure "Melta" without a number doesn't have trailing space
+            formatted = formatted.replace(/\s+$/, '');
+            if (formatted && !traits.includes(formatted)) traits.push(formatted);
+            rest = rest.slice(tm[0].length);
+            matched = true;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!matched) break;
+  }
+
+  // Only return traits if the entire suffix was consumed (no leftover text)
+  return rest.trim().length === 0 ? traits : [];
+}
+
 function cleanWeaponName(weapon: any): boolean {
   if (!weapon || !weapon.name || typeof weapon.name !== 'string') return false;
   let changed = false;
   const originalName = weapon.name;
 
-  // Pattern: "Heavy bolterSUSTAINEDHITS1" → name: "Heavy bolter", add "Sustained Hits 1" to traits
-  // Pattern: "SluggaPistol" → name: "Slugga", add "Pistol" to traits
-  // Pattern: "FlamerIGNORESCOVERTORRENT" → name: "Flamer", add traits
+  // Strategy: find candidate split points where trait text might start, then verify
+  // the entire remainder is composed of known traits.
+  //
+  // Pattern 1: lowercase/digit then uppercase: "bolterSUSTAINED", "BlasterASSAULT"
+  // Pattern 2: space then uppercase: "Mechanicus DEVASTATING"
+  // Pattern 3: camelCase trait boundary: "bladelethalHits" → split at "lethal"
+  //
+  // We try all candidate splits and pick the one that leaves the longest name.
 
-  // Find where the trait text starts (uppercase concatenated to end)
-  const match = weapon.name.match(/^(.+?)([A-Z]{2,}[A-Z0-9+\-\s]*?)$/);
-  if (match) {
-    const namePart = match[1].trim();
-    const traitsPart = match[2];
+  const candidateSplits: Set<number> = new Set();
 
-    // Verify the traitsPart contains known traits
-    if (TRAIT_PATTERN.test(traitsPart)) {
-      // Extract individual traits
-      const extractedTraits: string[] = [];
-      let remaining = traitsPart;
+  // (a) Uppercase letter after lowercase/digit/punctuation/hyphen
+  for (let i = 1; i < weapon.name.length; i++) {
+    if (/[A-Z]/.test(weapon.name[i]) && /[a-z0-9"'\)\]\-]/.test(weapon.name[i - 1])) {
+      candidateSplits.add(i);
+    }
+  }
 
-      // Parse traits from the concatenated string
-      const traitPatterns = [
-        /ANTI-(?:INFANTRY|VEHICLE|MONSTER|FLY|TITANIC|WALKER)\s*\d[+]?/gi,
-        /SUSTAINED\s*HITS\s*\d*/gi,
-        /LETHAL\s*HITS/gi,
-        /DEVASTATING\s*WOUNDS/gi,
-        /RAPID\s*FIRE\s*\d*/gi,
-        /EXTRA\s*ATTACKS?/gi,
-        /IGNORES?\s*COVER/gi,
-        /INDIRECT\s*FIRE/gi,
-        /TWIN-LINKED/gi,
-        /ONE\s*SHOT/gi,
-        /MELTA\s*\d*/gi,
-        /HAZARDOUS/gi,
-        /PRECISION/gi,
-        /PSYCHIC/gi,
-        /TORRENT/gi,
-        /ASSAULT/gi,
-        /PISTOL/gi,
-        /BLAST/gi,
-        /HEAVY/gi,
-        /LANCE/gi,
-      ];
+  // (b) After a space where the next char is uppercase (ALL-CAPS trait after space)
+  //     Only if the word after the space is ALL-CAPS (to avoid "Bright lance")
+  //     Mark these as "space splits" so we can apply stricter validation later
+  const spaceSplits = new Set<number>();
+  for (let i = 1; i < weapon.name.length; i++) {
+    if (weapon.name[i - 1] === ' ' && /[A-Z]/.test(weapon.name[i])) {
+      // Check if the word starting here is all-caps
+      const wordAfter = weapon.name.slice(i).match(/^[A-Z][A-Z0-9+\-]+/);
+      if (wordAfter) {
+        candidateSplits.add(i);
+        spaceSplits.add(i);
+      }
+    }
+  }
 
-      for (const pat of traitPatterns) {
-        let m;
-        while ((m = pat.exec(traitsPart)) !== null) {
-          // Format the trait nicely
-          let trait = m[0]
-            .replace(/ANTI-/g, 'Anti-')
-            .replace(/SUSTAINEDHITS/gi, 'Sustained Hits ')
-            .replace(/SUSTAINED HITS/gi, 'Sustained Hits ')
-            .replace(/LETHALHITS/gi, 'Lethal Hits')
-            .replace(/LETHAL HITS/gi, 'Lethal Hits')
-            .replace(/DEVASTATINGWOUNDS/gi, 'Devastating Wounds')
-            .replace(/DEVASTATING WOUNDS/gi, 'Devastating Wounds')
-            .replace(/RAPIDFIRE/gi, 'Rapid Fire ')
-            .replace(/RAPID FIRE/gi, 'Rapid Fire ')
-            .replace(/EXTRAATTACKS?/gi, 'Extra Attacks')
-            .replace(/EXTRA ATTACKS?/gi, 'Extra Attacks')
-            .replace(/IGNORESCOVER/gi, 'Ignores Cover')
-            .replace(/IGNORES COVER/gi, 'Ignores Cover')
-            .replace(/INDIRECTFIRE/gi, 'Indirect Fire')
-            .replace(/INDIRECT FIRE/gi, 'Indirect Fire')
-            .replace(/TWIN-LINKED/gi, 'Twin-linked')
-            .replace(/ONESHOT/gi, 'One Shot')
-            .replace(/ONE SHOT/gi, 'One Shot')
-            .replace(/MELTA/gi, 'Melta ')
-            .replace(/HAZARDOUS/gi, 'Hazardous')
-            .replace(/PRECISION/gi, 'Precision')
-            .replace(/PSYCHIC/gi, 'Psychic')
-            .replace(/TORRENT/gi, 'Torrent')
-            .replace(/ASSAULT/gi, 'Assault')
-            .replace(/PISTOL/gi, 'Pistol')
-            .replace(/BLAST/gi, 'Blast')
-            .replace(/HEAVY/gi, 'Heavy')
-            .replace(/LANCE/gi, 'Lance');
+  // (c) Case-insensitive search for multi-word (safe) trait starts within the name
+  //     These are unambiguous so we can find them even in mixed case
+  const safeTraitStarters = [
+    /Anti-/i, /Sustained/i, /Lethal/i, /Devastating/i, /Rapid/i,
+    /Extra/i, /Ignores?/i, /Indirect/i, /Twin-/i,
+  ];
+  for (const tPat of safeTraitStarters) {
+    const re = new RegExp(tPat.source, 'gi');
+    let tm;
+    while ((tm = re.exec(weapon.name)) !== null) {
+      if (tm.index > 0) {
+        candidateSplits.add(tm.index);
+      }
+    }
+  }
 
-          trait = trait.trim();
-          if (trait && !extractedTraits.includes(trait)) {
-            extractedTraits.push(trait);
-          }
-        }
+  // Try each split point. Prefer the split that extracts the MOST traits.
+  // If tied on trait count, prefer the longest remaining name.
+  let bestNamePart = '';
+  let bestTraits: string[] = [];
+
+  for (const splitIdx of candidateSplits) {
+    let namePart = weapon.name.slice(0, splitIdx).trim();
+    const traitSuffix = weapon.name.slice(splitIdx);
+
+    if (namePart.length < 2) continue;
+
+    const traits = extractTraitsFromSuffix(traitSuffix);
+    if (traits.length > 0) {
+      // For space-separated splits (e.g. "Bolt PISTOL"), require either:
+      // - Multiple traits, OR
+      // - At least one multi-word trait (safe/unambiguous)
+      // This prevents stripping "PISTOL" from "Bolt PISTOL" (which should be "Bolt pistol")
+      if (spaceSplits.has(splitIdx)) {
+        const hasMultiWordTrait = traits.some(t => t.includes(' ') || t.includes('-'));
+        if (traits.length < 2 && !hasMultiWordTrait) continue;
       }
 
-      if (extractedTraits.length > 0 && namePart.length > 1) {
-        weapon.name = namePart;
-        // Add extracted traits that aren't already present
-        if (!weapon.traits) weapon.traits = [];
-        for (const t of extractedTraits) {
-          const exists = weapon.traits.some((existing: string) =>
-            existing.toLowerCase().replace(/\s+/g, '') === t.toLowerCase().replace(/\s+/g, '')
-          );
-          if (!exists) {
-            weapon.traits.push(t);
-          }
+      // Prefer more traits extracted; if tied, prefer longer name
+      if (traits.length > bestTraits.length ||
+          (traits.length === bestTraits.length && namePart.length > bestNamePart.length)) {
+        bestNamePart = namePart;
+        bestTraits = traits;
+      }
+    }
+  }
+
+  if (bestTraits.length > 0 && bestNamePart.length > 1) {
+    weapon.name = bestNamePart;
+    if (!weapon.traits) weapon.traits = [];
+    for (const t of bestTraits) {
+      const exists = weapon.traits.some((existing: string) =>
+        existing.toLowerCase().replace(/\s+/g, '') === t.toLowerCase().replace(/\s+/g, '')
+      );
+      if (!exists) {
+        weapon.traits.push(t);
+      }
+    }
+    log('weapon-name', `"${originalName}" → "${weapon.name}" + traits: [${bestTraits.join(', ')}]`);
+    changed = true;
+  }
+
+  // Fix ALL-CAPS trait words in weapon names where the trait is already in traits array
+  // e.g. "Bolt PISTOL" → "Bolt pistol" (trait "Pistol" already exists)
+  // e.g. "Absolvor bolt PISTOL" → "Absolvor bolt pistol"
+  if (weapon.traits && Array.isArray(weapon.traits)) {
+    const ambiguousWords = ['PISTOL', 'HEAVY', 'BLAST', 'LANCE', 'MELTA', 'ASSAULT', 'TORRENT', 'PSYCHIC', 'PRECISION', 'HAZARDOUS'];
+    for (const word of ambiguousWords) {
+      const re = new RegExp(`\\s${word}$`);
+      if (re.test(weapon.name)) {
+        const traitName = word.charAt(0) + word.slice(1).toLowerCase();
+        const hasTrait = weapon.traits.some((t: string) => t.toLowerCase() === traitName.toLowerCase());
+        if (hasTrait) {
+          weapon.name = weapon.name.replace(re, ' ' + traitName.toLowerCase());
+          log('weapon-name', `Fixed ALL-CAPS trait word in name: "${originalName}" → "${weapon.name}"`);
+          changed = true;
         }
-        log('weapon-name', `"${originalName}" → "${weapon.name}" + traits: [${extractedTraits.join(', ')}]`);
-        changed = true;
       }
     }
   }
