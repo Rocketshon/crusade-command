@@ -29,6 +29,7 @@ export default function CreateCampaign() {
 
   const handleCreate = () => {
     if (!selectedFaction) return;
+    if (supplyLimit < 1) return;
     createCampaign(
       campaignName.trim(),
       supplyLimit,
@@ -91,7 +92,7 @@ export default function CreateCampaign() {
               type="number"
               value={supplyLimit}
               onChange={(e) => setSupplyLimit(parseInt(e.target.value) || 0)}
-              min={0}
+              min={1}
               className="w-full bg-stone-900 border border-stone-600 rounded-lg px-4 py-3 text-stone-100 placeholder:text-stone-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
             <p className="text-xs text-stone-500 mt-1">Maximum points for armies</p>

@@ -67,6 +67,7 @@ export const router = createBrowserRouter(
         // Settings
         { path: "/settings", Component: Settings },
         { path: "/campaign-history", Component: CampaignHistory },
+        { path: "*", lazy: () => import('./pages/NotFound').then(m => ({ Component: m.default })) },
       ],
     },
   ],

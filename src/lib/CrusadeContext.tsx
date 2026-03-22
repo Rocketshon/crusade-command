@@ -104,6 +104,8 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
   }, [user]);
 
   const joinCampaign = useCallback((code: string, playerName: string, factionId: FactionId) => {
+    // Guard: cannot join if already in a campaign
+    if (campaign) return { success: false, error: 'Leave your current campaign first.' };
     // For local-first: check if a campaign with this code exists
     const existingCampaign = storage.loadCampaign();
     if (existingCampaign && existingCampaign.join_code === code.toUpperCase()) {
@@ -127,7 +129,7 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
       return { success: true };
     }
     return { success: false, error: 'Campaign not found. Check the join code.' };
-  }, [user]);
+  }, [user, campaign]);
 
   const leaveCampaign = useCallback(() => {
     // Read current state for archiving before clearing

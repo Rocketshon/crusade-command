@@ -28,10 +28,11 @@ export default function CampaignHubActive() {
       ? [currentPlayer]
       : [];
 
-  const totalBattles = battles.length;
+  const playerBattles = battles.filter(b => b.player_id === currentPlayer?.id);
+  const totalBattles = playerBattles.length;
 
   // Recent battles: last 5, sorted newest first (battles are already sorted newest first from context)
-  const recentBattles = battles.slice(0, 5);
+  const recentBattles = playerBattles.slice(0, 5);
 
   const handleCopyJoinCode = () => {
     navigator.clipboard.writeText(campaign.join_code)

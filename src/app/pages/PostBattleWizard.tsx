@@ -41,10 +41,18 @@ interface UnitState {
 
 export default function PostBattleWizard() {
   const navigate = useNavigate();
-  const { battles, units, currentPlayer, awardXP, addBattleScar, addBattleHonour, markDestroyed, awardRequisition } = useCrusade();
+  const { campaign, battles, units, currentPlayer, awardXP, addBattleScar, addBattleHonour, markDestroyed, awardRequisition } = useCrusade();
+
+  // Guard: redirect if no campaign or player
+  useEffect(() => {
+    if (!campaign || !currentPlayer) navigate('/home');
+  }, [campaign, currentPlayer, navigate]);
 
   // Get the most recent battle
   const latestBattle = battles[0] ?? null;
+
+  // Guard: prevent double-apply on back-navigation remount
+  const alreadyProcessed = latestBattle && sessionStorage.getItem('lastProcessedBattleId') === latestBattle.id;
   const battleWon = latestBattle?.result === "victory";
 
   // Get fielded units: from battle.units_fielded, or fall back to all roster units
@@ -104,7 +112,14 @@ export default function PostBattleWizard() {
   }, [fieldedUnits]);
 
   // Track whether step 5 changes have been applied
-  const [changesApplied, setChangesApplied] = useState(false);
+  const [changesApplied, setChangesApplied] = useState(!!alreadyProcessed);
+
+  // If already processed, skip straight to summary
+  useEffect(() => {
+    if (alreadyProcessed) {
+      setCurrentStep(5);
+    }
+  }, [alreadyProcessed]);
 
   // UI state for pickers
   const [scarPickerOpen, setScarPickerOpen] = useState<string | null>(null);
@@ -218,6 +233,9 @@ export default function PostBattleWizard() {
     }
 
     setChangesApplied(true);
+    if (latestBattle) {
+      sessionStorage.setItem('lastProcessedBattleId', latestBattle.id);
+    }
   };
 
   const goToNextStep = () => {

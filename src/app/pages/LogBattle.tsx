@@ -34,6 +34,7 @@ export default function LogBattle() {
   const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
   const [markedForGreatness, setMarkedForGreatness] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Build opponent list from players (excluding current player)
   const otherPlayers = players.filter(p => p.id !== currentPlayer?.id);
@@ -60,6 +61,8 @@ export default function LogBattle() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
     if (!opponentName.trim() && !opponentId) {
       toast.error("Please select or name an opponent");
@@ -483,6 +486,7 @@ export default function LogBattle() {
           {/* Submit Button */}
           <button
             type="submit"
+            disabled={isSubmitting}
             className="w-full relative overflow-hidden group"
           >
             <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-500 rounded-lg transition-all duration-300 group-hover:shadow-[0_0_20px_rgba(245,158,11,0.3)]" />

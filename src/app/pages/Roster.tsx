@@ -43,7 +43,9 @@ export default function Roster() {
     setShowRemove(showRemove === unitId ? null : unitId);
   };
 
-  if (units.length === 0) {
+  const playerUnits = units.filter(u => u.player_id === currentPlayer.id);
+
+  if (playerUnits.length === 0) {
     // Empty State
     return (
       <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden">
@@ -204,7 +206,7 @@ export default function Roster() {
         )}
 
         {/* Tactical Cheat Sheet Button */}
-        {currentDetachment && units.length > 0 && (
+        {currentDetachment && playerUnits.length > 0 && (
           <button
             onClick={() => navigate('/cheat-sheet')}
             className="w-full mb-6 relative overflow-hidden rounded-sm border border-amber-500/30 bg-stone-900 p-4 hover:border-amber-500/50 transition-all group"
@@ -225,7 +227,7 @@ export default function Roster() {
 
         {/* Units List */}
         <div className="space-y-3 mb-6">
-          {units.map((unit) => {
+          {playerUnits.map((unit) => {
             const rank = getRankFromXP(unit.experience_points);
             const rankColor = getRankColor(rank);
 
