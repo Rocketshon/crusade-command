@@ -70,7 +70,8 @@
       "Bash(curl -s \"https://wahapedia.ru/wh40k10ed/the-rules/crusade-rules/\" -o /tmp/crusade_rules.html)",
       "Bash(curl -s \"https://wahapedia.ru/wh40k10ed/the-rules/core-rules/\" -o core_rules.html)",
       "Bash(curl -s \"https://wahapedia.ru/wh40k10ed/the-rules/crusade-rules/\" -o crusade_rules.html)",
-      "Bash(python scripts/rescrape-general.py)"
+      "Bash(python scripts/rescrape-general.py)",
+      "Bash(echo \"=== ALL <Link to= ===\")"
     ]
   }
 }

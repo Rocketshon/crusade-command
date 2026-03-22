@@ -221,6 +221,15 @@ export function parseRuleText(text: string): ReactNode[] {
     ? text.split(/\n\n|\n/).filter(p => p.trim())
     : [text];
 
+  // Collect blocks into a structured list so we can group consecutive bullets
+  type ParsedBlock =
+    | { kind: 'bullet'; text: string }
+    | { kind: 'heading'; text: string }
+    | { kind: 'section-header'; text: string }
+    | { kind: 'paragraph'; text: string };
+
+  const parsed: ParsedBlock[] = [];
+
   for (const block of blocks) {
     const trimmed = block.trim();
     if (!trimmed) continue;
@@ -228,32 +237,26 @@ export function parseRuleText(text: string): ReactNode[] {
     // Bullet point
     const bulletMatch = trimmed.match(/^[■•\-\*]\s*(.*)/);
     if (bulletMatch) {
-      elements.push(
-        <div key={keyIdx++} className="flex items-start gap-2 ml-2 my-1">
-          <span className="text-emerald-500 mt-0.5 flex-shrink-0">•</span>
-          <span className="text-stone-300 text-xs leading-relaxed">{bulletMatch[1]}</span>
-        </div>
-      );
+      parsed.push({ kind: 'bullet', text: bulletMatch[1] });
+      continue;
+    }
+
+    // [Section Name] bracket markers
+    const sectionHeaderMatch = trimmed.match(/^\[([^\]]+)\]$/);
+    if (sectionHeaderMatch) {
+      parsed.push({ kind: 'section-header', text: sectionHeaderMatch[1] });
       continue;
     }
 
     // Short ALL CAPS line = standalone heading
     if (trimmed.length < 60 && trimmed === trimmed.toUpperCase() && trimmed.length > 3) {
-      elements.push(
-        <h4 key={keyIdx++} className="text-xs font-bold text-emerald-400 uppercase tracking-wide mt-3 mb-1">
-          {toTitleCase(trimmed.replace(/:$/, ''))}
-        </h4>
-      );
+      parsed.push({ kind: 'heading', text: trimmed });
       continue;
     }
 
     // Short line ending with ":" = heading
     if (trimmed.endsWith(':') && trimmed.length < 80) {
-      elements.push(
-        <h4 key={keyIdx++} className="text-xs font-bold text-emerald-400 uppercase tracking-wide mt-3 mb-1">
-          {toTitleCase(trimmed.replace(/:$/, ''))}
-        </h4>
-      );
+      parsed.push({ kind: 'heading', text: trimmed });
       continue;
     }
 
@@ -261,19 +264,79 @@ export function parseRuleText(text: string): ReactNode[] {
     const sections = splitContinuousText(trimmed);
     for (const section of sections) {
       if (section.type === 'heading') {
-        elements.push(
-          <h4 key={keyIdx++} className="text-xs font-bold text-emerald-400 uppercase tracking-wide mt-3 mb-1">
-            {toTitleCase(section.text)}
-          </h4>
-        );
+        parsed.push({ kind: 'heading', text: section.text });
       } else {
-        elements.push(
-          <p key={keyIdx++} className="text-xs text-stone-300 leading-relaxed mb-2">
-            {renderInlineKeywords(section.text, keyIdx)}
-          </p>
-        );
+        // Check for inline [Section Name] markers within paragraph text
+        const sectionParts = section.text.split(/\[([^\]]+)\]/g);
+        if (sectionParts.length > 1) {
+          for (let si = 0; si < sectionParts.length; si++) {
+            const part = sectionParts[si].trim();
+            if (!part) continue;
+            if (si % 2 === 1) {
+              // This is a captured group from inside brackets — it's a section header
+              parsed.push({ kind: 'section-header', text: part });
+            } else {
+              parsed.push({ kind: 'paragraph', text: part });
+            }
+          }
+        } else {
+          parsed.push({ kind: 'paragraph', text: section.text });
+        }
       }
     }
+  }
+
+  // Now render, grouping consecutive bullets into ordered lists
+  let i = 0;
+  while (i < parsed.length) {
+    const item = parsed[i];
+
+    if (item.kind === 'bullet') {
+      // Collect all consecutive bullets
+      const bullets: string[] = [];
+      while (i < parsed.length && parsed[i].kind === 'bullet') {
+        bullets.push(parsed[i].text);
+        i++;
+      }
+      elements.push(
+        <ol key={keyIdx++} className="list-decimal list-outside ml-6 my-2 space-y-1">
+          {bullets.map((b, bi) => (
+            <li key={bi} className="text-stone-300 text-xs leading-relaxed pl-1">
+              {renderInlineKeywords(b, `${keyIdx}-${bi}`)}
+            </li>
+          ))}
+        </ol>
+      );
+      continue;
+    }
+
+    if (item.kind === 'section-header') {
+      elements.push(
+        <h3 key={keyIdx++} className="text-sm font-bold text-emerald-400 tracking-wide mt-5 mb-2 pt-3 border-t border-stone-700/40">
+          {toTitleCase(item.text)}
+        </h3>
+      );
+      i++;
+      continue;
+    }
+
+    if (item.kind === 'heading') {
+      elements.push(
+        <h4 key={keyIdx++} className="text-xs font-bold text-emerald-400 uppercase tracking-wide mt-3 mb-1">
+          {toTitleCase(item.text.replace(/:$/, ''))}
+        </h4>
+      );
+      i++;
+      continue;
+    }
+
+    // paragraph
+    elements.push(
+      <p key={keyIdx++} className="text-xs text-stone-300 leading-relaxed mb-2">
+        {renderInlineKeywords(item.text, keyIdx)}
+      </p>
+    );
+    i++;
   }
 
   return elements;

@@ -8,7 +8,7 @@ export const CORE_RULES: GeneralRulesDocument | null = {
   "sections": [
     {
       "name": "Introduction",
-      "text": "",
+      "text": "Welcome to CrusadeCommand — your tactical companion for Warhammer 40,000 Crusade campaigns. These Core Rules cover everything you need to play: army building, movement, shooting, fighting, and terrain. Use the sections below to quickly reference any rule during your games.",
       "subsections": []
     },
     {

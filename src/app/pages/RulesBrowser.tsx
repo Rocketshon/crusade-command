@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { ArrowLeft, Search, BookOpen, ChevronDown, ChevronRight, Shield } from "lucide-react";
 import { CORE_RULES, CRUSADE_RULES } from '../../data/general';
@@ -129,8 +129,22 @@ function groupCoreRules(items: RuleItem[]): { label: string; items: RuleItem[] }
 export default function RulesBrowser() {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedSections, setExpandedSections] = useState<string[]>([]);
+  const [expandedSections, setExpandedSections] = useState<string[]>(() => {
+    try {
+      const saved = sessionStorage.getItem('rules_expanded_sections');
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const { currentPlayer } = useCrusade();
+
+  // Persist expanded sections to sessionStorage
+  useEffect(() => {
+    try {
+      sessionStorage.setItem('rules_expanded_sections', JSON.stringify(expandedSections));
+    } catch { /* ignore */ }
+  }, [expandedSections]);
 
   // Build rules from real data
   const coreRuleItems = CORE_RULES ? buildRuleItems(CORE_RULES.sections, "core") : [];
