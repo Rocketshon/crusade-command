@@ -1,10 +1,11 @@
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
-import { ArrowLeft, BookOpen, Shield, Award } from "lucide-react";
+import { ArrowLeft, BookOpen, Shield, Award, ChevronDown, ChevronRight } from "lucide-react";
 import { CORE_RULES, CRUSADE_RULES } from '../../data/general';
 import { getRulesForFaction } from '../../data';
 import { useCrusade } from '../../lib/CrusadeContext';
 import { getFaction, getFactionName, getDataFactionId } from '../../lib/factions';
-import { FormattedRuleText, toTitleCase, getStratagemTypeColor, getEnhancementCardColors } from '../../lib/formatText';
+import { FormattedRuleText, getStratagemTypeColor, getEnhancementCardColors } from '../../lib/formatText';
 import type { RulesSection } from '../../types';
 
 // Parse a rule ID like "core-5" or "crusade-2" or "faction-det-1" etc.
@@ -77,14 +78,16 @@ function lookupRule(
   return null;
 }
 
-// Clean rules text: remove [TABLE:...] blocks & [Section] refs, split into paragraphs/bullets
+// Clean rules text: remove [TABLE:...] blocks, remove stray brackets, split into paragraphs/bullets
 function cleanRuleText(text: string): { paragraphs: string[]; bullets: string[] } {
   if (!text) return { paragraphs: [], bullets: [] };
 
   // Remove [TABLE: ...] blocks (nested brackets)
   let cleaned = text.replace(/\[TABLE:\s*\[[\s\S]*?\]\]\s*/g, '');
-  // Remove section references like [Unit Coherency]
+  // Remove section references like [Unit Coherency] but preserve text
   cleaned = cleaned.replace(/\[([A-Za-z][A-Za-z\s&,]+)\]\s*/g, '');
+  // Remove any remaining stray brackets
+  cleaned = cleaned.replace(/\[|\]/g, '');
   // Clean up multiple spaces
   cleaned = cleaned.replace(/\s{2,}/g, ' ').trim();
 
@@ -106,12 +109,59 @@ function cleanRuleText(text: string): { paragraphs: string[]; bullets: string[] 
   return { paragraphs, bullets };
 }
 
+/**
+ * Parse text that contains [Section Name] patterns into sections with headers.
+ * Returns an array of { header?: string; text: string } blocks.
+ */
+function parseTextWithSectionHeaders(text: string): { header?: string; text: string }[] {
+  if (!text) return [];
+
+  // Split on [SectionName] patterns, keeping the section name
+  const parts = text.split(/\[([A-Z][A-Za-z\s&,'-]+)\]/);
+  const result: { header?: string; text: string }[] = [];
+
+  for (let i = 0; i < parts.length; i++) {
+    const part = parts[i].trim();
+    if (!part) continue;
+
+    // Odd indices are captured group (section names)
+    if (i % 2 === 1) {
+      // This is a section header; the next part (if any) is its text
+      const nextText = (i + 1 < parts.length) ? parts[i + 1].trim() : '';
+      if (nextText) {
+        result.push({ header: part, text: nextText });
+        i++; // skip next since we consumed it
+      } else {
+        result.push({ header: part, text: '' });
+      }
+    } else {
+      // Leading text before any section header
+      result.push({ text: part });
+    }
+  }
+
+  return result;
+}
+
 export default function RuleDetail() {
   const { ruleId } = useParams();
   const navigate = useNavigate();
   const { currentPlayer } = useCrusade();
+  const [expandedSubsections, setExpandedSubsections] = useState<Set<string>>(new Set());
 
   const rule = ruleId ? lookupRule(ruleId, currentPlayer?.faction_id) : null;
+
+  const toggleSubsection = (key: string) => {
+    setExpandedSubsections((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) {
+        next.delete(key);
+      } else {
+        next.add(key);
+      }
+      return next;
+    });
+  };
 
   if (!rule) {
     return (
@@ -187,7 +237,7 @@ export default function RuleDetail() {
             <ul className="relative space-y-2">
               {parsed.bullets.map((item, idx) => (
                 <li key={idx} className="flex items-start gap-3 text-stone-300">
-                  <span className="text-emerald-500 mt-1.5">•</span>
+                  <span className="text-emerald-500 mt-1.5">&#8226;</span>
                   <span className="flex-1 leading-relaxed">{item}</span>
                 </li>
               ))}
@@ -195,21 +245,41 @@ export default function RuleDetail() {
           </div>
         )}
 
-        {/* Subsections */}
+        {/* Subsections — expandable/collapsible */}
         {section.subsections.length > 0 && (
-          <div className="space-y-4">
-            <h2 className="text-xl font-bold text-stone-200 tracking-wide">
+          <div className="space-y-2">
+            <h2 className="text-lg font-bold text-stone-200 tracking-wide">
               Subsections
             </h2>
-            <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4">
-              <ul className="relative space-y-2">
-                {section.subsections.map((sub, idx) => (
-                  <li key={idx} className="flex items-start gap-3 text-stone-300">
-                    <span className="text-emerald-500 mt-1.5">•</span>
-                    <span className="flex-1 leading-relaxed">{sub}</span>
-                  </li>
-                ))}
-              </ul>
+            <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900">
+              {section.subsections.map((sub, idx) => {
+                const key = `sub-${idx}`;
+                const isExpanded = expandedSubsections.has(key);
+                // Find the text for this subsection from the parent section text
+                const subText = extractSubsectionText(section.text, sub);
+                return (
+                  <div key={idx} className={idx !== section.subsections.length - 1 ? "border-b border-stone-800/60" : ""}>
+                    <button
+                      onClick={() => toggleSubsection(key)}
+                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-emerald-500/5 transition-all"
+                    >
+                      <span className="text-sm text-emerald-400 font-medium text-left">{sub}</span>
+                      {isExpanded ? (
+                        <ChevronDown className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      ) : (
+                        <ChevronRight className="w-4 h-4 text-stone-500 flex-shrink-0" />
+                      )}
+                    </button>
+                    {isExpanded && subText && (
+                      <div className="px-4 pb-3 border-t border-stone-800/30">
+                        <div className="pt-3">
+                          <FormattedRuleText text={subText} className="text-sm" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -342,7 +412,32 @@ export default function RuleDetail() {
                 {cr.name && (
                   <h3 className="text-base font-bold text-amber-400 mb-2">{cr.name}</h3>
                 )}
-                <FormattedRuleText text={cr.text} />
+                {/* Render sub_sections if present */}
+                {cr.sub_sections && cr.sub_sections.length > 0 ? (
+                  <div className="space-y-4">
+                    {/* Main text if any */}
+                    {cr.text && (
+                      <div className="mb-3">
+                        <FormattedRuleText text={cr.text} />
+                      </div>
+                    )}
+                    {/* Sub-sections with headers */}
+                    {cr.sub_sections.map((sub: { name: string; text: string }, subIdx: number) => (
+                      <div key={subIdx}>
+                        {subIdx > 0 && (
+                          <div className="border-t border-amber-500/10 my-3" />
+                        )}
+                        <h3 className="text-sm font-bold text-emerald-400 mb-2 tracking-wide">
+                          {sub.name}
+                        </h3>
+                        <FormattedRuleText text={sub.text} />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  /* No sub_sections: check for [Section Name] patterns in text */
+                  renderCrusadeText(cr.text)
+                )}
               </div>
             </div>
           ))}
@@ -351,6 +446,37 @@ export default function RuleDetail() {
     }
 
     return null;
+  };
+
+  /** Render crusade rule text, parsing [Section Name] patterns as headers */
+  const renderCrusadeText = (text: string) => {
+    if (!text) return null;
+
+    // Check if text contains [SectionName] patterns
+    const hasSectionHeaders = /\[([A-Z][A-Za-z\s&,'-]+)\]/.test(text);
+
+    if (!hasSectionHeaders) {
+      return <FormattedRuleText text={text} />;
+    }
+
+    const sections = parseTextWithSectionHeaders(text);
+    return (
+      <div className="space-y-3">
+        {sections.map((section, idx) => (
+          <div key={idx}>
+            {idx > 0 && section.header && (
+              <div className="border-t border-amber-500/10 my-3" />
+            )}
+            {section.header && (
+              <h3 className="text-sm font-bold text-emerald-400 mb-2 tracking-wide">
+                {section.header}
+              </h3>
+            )}
+            {section.text && <FormattedRuleText text={section.text} />}
+          </div>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -386,4 +512,36 @@ export default function RuleDetail() {
       </div>
     </div>
   );
+}
+
+/**
+ * Extract the text content for a named subsection from the parent section's full text.
+ * Looks for [SubsectionName] markers and returns the text that follows until the next marker.
+ */
+function extractSubsectionText(fullText: string, subsectionName: string): string | null {
+  if (!fullText || !subsectionName) return null;
+
+  // Find the [SubsectionName] marker
+  const markerPattern = new RegExp(`\\[${escapeRegex(subsectionName)}\\]`, 'i');
+  const match = fullText.match(markerPattern);
+  if (!match || match.index === undefined) return null;
+
+  const startIdx = match.index + match[0].length;
+
+  // Find the next [SectionName] marker or TABLE marker or end of text
+  const remaining = fullText.slice(startIdx);
+  const nextMarker = remaining.match(/\[(?:TABLE:|[A-Z][A-Za-z\s&,]+\])/);
+  const endIdx = nextMarker && nextMarker.index !== undefined ? nextMarker.index : remaining.length;
+
+  let extracted = remaining.slice(0, endIdx).trim();
+  // Clean up stray brackets
+  extracted = extracted.replace(/\[|\]/g, '');
+  // Clean up multiple spaces
+  extracted = extracted.replace(/\s{2,}/g, ' ').trim();
+
+  return extracted || null;
+}
+
+function escapeRegex(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }

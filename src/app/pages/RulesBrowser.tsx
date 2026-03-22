@@ -5,7 +5,7 @@ import { CORE_RULES, CRUSADE_RULES } from '../../data/general';
 import { getRulesForFaction } from '../../data';
 import { useCrusade } from '../../lib/CrusadeContext';
 import { getFactionName, getDataFactionId } from '../../lib/factions';
-import type { RulesSection, FactionId } from '../../types';
+import type { RulesSection } from '../../types';
 
 /** Strip leading "N. " numbering from section names (e.g. "1. Command" -> "Command") */
 function stripSectionNumber(name: string): string {
@@ -19,7 +19,111 @@ function buildRuleItems(sections: RulesSection[], category: string) {
     title: stripSectionNumber(section.name),
     subtitle: section.subsections.length > 0 ? `${section.subsections.length} subsections` : undefined,
     category,
+    originalName: section.name,
   }));
+}
+
+interface RuleItem {
+  id: string;
+  title: string;
+  subtitle?: string;
+  category: string;
+  originalName: string;
+}
+
+/** Category groupings for core rules, keyed by group label.
+ *  Values are the original section names (before stripping numbers). */
+const CORE_RULE_GROUPS: { label: string; sectionNames: string[] }[] = [
+  {
+    label: "Getting Started",
+    sectionNames: ["Introduction", "Books"],
+  },
+  {
+    label: "Army Building",
+    sectionNames: ["Armies", "Muster Your Army"],
+  },
+  {
+    label: "Battlefield Setup",
+    sectionNames: [
+      "Battlefield",
+      "Measuring Distances",
+      "Determining Visibility",
+      "Objective Markers",
+      "Mission Map Key",
+      "Example Battlefields",
+      "Missions",
+    ],
+  },
+  {
+    label: "Game Phases",
+    sectionNames: [
+      "Sequencing",
+      "1. Command",
+      "2. Battle-shock",
+      "1. Move Units",
+      "2. Reinforcements",
+      "Transports",
+    ],
+  },
+  {
+    label: "Shooting Phase",
+    sectionNames: [
+      "1. Hit Roll",
+      "2. Wound Roll",
+      "3. Allocate Attack",
+      "4. Saving Throw",
+      "5. Inflict Damage",
+    ],
+  },
+  {
+    label: "Fight Phase",
+    sectionNames: [
+      "1. Fights First",
+      "2. Remaining Combats",
+      "1. Pile In",
+      "2. Make Melee Attacks",
+      "3. Consolidate",
+    ],
+  },
+  {
+    label: "Terrain",
+    sectionNames: [
+      "Craters and Rubble",
+      "Barricades and Fuel Pipes",
+      "Battlefield Debris and Statuary",
+      "Hills, Industrial Structures, Sealed Buildings and Armoured Containers",
+      "Woods",
+      "Ruins",
+    ],
+  },
+  {
+    label: "Dice & Sequencing",
+    sectionNames: ["Dice"],
+  },
+];
+
+/** Group rule items into categories. Items not in any group go into "Other". */
+function groupCoreRules(items: RuleItem[]): { label: string; items: RuleItem[] }[] {
+  const assigned = new Set<string>();
+  const groups: { label: string; items: RuleItem[] }[] = [];
+
+  for (const group of CORE_RULE_GROUPS) {
+    const matching = items.filter((item) =>
+      group.sectionNames.includes(item.originalName)
+    );
+    if (matching.length > 0) {
+      groups.push({ label: group.label, items: matching });
+      matching.forEach((m) => assigned.add(m.id));
+    }
+  }
+
+  // Any items not assigned to a group
+  const remaining = items.filter((item) => !assigned.has(item.id));
+  if (remaining.length > 0) {
+    groups.push({ label: "Other", items: remaining });
+  }
+
+  return groups;
 }
 
 export default function RulesBrowser() {
@@ -34,33 +138,33 @@ export default function RulesBrowser() {
 
   // Build faction rules if the player has an active campaign
   const factionRulesData = currentPlayer ? getRulesForFaction(getDataFactionId(currentPlayer.faction_id)) : undefined;
-  const factionRuleItems: { id: string; title: string; subtitle?: string; category: string }[] = [];
+  const factionRuleItems: RuleItem[] = [];
   if (factionRulesData) {
-    // Army rules as a single entry
     if (factionRulesData.army_rules.length > 0) {
       factionRuleItems.push({
         id: 'faction-army-rules',
         title: 'Army Rules',
         subtitle: `${factionRulesData.army_rules.length} rules`,
         category: 'faction',
+        originalName: 'Army Rules',
       });
     }
-    // Each detachment as an entry
     factionRulesData.detachments.forEach((det, idx) => {
       factionRuleItems.push({
         id: `faction-det-${idx}`,
         title: det.name,
         subtitle: 'Detachment',
         category: 'faction',
+        originalName: det.name,
       });
     });
-    // Crusade rules if present
     if (factionRulesData.crusade_rules && factionRulesData.crusade_rules.length > 0) {
       factionRuleItems.push({
         id: 'faction-crusade',
         title: 'Faction Crusade Rules',
         subtitle: `${factionRulesData.crusade_rules.length} sections`,
         category: 'faction',
+        originalName: 'Faction Crusade Rules',
       });
     }
   }
@@ -74,11 +178,12 @@ export default function RulesBrowser() {
   };
 
   // Filter rules based on search
-  const filterRules = (rules: { id: string; title: string; subtitle?: string; category: string }[]) => {
+  const filterRules = (rules: RuleItem[]) => {
     if (!searchQuery.trim()) return rules;
+    const q = searchQuery.toLowerCase();
     return rules.filter((rule) =>
-      rule.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      rule.subtitle?.toLowerCase().includes(searchQuery.toLowerCase())
+      rule.title.toLowerCase().includes(q) ||
+      rule.subtitle?.toLowerCase().includes(q)
     );
   };
 
@@ -86,11 +191,39 @@ export default function RulesBrowser() {
   const filteredCrusadeRules = filterRules(crusadeRuleItems);
   const filteredFactionRules = filterRules(factionRuleItems);
 
+  // Group core rules into categories
+  const coreRuleGroups = groupCoreRules(filteredCoreRules);
+
   const handleRuleClick = (ruleId: string) => {
     navigate(`/rule/${ruleId}`);
   };
 
   const factionName = currentPlayer ? getFactionName(currentPlayer.faction_id) : null;
+
+  /** Render a list of rule items as clickable rows */
+  const renderRuleList = (rules: RuleItem[]) => (
+    <>
+      {rules.map((rule, idx) => (
+        <button
+          key={rule.id}
+          onClick={() => handleRuleClick(rule.id)}
+          className={`w-full p-3 pl-4 text-left hover:bg-emerald-500/5 transition-all ${
+            idx !== rules.length - 1 ? "border-b border-stone-800/60" : ""
+          }`}
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <span className="text-sm text-stone-200">{rule.title}</span>
+              {rule.subtitle && (
+                <span className="text-xs text-stone-500 ml-2">{rule.subtitle}</span>
+              )}
+            </div>
+            <ChevronRight className="w-4 h-4 text-stone-500 flex-shrink-0" />
+          </div>
+        </button>
+      ))}
+    </>
+  );
 
   return (
     <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-8">
@@ -138,7 +271,7 @@ export default function RulesBrowser() {
 
         {/* Rules Sections */}
         <div className="space-y-4">
-          {/* Core Rules Section */}
+          {/* Core Rules Section — grouped by category */}
           <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900">
             <button
               onClick={() => toggleSection("core")}
@@ -164,21 +297,16 @@ export default function RulesBrowser() {
 
             {expandedSections.includes("core") && (
               <div className="border-t border-emerald-500/10">
-                {filteredCoreRules.map((rule, idx) => (
-                  <button
-                    key={rule.id}
-                    onClick={() => handleRuleClick(rule.id)}
-                    className={`w-full p-3 text-left hover:bg-emerald-500/5 transition-all ${
-                      idx !== filteredCoreRules.length - 1 ? "border-b border-emerald-500/10" : ""
-                    }`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-sm text-stone-200">
-                        {rule.title}
+                {coreRuleGroups.map((group) => (
+                  <div key={group.label}>
+                    {/* Group header */}
+                    <div className="px-4 py-2 bg-stone-950/80 border-b border-stone-800/40">
+                      <span className="text-[11px] font-bold text-emerald-500/80 uppercase tracking-widest">
+                        {group.label}
                       </span>
-                      <ChevronRight className="w-4 h-4 text-stone-500" />
                     </div>
-                  </button>
+                    {renderRuleList(group.items)}
+                  </div>
                 ))}
                 {filteredCoreRules.length === 0 && (
                   <div className="p-4 text-center text-sm text-stone-400">
@@ -220,7 +348,7 @@ export default function RulesBrowser() {
                     key={rule.id}
                     onClick={() => handleRuleClick(rule.id)}
                     className={`w-full p-3 text-left hover:bg-emerald-500/5 transition-all ${
-                      idx !== filteredCrusadeRules.length - 1 ? "border-b border-emerald-500/10" : ""
+                      idx !== filteredCrusadeRules.length - 1 ? "border-b border-stone-800/60" : ""
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
@@ -272,7 +400,7 @@ export default function RulesBrowser() {
                       key={rule.id}
                       onClick={() => handleRuleClick(rule.id)}
                       className={`w-full p-3 text-left hover:bg-emerald-500/5 transition-all ${
-                        idx !== filteredFactionRules.length - 1 ? "border-b border-emerald-500/10" : ""
+                        idx !== filteredFactionRules.length - 1 ? "border-b border-stone-800/60" : ""
                       }`}
                     >
                       <div className="flex items-center justify-between gap-3">
