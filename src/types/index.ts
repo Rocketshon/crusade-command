@@ -227,6 +227,7 @@ export interface RulesSection {
   name: string;
   subsections: string[];
   text: string;
+  accordion?: Array<{ title: string; text: string }>;
 }
 
 export interface GeneralRulesDocument {

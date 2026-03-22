@@ -80,7 +80,8 @@
       "Bash(grep -rn \"api_key\\\\|ANTHROPIC\" C:/Users/dshon/Projects/GuardianHedgeBrain/.env*)",
       "Bash(grep -rn \"api_key\\\\|ANTHROPIC\" C:/Users/dshon/Projects/WeThePeople/.env*)",
       "Bash(grep -rn ANTHROPIC C:/Users/dshon/Projects/*/.env)",
-      "Bash(node scripts/sonnet-text-cleanup.cjs)"
+      "Bash(node scripts/sonnet-text-cleanup.cjs)",
+      "Bash(node scripts/sonnet-split-sections.cjs)"
     ]
   }
 }

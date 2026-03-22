@@ -8,8 +8,14 @@ export const CORE_RULES: GeneralRulesDocument | null = {
   "sections": [
     {
       "name": "Introduction",
-      "text": "[Welcome to CrusadeCommand]\nYour tactical companion for Warhammer 40,000 Crusade campaigns. Use these Core Rules to quickly reference any rule during your games — from army building and movement to shooting, fighting, and terrain.\n\n[About Warhammer 40,000]\nWarhammer 40,000 is a tabletop war game in which players command armies of Citadel miniatures and attempt to defeat their opponent through a mixture of skill, tactics and luck. Storytelling is at the core of Warhammer 40,000, with the rules designed to bring to life the epic conflicts between the forces of Mankind, aliens and daemons in the grim darkness of the far future.\n\n[How to Use These Rules]\nBrowse the sections below to find the rule you need. Each section is organized with headers so you can quickly scan for the specific rule. Tap any section to expand it. Use the search or browse by category to find what you need fast.",
-      "subsections": []
+      "text": "",
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Introduction",
+          "text": ""
+        }
+      ]
     },
     {
       "name": "Books",
@@ -17,6 +23,56 @@ export const CORE_RULES: GeneralRulesDocument | null = {
       "subsections": [
         "Introduction",
         "CORE CONCEPTS"
+      ],
+      "accordion": [
+        {
+          "title": "Game Introduction",
+          "text": "Welcome to the Warhammer 40,000 Core Rules! This page contain everything you need to know in order to wage glorious battle across the war-torn galaxy of the 41st Millennium.\n\nWarhammer 40,000 is a tabletop war game in which players command armies of Citadel miniatures and attempt to defeat their opponent through a mixture of skill, tactics and luck. Storytelling is at the core of Warhammer 40,000, with the rules designed to bring to life the epic conflicts between the forces of Mankind, aliens and daemons in the grim darkness of the far future.\n\nThe purpose of the game is for all players to have an enjoyable shared experience, putting their tactical skills to the test while admiring the spectacle of amazing miniatures clashing on fantastic battlefields. In this spirit, good sportsmanship and politeness are at the heart of the game."
+        },
+        {
+          "title": "Winning the Game",
+          "text": "Games of Warhammer 40,000 are won by scoring more Victory points than your opponent through achieving various objectives, from recovering vital relics to capturing enemy strongholds or eliminating the opposing Warlord. The game is played in a series of , broken into different phases during which players move, shoot and fight with their miniatures."
+        },
+        {
+          "title": "Resolving Disputes",
+          "text": "In a game as wide-ranging as Warhammer 40,000, there may be times when you are not sure exactly how to resolve a situation that has come up during play. When this happens, have a quick chat with your opponent and apply the solution that makes the most sense to both of you (or seems the most fun!). If no single solution presents itself, you and your opponent should roll , and whoever rolls highest gets to choose what happens. Then you can get on with the fighting!"
+        },
+        {
+          "title": "Abilities and Format",
+          "text": "ABILITIES\nMany units in Warhammer 40,000 have one or more abilities listed on their that they can use in battle. Some of the most common of these are not written out in full on those datasheets, but are instead only referenced by name; the full details of these can be found on the Core Rules page ahead, marked with the symbol shown on the right.\n\nHINTS AND TIPS\nSome sections feature Hints and Tips, covering topics like dice-rolling practices and how to ensure you don't damage your models while moving them around the battlefield. Note that these are not rules, they are simply pieces of advice you may find useful to apply to your own games.\n\nSUMMARIES\nSome rules in the sections ahead include bullet-pointed summaries for quick reference purposes. Note that these are not comprehensive, and you should always consult the full rules if you are unsure.\n- Unit: One or more models from the same datasheet.\n- Friendly Models/Units: All models/units from the same army.\n- Enemy Models/Units: All models/units from your opponent's army."
+        },
+        {
+          "title": "Missions and Armies",
+          "text": "To play a game of Warhammer 40,000, you must first select a mission. The mission will tell you how to muster your armies, create your battlefield and deploy your forces on the tabletop. It will also tell you any special rules that apply to the battle, and (most importantly!) what you need to do to win. You can find out more about missions\n\nEach player in a game of Warhammer 40,000 commands an army of Citadel miniatures, hereafter referred to as models. The mission you have selected will guide you as to how big your army should be.\n- Army: All of the models under your command."
+        },
+        {
+          "title": "Units and Datasheets",
+          "text": "Models move and fight in units. A unit can have one or more models from a single datasheet (see below). Models and units from the same army are said to be friendly in relation to each other. Models and units from your opponent's army are referred to as enemy models and units. If a rule affects 'models' or 'units' without specifying that they are friendly or enemy, that rule affects all models or all units, regardless of whose army they are in.\n- Unit: One or more models from the same datasheet.\n- Friendly Models/Units: All models/units from the same army.\n- Enemy Models/Units: All models/units from your opponent's army.\n\nThe rules you will need to use your models in games are presented on datasheets. Each unit has a datasheet; you will need the datasheets for all the units from your army. You can find out more about datasheets"
+        },
+        {
+          "title": "Keywords",
+          "text": "have a list of keywords, separated into Faction keywords and other keywords. Faction keywords can be used to help you decide which models to include in your army, but otherwise both sets of keywords are functionally the same. In either case, keywords appear in KEYWORD BOLD . Keywords are sometimes linked to (or 'tagged' by) a rule. For example, a rule might say that it applies to INFANTRY units. This means it only applies to units that have the INFANTRY keyword on their datasheet. The pluralisation (or otherwise) of keywords does not affect which units the rule in question applies to."
+        },
+        {
+          "title": "Redeployments",
+          "text": "Rules that allow players to redeploy certain units after both armies are deployed (e.g. 's Red Corsairs ability) are always resolved after the step (or, if you are playing a , after the step), and before the step, before determining who has the first turn. When a player uses such a rule, they remove that unit or units from the battlefield, then deploy them again using all the normal rules (for example, if all the models in one of these units have the Infiltrators ability, that unit's player can set that unit up using that ability). Players alternate resolving any such rules, starting with the Attacker."
+        },
+        {
+          "title": "Engagement Range",
+          "text": "Engagement Range represents the zone of threat that models present to their enemies. While a model is within 1\" horizontally and 5\" vertically of an enemy model, those models – and their units – are within Engagement Range of each other. Models cannot be set up or end a Normal Advance Fall Back move within Engagement Range of any enemy models. If for any reason a model cannot meet this condition, that model is destroyed\n- Engagement Range: Within 1\" horizontally and 5\" vertically.\n- Models cannot be set up or end a Normal, Advance or Fall Back move within Engagement Range of any enemy models."
+        },
+        {
+          "title": "Unit Coherency",
+          "text": "A unit that contains more than one model must be set up and end any kind of move as a single group, with all of its models within 2\" horizontally and 5\" vertically of at least one other model from that unit. While a unit has seven or more models, all of its models must instead be set up and end any kind of move within 2\" horizontally and 5\" vertically of at least two other models from that unit. This is called Unit Coherency.\n\nIf for any reason a model cannot be set up in Unit Coherency, or cannot be set up following any restrictions stated by other rules (e.g. while setting up using the Deep Strike ability), that unit cannot be set up. If a unit cannot end a move in Unit Coherency, it cannot make that move and its models are returned to their previous positions.\n\nAt the end of every turn, each player must remove models, one at a time, from any of the units from their armies that are no longer in Unit Coherency, until only a single group of models from each of those units remains in play and in Unit Coherency. Models removed in this way count as having been destroyed, but they never trigger any rules that apply when a model is destroyed.\n- Unit Coherency: Within 2\" horizontally and 5\" vertically of:One other model from the same unit (in units of 2-6 models).Two other models from the same unit (in units of 7+ models).\n- At the end of every turn, if a unit is not in Unit Coherency, the controlling player must remove models until that unit is in Unit Coherency again."
+        },
+        {
+          "title": "Battlefields and Terrain",
+          "text": "Battles of Warhammer 40,000 are fought on rectangular battlefields. This can be any surface upon which the models can stand – a dining table, for example, or the floor. Your mission will guide you as to the size of battlefield required.\n\nThe scenery on a battlefield can be represented by models from the Warhammer 40,000 range. These models are called terrain features to differentiate them from the models that make up an army. Terrain features are set up on the battlefield before the battle begins. You can find out more about terrain features\n\nUnless the mission you are playing instructs you otherwise, you should feel free to create an exciting battlefield using any terrain features from your collection."
+        },
+        {
+          "title": "Measuring Distances",
+          "text": "Distances in Warhammer 40,000 are measured in inches (\"). You can measure distances whenever you wish. When measuring the distance between models, measure between the closest points of the bases of the models you're measuring to and from. If a model does not have a base, measure to the closest point of any part of that model instead. If a rule says it applies 'within' a certain distance, it applies at any distance that is not more than the specified distance. For example, within 1\" means any distance that is not more than 1\" away.\n\nSometimes you may find that a particular terrain feature makes it hard for you to place a model exactly where you want to. If you delicately balance a model in place, it is very likely to fall as soon as someone nudges the table, leaving your painted model damaged or even broken. In cases like this, provided it is still physically possible to place the model in the desired location, you may find it helps to leave a model in a safer position, provided both players agree and know its 'actual' location. If, later on, an enemy model is shooting the model, you will have to hold it back in place so that visibility can be determined."
+        }
       ]
     },
     {
@@ -28,24 +84,104 @@ export const CORE_RULES: GeneralRulesDocument | null = {
         "Keywords",
         "Redeployments",
         "Engagement Range"
+      ],
+      "accordion": [
+        {
+          "title": "Selecting a Mission",
+          "text": "To play a game of Warhammer 40,000, you must first select a mission. The mission will tell you how to muster your armies, create your battlefield and deploy your forces on the tabletop. It will also tell you any special rules that apply to the battle, and (most importantly!) what you need to do to win. You can find out more about missions"
+        },
+        {
+          "title": "Armies and Models",
+          "text": "Each player in a game of Warhammer 40,000 commands an army of Citadel miniatures, hereafter referred to as models. The mission you have selected will guide you as to how big your army should be.\n\n- Army: All of the models under your command."
+        },
+        {
+          "title": "Units",
+          "text": "Models move and fight in units. A unit can have one or more models from a single datasheet (see below). Models and units from the same army are said to be friendly in relation to each other. Models and units from your opponent's army are referred to as enemy models and units. If a rule affects 'models' or 'units' without specifying that they are friendly or enemy, that rule affects all models or all units, regardless of whose army they are in.\n\n- Unit: One or more models from the same datasheet.\n- Friendly Models/Units: All models/units from the same army.\n- Enemy Models/Units: All models/units from your opponent's army."
+        },
+        {
+          "title": "Datasheets",
+          "text": "The rules you will need to use your models in games are presented on datasheets. Each unit has a datasheet; you will need the datasheets for all the units from your army. You can find out more about datasheets"
+        },
+        {
+          "title": "Keywords",
+          "text": "have a list of keywords, separated into Faction keywords and other keywords. Faction keywords can be used to help you decide which models to include in your army, but otherwise both sets of keywords are functionally the same. In either case, keywords appear in KEYWORD BOLD . Keywords are sometimes linked to (or 'tagged' by) a rule. For example, a rule might say that it applies to INFANTRY units. This means it only applies to units that have the INFANTRY keyword on their datasheet. The pluralisation (or otherwise) of keywords does not affect which units the rule in question applies to."
+        },
+        {
+          "title": "Redeployments",
+          "text": "Rules that allow players to redeploy certain units after both armies are deployed (e.g. 's Red Corsairs ability) are always resolved after the step (or, if you are playing a , after the step), and before the step, before determining who has the first turn. When a player uses such a rule, they remove that unit or units from the battlefield, then deploy them again using all the normal rules (for example, if all the models in one of these units have the Infiltrators ability, that unit's player can set that unit up using that ability). Players alternate resolving any such rules, starting with the Attacker."
+        },
+        {
+          "title": "Engagement Range",
+          "text": "Engagement Range represents the zone of threat that models present to their enemies. While a model is within 1\" horizontally and 5\" vertically of an enemy model, those models – and their units – are within Engagement Range of each other. Models cannot be set up or end a Normal Advance Fall Back move within Engagement Range of any enemy models. If for any reason a model cannot meet this condition, that model is destroyed\n\n- Engagement Range: Within 1\" horizontally and 5\" vertically.\n- Models cannot be set up or end a Normal, Advance or Fall Back move within Engagement Range of any enemy models."
+        }
       ]
     },
     {
       "name": "Armies",
       "text": "[Army Composition]\n- Army: All of the models under your command.\n\n[Units]\nModels move and fight in units. A unit can have one or more models from a single datasheet (see below). Models and units from the same army are said to be friendly in relation to each other. Models and units from your opponent's army are referred to as enemy models and units. If a rule affects 'models' or 'units' without specifying that they are friendly or enemy, that rule affects all models or all units, regardless of whose army they are in.\n\n- Unit: One or more models from the same datasheet.\n- Friendly Models/Units: All models/units from the same army.\n- Enemy Models/Units: All models/units from your opponent's army.\n\n[Datasheets]\nThe rules you will need to use your models in games are presented on datasheets. Each unit has a datasheet; you will need the datasheets for all the units from your army. You can find out more about datasheets\n\n[Keywords]\nhave a list of keywords, separated into Faction keywords and other keywords. Faction keywords can be used to help you decide which models to include in your army, but otherwise both sets of keywords are functionally the same. In either case, keywords appear in KEYWORD BOLD .\n\nKeywords are sometimes linked to (or 'tagged' by) a rule. For example, a rule might say that it applies to INFANTRY units. This means it only applies to units that have the INFANTRY keyword on their datasheet. The pluralisation (or otherwise) of keywords does not affect which units the rule in question applies to.\n\n[Redeployments]\nRules that allow players to redeploy certain units after both armies are deployed (e.g. 's Red Corsairs ability) are always resolved after the step (or, if you are playing a , after the step), and before the step, before determining who has the first turn.\n\nWhen a player uses such a rule, they remove that unit or units from the battlefield, then deploy them again using all the normal rules (for example, if all the models in one of these units have the Infiltrators ability, that unit's player can set that unit up using that ability). Players alternate resolving any such rules, starting with the Attacker.\n\n[Engagement Range]\nEngagement Range represents the zone of threat that models present to their enemies. While a model is within 1\" horizontally and 5\" vertically of an enemy model, those models – and their units – are within Engagement Range of each other.\n\nModels cannot be set up or end a Normal Advance Fall Back move within Engagement Range of any enemy models. If for any reason a model cannot meet this condition, that model is destroyed\n\n- Engagement Range: Within 1\" horizontally and 5\" vertically.\n- Models cannot be set up or end a Normal, Advance or Fall Back move within Engagement Range of any enemy models.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Army Definition",
+          "text": "Army: All of the models under your command."
+        },
+        {
+          "title": "Units and Models",
+          "text": "Models move and fight in units. A unit can have one or more models from a single datasheet (see below). Models and units from the same army are said to be friendly in relation to each other. Models and units from your opponent's army are referred to as enemy models and units. If a rule affects 'models' or 'units' without specifying that they are friendly or enemy, that rule affects all models or all units, regardless of whose army they are in.\n\n- Unit: One or more models from the same datasheet.\n- Friendly Models/Units: All models/units from the same army.\n- Enemy Models/Units: All models/units from your opponent's army."
+        },
+        {
+          "title": "Datasheets",
+          "text": "The rules you will need to use your models in games are presented on datasheets. Each unit has a datasheet; you will need the datasheets for all the units from your army. You can find out more about datasheets"
+        },
+        {
+          "title": "Keywords",
+          "text": "have a list of keywords, separated into Faction keywords and other keywords. Faction keywords can be used to help you decide which models to include in your army, but otherwise both sets of keywords are functionally the same. In either case, keywords appear in KEYWORD BOLD .\n\nKeywords are sometimes linked to (or 'tagged' by) a rule. For example, a rule might say that it applies to INFANTRY units. This means it only applies to units that have the INFANTRY keyword on their datasheet. The pluralisation (or otherwise) of keywords does not affect which units the rule in question applies to."
+        },
+        {
+          "title": "Redeployments",
+          "text": "Rules that allow players to redeploy certain units after both armies are deployed (e.g. 's Red Corsairs ability) are always resolved after the step (or, if you are playing a , after the step), and before the step, before determining who has the first turn.\n\nWhen a player uses such a rule, they remove that unit or units from the battlefield, then deploy them again using all the normal rules (for example, if all the models in one of these units have the Infiltrators ability, that unit's player can set that unit up using that ability). Players alternate resolving any such rules, starting with the Attacker."
+        },
+        {
+          "title": "Engagement Range",
+          "text": "Engagement Range represents the zone of threat that models present to their enemies. While a model is within 1\" horizontally and 5\" vertically of an enemy model, those models – and their units – are within Engagement Range of each other.\n\nModels cannot be set up or end a Normal Advance Fall Back move within Engagement Range of any enemy models. If for any reason a model cannot meet this condition, that model is destroyed\n\n- Engagement Range: Within 1\" horizontally and 5\" vertically.\n- Models cannot be set up or end a Normal, Advance or Fall Back move within Engagement Range of any enemy models."
+        }
+      ]
     },
     {
       "name": "Battlefield",
       "text": "[Terrain Features] \nDistances in Warhammer 40,000 are measured in inches (\"). You can measure distances whenever you wish. When measuring the distance between models, measure between the closest points of the bases of the models you're measuring to and from. If a model does not have a base, measure to the closest point of any part of that model instead. If a rule says it applies 'within' a certain distance, it applies at any distance that is not more than the specified distance. For example, within 1\" means any distance that is not more than 1\" away.\n\n[Hints and Tips - Wobbly Models] \nSometimes you may find that a particular terrain feature makes it hard for you to place a model exactly where you want to. If you delicately balance a model in place, it is very likely to fall as soon as someone nudges the table, leaving your painted model damaged or even broken. In cases like this, provided it is still physically possible to place the model in the desired location, you may find it helps to leave a model in a safer position, provided both players agree and know its 'actual' location. If, later on, an enemy model is shooting the model, you will have to hold it back in place so that visibility can be determined.",
       "subsections": [
         "Terrain Features"
+      ],
+      "accordion": [
+        {
+          "title": "Distance Measurement",
+          "text": "Distances in Warhammer 40,000 are measured in inches (\"). You can measure distances whenever you wish. When measuring the distance between models, measure between the closest points of the bases of the models you're measuring to and from. If a model does not have a base, measure to the closest point of any part of that model instead. If a rule says it applies 'within' a certain distance, it applies at any distance that is not more than the specified distance. For example, within 1\" means any distance that is not more than 1\" away."
+        },
+        {
+          "title": "Wobbly Model Syndrome",
+          "text": "Sometimes you may find that a particular terrain feature makes it hard for you to place a model exactly where you want to. If you delicately balance a model in place, it is very likely to fall as soon as someone nudges the table, leaving your painted model damaged or even broken. In cases like this, provided it is still physically possible to place the model in the desired location, you may find it helps to leave a model in a safer position, provided both players agree and know its 'actual' location. If, later on, an enemy model is shooting the model, you will have to hold it back in place so that visibility can be determined."
+        }
       ]
     },
     {
       "name": "Measuring Distances",
       "text": "[Measuring Distances]\n\nDistances in Warhammer 40,000 are measured in inches (\"). You can measure distances whenever you wish. \n\nWhen measuring the distance between models, measure between the closest points of the bases of the models you're measuring to and from. If a model does not have a base, measure to the closest point of any part of that model instead. \n\nIf a rule says it applies 'within' a certain distance, it applies at any distance that is not more than the specified distance. For example, within 1\" means any distance that is not more than 1\" away.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Basic Distance Rules",
+          "text": "Distances in Warhammer 40,000 are measured in inches (\"). You can measure distances whenever you wish."
+        },
+        {
+          "title": "Measuring Between Models",
+          "text": "When measuring the distance between models, measure between the closest points of the bases of the models you're measuring to and from. If a model does not have a base, measure to the closest point of any part of that model instead."
+        },
+        {
+          "title": "Within Distance",
+          "text": "If a rule says it applies 'within' a certain distance, it applies at any distance that is not more than the specified distance. For example, within 1\" means any distance that is not more than 1\" away."
+        }
+      ]
     },
     {
       "name": "Determining Visibility",
@@ -56,12 +192,128 @@ export const CORE_RULES: GeneralRulesDocument | null = {
         "Out-of-Phase Rules",
         "COMMAND PHASE",
         "MOVEMENT PHASE"
+      ],
+      "accordion": [
+        {
+          "title": "Model Visibility",
+          "text": "If any part of another model can be seen from any part of the observing model, that other model is visible to the observing model."
+        },
+        {
+          "title": "Unit Visibility",
+          "text": "If one or more models in a unit is visible to the observing model, then that model's unit is visible to the observing model."
+        },
+        {
+          "title": "Model Fully Visible",
+          "text": "If every part of another model that is facing the observing model can be seen from any part of the observing model, then that other model is said to be fully visible to the observing model, i.e. the observing model has line of sight to all parts of the other model that are facing it, without any other models or blocking visibility to any of those parts."
+        },
+        {
+          "title": "Unit Fully Visible",
+          "text": "If every model in a unit is fully visible to an observing model, then that unit is fully visible to that observing model. For the purposes of determining if an enemy unit is fully visible, an observing model can see through other models in the unit it is observing.\n\n- Model Visible: If any part of a model can be seen, it is visible.\n- Unit Visible: If any model in a unit is visible, that model's unit is visible.\n- Model Fully Visible: If every facing part of a model can be seen, it is fully visible.\n- Unit Fully Visible: If every model in a unit is fully visible, that unit is fully visible."
+        },
+        {
+          "title": "Using Dice",
+          "text": "In order to fight a battle, you will require some six-sided dice (often abbreviated to D6). Some rules refer to 2D6, 3D6 and so on – in such cases, roll that many D6 and add the results together. If a rule requires you to roll a D3, roll a D6 and halve the result (rounding up to a whole number) to get the D3 result, as shown below.\n\nIf a rule requires a dice roll of, for example, 3 or more, this is often abbreviated to 3+. Where several consecutive dice results are relevant to a rule, these are often shown as a range (e.g. 1-3)."
+        },
+        {
+          "title": "Re-rolls",
+          "text": "Some rules allow you to re-roll a dice roll, which means you get to roll some or all of the dice again. If a rule allows you to re-roll a dice roll that was made by adding several dice together (e.g. 2D6, 3D6, etc.) then, unless otherwise stated, you must re-roll all of those dice again. You can never re-roll a dice more than once, and re-rolls happen before modifiers (if any) are applied. Rules that refer to the value of an 'unmodified' dice roll are referring to the dice result after any re-rolls, but before any modifiers are applied.\n\n- Unmodified Dice: the result after re-rolls, but before any modifiers.\n- A dice can never be re-rolled more than once.\n- You must re-roll all dice if several need adding together (e.g. 2D6).\n- Re-rolls are applied before any modifiers."
+        },
+        {
+          "title": "Roll-offs",
+          "text": "Some rules instruct players to roll off. To do so, both players roll one D6, and whoever scores highest wins the roll-off. If there is a tie for the highest roll, roll off again. Neither player is allowed to re-roll or modify any of the D6 when making a roll-off."
+        },
+        {
+          "title": "Dice Rolling Tips",
+          "text": "In a game of Warhammer 40,000 you and your opponent will be rolling, and in some cases re-rolling, lots of dice. It is good practice to always make sure your opponent knows what you are rolling dice for, and what abilities and rules are in effect that enable you to make any re-rolls.\n\nMany gamers roll their dice somewhere on the battlefield, but some roll their dice elsewhere, such as in a dice tray. Wherever you roll your dice, make sure you roll the dice where your opponent can see the results too. If a dice is rolled out of bounds (i.e. it rolls off your battlefield, out of your dice tray or ends up on the floor), it is very common to ignore the result of that dice and roll it again. Rolling an out-of-bounds dice again doesn't count as having re-rolled that dice.\n\nIf a dice does not lie flat on your battlefield after it has been thrown, it is called a cocked dice. Some players use a house rule that unless a dice is flat after it has been rolled, or unless you can balance another dice on top of a cocked dice without it sliding off, it must be rolled again. It is more common for players to roll the dice again only if they can't be sure of the result. In any case, rolling a cocked dice again doesn't count as having re-rolled that dice."
+        },
+        {
+          "title": "Simultaneous Rules",
+          "text": "While playing Warhammer 40,000, you'll occasionally find that two or more rules are to be resolved at the same time. If this occurs during the battle, the player whose turn it is chooses the order. If this occurs before or after the battle, or at the start or end of a battle round, the players roll and the winner decides the order in which those rules are resolved."
+        },
+        {
+          "title": "Battle Round Structure",
+          "text": "Both players muster strategic resources, then you test your units' battle readiness. Your units manoeuvre across the battlefield and reinforcements enter the fray. Your units fire their ranged weapons at the foe. Your units charge forward to battle at close quarters. Both players' units pile in and attack with melee weapons. Once a player's turn has ended, their opponent then starts their turn. Once both players have completed a turn, the battle round has been completed and the next one begins, and so on, until the battle ends."
+        },
+        {
+          "title": "Out-of-Phase Rules",
+          "text": "Example: In your opponent's , you use the Fire Overwatch Stratagem to enable a from your army to shoot as if it were your Shooting phase. The Whirlwind has the Pinning Bombardment ability, which is used 'In your Shooting phase, after this model has shot'. Because Fire Overwatch is an out-of-phase rule, it only allows the Whirlwind to perform the specified action (in this case, shooting as if it were your Shooting phase) and does not trigger any other rules that would normally be used in your Shooting phase. This means the Whirlwind's Pinning Bombardment ability has no effect while resolving these attacks, and you could not use any other Stratagems that are used in your Shooting phase to affect those attacks."
+        },
+        {
+          "title": "Command Phase",
+          "text": "Your Command phase is split into two steps. In the first, both players gain 1 Command point (CP) and you resolve any other Command phase rules; in the second, you test to see if any of your units are Battle-shocked.\n\nAt the start of your Command phase, before doing anything else, both players gain 1CP. Command points are a strategic resource that you can spend during the battle to use Then, if you have any other rules that need to be resolved in the Command phase, you do so now before progressing to the Battle-shock step.\n\n- Both players gain 1CP.\n- Resolve any other rules that occur in the Command phase."
+        },
+        {
+          "title": "Battle-shock Tests",
+          "text": "In this step, you must take a Battle-shock test for each of your units on the battlefield that is Below Half-strength . To do so, roll 2D6: if the result is greater than or equal to the best Leadership characteristic in that unit, the test is passed; otherwise, the test is failed and, until the start of your next Command phase, that unit is Battle-shocked.\n\nWhile a unit is Battle-shocked:\n- The Objective Control characteristic of all of its models is 0.\n- If it Falls Back, you must take a Desperate Escape test for every model in that unit.\n- Its controlling player cannot use Stratagems to affect that unit.\n\nOnce you have taken Battle-shock tests for all of your units that require them, your Command phase ends and you progress to your In this step, if for any reason a unit is forced to take a Battle-shock test for being below its Starting Strength, unless otherwise stated, that unit does not also have to take a Battle-shock test for being Below Half-strength.\n\nWhile a unit is Battle-shocked, all models in that unit are also Battle-shocked.\n\n- Take a Battle-shock test for each unit from your army on the battlefield that is Below Half-strength.\n- Roll 2D6: if the result is greater than or equal to the unit's Leadership, the test is passed. Otherwise, the unit is Battle-shocked until the start of your next Command phase.\n- Battle-shocked units have an OC of 0 and their controlling player cannot use Stratagems to affect them.\n- Battle-shocked units must take Desperate Escape tests if they Fall Back."
+        },
+        {
+          "title": "Command Points",
+          "text": "Outside of the 1CP players gain at the start of the , each player can only gain a total of 1CP per , regardless of the source (this includes other CP gained at the start of the Command phase)."
+        },
+        {
+          "title": "Starting Strength",
+          "text": "The number of models a unit contains when it is added to your army is known as its Starting Strength."
+        },
+        {
+          "title": "Below Half-strength",
+          "text": "Some rules will refer to a unit being Below Half-strength.\n- If a unit has a Starting Strength of 1, then it is said to be Below Half-strength while its remaining number of wounds is less than half of its Wounds characteristic.\n- For any other unit, while the number of models in that unit is less than half of its Starting Strength, that unit is said to be Below Half-strength."
+        },
+        {
+          "title": "Destroyed Units",
+          "text": "Throughout a battle, models will suffer damage and be destroyed. When a model is destroyed, it is removed from the battlefield. When every model in a unit has been destroyed, that unit is destroyed."
+        },
+        {
+          "title": "Attached Units",
+          "text": "Some CHARACTER units have the Leader ability, which lets them merge with other units (known as Bodyguard units) to form an Attached unit. Starting Strength of an Attached unit is equal to the combined Starting Strengths of all of its units (i.e. the number of models in the Leader unit added to the number of models in the Bodyguard unit). If either the Leader unit or the Bodyguard unit in an Attached unit is destroyed , the Starting Strength of the remaining unit is changed to be equal to its original Starting Strength.\n\nExample: A Primaris Captain (Starting Strength 1) is attached to a unit of Intercessors (Starting Strength 5). This Attached unit has a Starting Strength of 6. If all the Intercessors are destroyed, the remaining Primaris Captain would revert to having a Starting Strength of 1.\n\nFor the purposes of rules that are triggered when a unit is destroyed, such rules are still triggered when one of the individual units that made up an Attached unit is destroyed (the Leader or the Bodyguard unit).\n\nExample: If a rule awards you with 1VP each time an enemy unit is destroyed, and you target an Attached unit, you would gain 1VP if the Bodyguard unit is destroyed and 1VP if the Leader unit is destroyed (for a total of 2VP)."
+        },
+        {
+          "title": "Movement Phase",
+          "text": "Your Movement phase is split into two steps. First you can move your units, then you can set up reinforcements."
+        },
+        {
+          "title": "Moving Units",
+          "text": "Start your Movement phase by selecting one unit from your army that is on the battlefield to move:\n- Unless that unit is within Engagement Range of any enemy models, it can make a Normal move, or Advance, or Remain Stationary.\n- If that unit is within Engagement Range of any enemy models, it can either Remain Stationary or Fall Back.\n\nAfter you have finished moving that unit, select another unit from your army to move, and so on, until you have done so with all of your units. Once you have moved all of your units, progress to the of your Movement phase.\n\n- When a unit moves it can make a Normal move, Advance or Remain Stationary.\n- Units that are within Engagement Range of any enemy models can only Fall Back or Remain Stationary."
+        },
+        {
+          "title": "How Models Move",
+          "text": "Each time you move a unit, you can move any of its models you choose to. The controlling player chooses the order in which to move their models. Each time you move a model (other than when a model Remains Stationary , see below), you can move it across the battlefield in any combination of straight lines pivots (see below). While you are moving it, no part of its base can be moved through an enemy model or cross the edge of the battlefield. It can be moved through friendly models, but it cannot end its move on top of another model. The only exception to this is when moving MONSTER VEHICLE models; such models cannot be moved through other friendly MONSTER VEHICLE models and must be moved around them instead.\n\nWhile a model (excluding VEHICLE models that do not have the WALKER keyword) is moving in a straight line, it can be moved through any space its base can fit through, but it cannot end its move somewhere the model cannot be placed.\n\nDespite this model's wings being wider than the gap between the , the model's base fits between the ruins, so the model can move through the gap."
+        },
+        {
+          "title": "Surge Moves",
+          "text": "Some rules enable units to make out-of-phase 'surge' moves when a certain trigger occurs (e.g. ' Blood Surge ability, triggered after one or more of their models are destroyed by enemy ranged attacks). Unless otherwise stated, the following restrictions apply to all such moves:\n- Each unit can only make one 'surge' move per phase.\n- A unit cannot make a 'surge' move while it is Battle-shocked.\n- A unit cannot make a 'surge' move while it is within Engagement Range of one or more enemy units."
+        },
+        {
+          "title": "Remain Stationary",
+          "text": "If a unit Remains Stationary, none of its models can be moved for the rest of the phase."
+        },
+        {
+          "title": "Normal Moves",
+          "text": "When a unit makes a Normal move, each model in that unit can move a distance in inches less than or equal to its Move (M) characteristic, but no model can be moved within Engagement Range of any enemy models. A unit cannot make more than one Normal move per phase.\n\n- Normal Move: Models move up to M\".\n- Cannot move within Engagement Range of any enemy models."
+        },
+        {
+          "title": "Straight Lines",
+          "text": "Each time you move a model in a straight line, measure the distance from the same point on its base at the start and end of that line. For example, you can measure from the 'back' of the model's base, and measure the distance to the back of the model's base at the end of that line. If a model does not have a base, measure using the same point on the model at the start and end of that line."
+        },
+        {
+          "title": "Pivots",
+          "text": "Each time you pivot a model, rotate it any amount around its central axis (perpendicular to the battlefield through the centre of its base, or through the centre of the model if it doesn't have a base). The first time you do this during each model's move, subtract that model's pivot value (see below) from the remaining distance it can move during that move. If there is not enough distance left to do this, it cannot pivot. Note that the distance it can move is only reduced once for that move, regardless of how many additional times it pivots during that move.\n\nPivot Value Unless otherwise stated, the following pivot values apply.\n\n*Note that AIRCRAFT models have separate"
+        },
+        {
+          "title": "Advance Moves",
+          "text": "When a unit Advances, make an Advance roll for that unit by rolling one D6. Add the result in inches to the Move characteristic of each model in that unit until the end of the phase. Each model in that unit can then make an Advance move by moving a distance in inches less than or equal to this total, but no model can be moved within Engagement Range of enemy models. A unit cannot shoot or in the same turn that it Advanced.\n\n- Advance Move: Models move up to M+D6\".\n- Cannot move within Engagement Range of any enemy models.\n- Units that Advance cannot shoot or charge this turn.\n\nTo find the centre of a model without a base, draw an imaginary four-sided shape, as small as possible, that contains each part of that model as you look directly down at it. Then draw two imaginary lines across the diagonals of that shape. The point"
+        }
       ]
     },
     {
       "name": "Dice",
       "text": "[TABLE: [[\"ROLLING A D3DICE RESULTD3 RESULTor1or2or3\", \"ROLLING A D3\", \"DICE RESULT\", \"D3 RESULT\", \"or\", \"1\", \"or\", \"2\", \"or\", \"3\"], [\"ROLLING A D3\"], [\"DICE RESULT\", \"D3 RESULT\"], [\"or\", \"1\"], [\"or\", \"2\"], [\"or\", \"3\"]]]",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Dice",
+          "text": "]"
+        }
+      ]
     },
     {
       "name": "Sequencing",
@@ -71,17 +323,59 @@ export const CORE_RULES: GeneralRulesDocument | null = {
         "Re-rolls",
         "Roll-offs",
         "Hints and TipsDice Rolling"
+      ],
+      "accordion": [
+        {
+          "title": "Dice Basics",
+          "text": "In order to fight a battle, you will require some six-sided dice (often abbreviated to D6). Some rules refer to 2D6, 3D6 and so on – in such cases, roll that many D6 and add the results together. If a rule requires you to roll a D3, roll a D6 and halve the result (rounding up to a whole number) to get the D3 result, as shown below. ] If a rule requires a dice roll of, for example, 3 or more, this is often abbreviated to 3+. Where several consecutive dice results are relevant to a rule, these are often shown as a range (e.g. 1-3)."
+        },
+        {
+          "title": "Re-rolls",
+          "text": "Some rules allow you to re-roll a dice roll, which means you get to roll some or all of the dice again. If a rule allows you to re-roll a dice roll that was made by adding several dice together (e.g. 2D6, 3D6, etc.) then, unless otherwise stated, you must re-roll all of those dice again. You can never re-roll a dice more than once, and re-rolls happen before modifiers (if any) are applied. Rules that refer to the value of an 'unmodified' dice roll are referring to the dice result after any re-rolls, but before any modifiers are applied.\n\n- Unmodified Dice: the result after re-rolls, but before any modifiers.\n- A dice can never be re-rolled more than once.\n- You must re-roll all dice if several need adding together (e.g. 2D6).\n- Re-rolls are applied before any modifiers."
+        },
+        {
+          "title": "Roll-offs",
+          "text": "Some rules instruct players to roll off. To do so, both players roll one D6, and whoever scores highest wins the roll-off. If there is a tie for the highest roll, roll off again. Neither player is allowed to re-roll or modify any of the D6 when making a roll-off."
+        },
+        {
+          "title": "Dice Rolling Tips",
+          "text": "In a game of Warhammer 40,000 you and your opponent will be rolling, and in some cases re-rolling, lots of dice. It is good practice to always make sure your opponent knows what you are rolling dice for, and what abilities and rules are in effect that enable you to make any re-rolls.\n\nMany gamers roll their dice somewhere on the battlefield, but some roll their dice elsewhere, such as in a dice tray. Wherever you roll your dice, make sure you roll the dice where your opponent can see the results too. If a dice is rolled out of bounds (i.e. it rolls off your battlefield, out of your dice tray or ends up on the floor), it is very common to ignore the result of that dice and roll it again. Rolling an out-of-bounds dice again doesn't count as having re-rolled that dice.\n\nIf a dice does not lie flat on your battlefield after it has been thrown, it is called a cocked dice. Some players use a house rule that unless a dice is flat after it has been rolled, or unless you can balance another dice on top of a cocked dice without it sliding off, it must be rolled again. It is more common for players to roll the dice again only if they can't be sure of the result. In any case, rolling a cocked dice again doesn't count as having re-rolled that dice."
+        },
+        {
+          "title": "Sequencing Rules",
+          "text": "While playing Warhammer 40,000, you'll occasionally find that two or more rules are to be resolved at the same time. If this occurs during the battle, the player whose turn it is chooses the order. If this occurs before or after the battle, or at the start or end of a battle round, the players roll and the winner decides the order in which those rules are resolved."
+        }
       ]
     },
     {
       "name": "1. Command",
       "text": "- Both players gain 1CP. - Resolve any other rules that occur in the Command phase.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Command Phase",
+          "text": "- Both players gain 1CP. - Resolve any other rules that occur in the Command phase."
+        }
+      ]
     },
     {
       "name": "2. Battle-shock",
       "text": "[Battle-shocked Unit Effects]\n- The Objective Control characteristic of all of its models is 0.\n- If it Falls Back, you must take a Desperate Escape test for every model in that unit.\n- Its controlling player cannot use Stratagems to affect that unit.\n\n[Battle-shock Tests]\n- Take a Battle-shock test for each unit from your army on the battlefield that is Below Half-strength.\n- Roll 2D6: if the result is greater than or equal to the unit's Leadership, the test is passed. Otherwise, the unit is Battle-shocked until the start of your next Command phase.\n\n[Battle-shocked Unit Restrictions]\n- Battle-shocked units have an OC of 0 and their controlling player cannot use Stratagems to affect them.\n- Battle-shocked units must take Desperate Escape tests if they Fall Back.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Battle-shocked Unit Effects",
+          "text": "- The Objective Control characteristic of all of its models is 0.\n- If it Falls Back, you must take a Desperate Escape test for every model in that unit.\n- Its controlling player cannot use Stratagems to affect that unit."
+        },
+        {
+          "title": "Battle-shock Tests",
+          "text": "- Take a Battle-shock test for each unit from your army on the battlefield that is Below Half-strength.\n- Roll 2D6: if the result is greater than or equal to the unit's Leadership, the test is passed. Otherwise, the unit is Battle-shocked until the start of your next Command phase."
+        },
+        {
+          "title": "Battle-shocked Unit Restrictions",
+          "text": "- Battle-shocked units have an OC of 0 and their controlling player cannot use Stratagems to affect them.\n- Battle-shocked units must take Desperate Escape tests if they Fall Back."
+        }
+      ]
     },
     {
       "name": "1. Move Units",
@@ -90,12 +384,56 @@ export const CORE_RULES: GeneralRulesDocument | null = {
         "‘Surge’ Moves",
         "Remain Stationary",
         "Advance Moves"
+      ],
+      "accordion": [
+        {
+          "title": "Movement Options",
+          "text": "Unless that unit is within Engagement Range of any enemy models, it can make a Normal move, or Advance, or Remain Stationary.\n\nIf that unit is within Engagement Range of any enemy models, it can either Remain Stationary or Fall Back.\n\nWhen a unit moves it can make a Normal move, Advance or Remain Stationary.\n\nUnits that are within Engagement Range of any enemy models can only Fall Back or Remain Stationary.\n\nDespite this model's wings being wider than the gap between the , the model's base fits between the ruins, so the model can move through the gap."
+        },
+        {
+          "title": "Surge Moves",
+          "text": "Each unit can only make one 'surge' move per phase.\n\nA unit cannot make a 'surge' move while it is Battle-shocked.\n\nA unit cannot make a 'surge' move while it is within Engagement Range of one or more enemy units."
+        },
+        {
+          "title": "Normal Moves",
+          "text": "When a unit makes a Normal move, each model in that unit can move a distance in inches less than or equal to its Move (M) characteristic, but no model can be moved within Engagement Range of any enemy models. A unit cannot make more than one Normal move per phase.\n\nNormal Move: Models move up to M\".\n\nCannot move within Engagement Range of any enemy models."
+        },
+        {
+          "title": "Advance Moves",
+          "text": "Advance Move: Models move up to M+D6\".\n\nCannot move within Engagement Range of any enemy models.\n\nUnits that Advance cannot shoot or charge this turn."
+        },
+        {
+          "title": "Measuring Movement",
+          "text": "Each time you move a model in a straight line, measure the distance from the same point on its base at the start and end of that line. For example, you can measure from the 'back' of the model's base, and measure the distance to the back of the model's base at the end of that line. If a model does not have a base, measure using the same point on the model at the start and end of that line."
+        },
+        {
+          "title": "Pivots",
+          "text": "Each time you pivot a model, rotate it any amount around its central axis (perpendicular to the battlefield through the centre of its base, or through the centre of the model if it doesn't have a base). The first time you do this during each model's move, subtract that model's pivot value (see below) from the remaining distance it can move during that move. If there is not enough distance left to do this, it cannot pivot. Note that the distance it can move is only reduced once for that move, regardless of how many additional times it pivots during that move.\n\nUnless otherwise stated, the following pivot values apply.\n\n*Note that AIRCRAFT models have separate"
+        }
       ]
     },
     {
       "name": "2. Reinforcements",
       "text": "[Basic Rules]\nSome units have a rule that allows them to start the battle in Reserves, such as Deep Strike . Such units will arrive later in the battle and are known as Reserves units. Any Reserves units that have not been set up on the battlefield when the battle ends count as having been destroyed\n\n[Setting Up Reserves Units]\nIn the step of your , if you have any Reserves units in your army, you can select one or more of them and set them up on the battlefield, one at a time. Once all your Reserves units that you wish to set up this turn have been set up, your Movement phase ends and you progress to your\n\n[Setup Requirements and Restrictions]\nDetails of how to set up Reserves units are described in the same rules that enabled the unit to be set up in Reserves. These rules will typically specify a distance away from all enemy models; whenever such a distance is specified, it always applies to the horizontal distance, even though normally you measure to and from the closest part of a model's base.\n\nReserves units always count as having made a Normal move in the turn they are set up on the battlefield, and so cannot move further during this phase. Otherwise, units set up in this way can act normally this turn (shoot, declare a charge, fight, etc.).\n\n[Key Points]\n- Reserves Unit: A unit that starts the battle in a location other than the battlefield.\n- Always count as having made a Normal move in the turn they are set up on the battlefield.\n- Any specified distance from enemy models applies to horizontal distance.\n- Any Reserves unit not set up on the battlefield by the end of the battle counts as destroyed.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Basic Rules",
+          "text": "Some units have a rule that allows them to start the battle in Reserves, such as Deep Strike . Such units will arrive later in the battle and are known as Reserves units. Any Reserves units that have not been set up on the battlefield when the battle ends count as having been destroyed"
+        },
+        {
+          "title": "Setting Up Reserves Units",
+          "text": "In the step of your , if you have any Reserves units in your army, you can select one or more of them and set them up on the battlefield, one at a time. Once all your Reserves units that you wish to set up this turn have been set up, your Movement phase ends and you progress to your"
+        },
+        {
+          "title": "Setup Requirements and Restrictions",
+          "text": "Details of how to set up Reserves units are described in the same rules that enabled the unit to be set up in Reserves. These rules will typically specify a distance away from all enemy models; whenever such a distance is specified, it always applies to the horizontal distance, even though normally you measure to and from the closest part of a model's base.\n\nReserves units always count as having made a Normal move in the turn they are set up on the battlefield, and so cannot move further during this phase. Otherwise, units set up in this way can act normally this turn (shoot, declare a charge, fight, etc.)."
+        },
+        {
+          "title": "Key Points",
+          "text": "- Reserves Unit: A unit that starts the battle in a location other than the battlefield.\n- Always count as having made a Normal move in the turn they are set up on the battlefield.\n- Any specified distance from enemy models applies to horizontal distance.\n- Any Reserves unit not set up on the battlefield by the end of the battle counts as destroyed."
+        }
+      ]
     },
     {
       "name": "Transports",
@@ -113,47 +451,181 @@ export const CORE_RULES: GeneralRulesDocument | null = {
         "Stratagems",
         "Strategic Reserves",
         "Terrain Features"
+      ],
+      "accordion": [
+        {
+          "title": "Transport Capacity",
+          "text": "TRANSPORT models have a transport capacity listed on their datasheet. This determines the type and maximum number of friendly models that can embark within them. Units can start the battle embarked within a TRANSPORT model instead of being set up separately – declare which units are embarked within a TRANSPORT model before you set it up."
+        },
+        {
+          "title": "Firing Deck",
+          "text": "Some TRANSPORT models have 'Firing Deck x' listed in their abilities. Each time such a model is selected to shoot in the Shooting phase, you can select up to 'x' models embarked within it whose units have not already shot this phase. Then, for each of those embarked models, you can select one ranged weapon that embarked model is equipped with (excluding weapons with the [ONE SHOT] ability). Until that TRANSPORT model has resolved all of its attacks, it counts as being equipped with all of the weapons you selected in this way, in addition to its other weapons. Until the end of the phase, those selected models' units are not eligible to shoot.\n\n- Firing Deck 'x': Each time this TRANSPORT shoots, select one weapon (excluding weapons with the [ONE SHOT] ability) from up to 'x' models embarked within it whose units have not shot this phase; this TRANSPORT counts as being equipped with those weapons as well. Until the end of the phase, those selected models' units are not eligible to shoot."
+        },
+        {
+          "title": "Embark",
+          "text": "If a unit makes a Normal, Advance, or Fall Back move, and every model in that unit ends that move within 3\" of a friendly TRANSPORT model, they can embark within it. A unit cannot embark if it has already disembarked from a TRANSPORT model in the same phase. Remove the unit from the battlefield and place it to one side – it is now embarked within that TRANSPORT model. Unless otherwise stated, units cannot do anything or be affected in any way while they are embarked.\n\n- A unit can embark within a friendly TRANSPORT if all of its models end a Normal, Advance or Fall Back move within 3\" of that TRANSPORT.\n- A unit cannot embark and disembark in the same phase."
+        },
+        {
+          "title": "Disembark",
+          "text": "If a unit from your army starts your Movement phase embarked within a TRANSPORT model, that unit can disembark in that phase. When a unit disembarks from a TRANSPORT model, set it up on the battlefield so that it is wholly within 3\" of that TRANSPORT model and not within Engagement Range of any enemy models. If, for any reason, a disembarking model cannot be set up, that model's unit cannot disembark.\n\nUnits that disembark from a TRANSPORT model that either Remained Stationary this phase or has not yet made a Normal, Advance, or Fall Back move this phase can then act normally (make a Normal move, Advance, shoot, declare a charge, fight, etc.) in the remainder of the turn. Such a disembarking unit cannot choose to Remain Stationary.\n\nUnits that disembark from a TRANSPORT model that made a Normal move this phase count as having made a Normal move themselves; they cannot move further during this phase. Such a unit also cannot declare a charge in the same turn, but can otherwise act normally in the remainder of the turn.\n\nUnits cannot disembark from a TRANSPORT model that either Advanced or Fell Back this turn.\n\n- Units that start your Movement phase embarked within a TRANSPORT can disembark this phase, provided their TRANSPORT has not Advanced or Fallen Back.\n- If a unit disembarks before its TRANSPORT moves, it can act normally.\n- If a unit disembarks after its TRANSPORT moves, it cannot move or charge this turn, but can otherwise act normally.\n- Disembarking units must be set up wholly within 3\" of their TRANSPORT and not within Engagement Range of any enemy models (or the unit cannot disembark).\n- Units that disembark this turn cannot Remain Stationary."
+        },
+        {
+          "title": "Destroyed Transports",
+          "text": "If a TRANSPORT model is destroyed, any units embarked within that TRANSPORT model must immediately disembark (see below) before that TRANSPORT model is removed from the battlefield. Units that disembark from a destroyed TRANSPORT model are not affected by that model's Deadly Demise ability. Instead, you must roll one D6 for each disembarking model. For each roll of 1, that disembarking model's unit suffers 1 mortal wound. In addition, if a unit disembarks from a destroyed TRANSPORT model:\n\n- Until the start of its controlling player's next Command phase, that unit is Battle-shocked.\n- Until the end of the turn, that unit counts as having made a Normal move this turn, and cannot declare a charge this turn.\n\n- If a TRANSPORT is destroyed, any embarked units must disembark.\n- Roll one D6 for each model that disembarks: for each 1, that model's unit suffers 1 mortal wound.\n- Until the start of its controlling player's next Command phase, the disembarking unit is Battle-shocked.\n- Until the end of the turn, the disembarking unit counts as having made a Normal move, and cannot declare a charge."
+        },
+        {
+          "title": "Emergency Disembarkation",
+          "text": "If a TRANSPORT model is destroyed and it is not possible to set up a disembarking unit wholly within 3\" of that TRANSPORT model and not within Engagement Range of any enemy models, that unit must instead perform an Emergency Disembarkation. This is performed as described for disembarking from a destroyed TRANSPORT model, except that a unit that does so must be set up wholly within 6\" of the destroyed TRANSPORT model (instead of wholly within 3\") and not within Engagement Range of any enemy models, and when rolling for each disembarking model, that unit suffers 1 mortal wound for each roll of 1-3 (instead of for each roll of 1). If, for any reason, a disembarking model still cannot be set up, that model is destroyed.\n\n- Units disembarking a destroyed TRANSPORT that cannot be set up wholly within 3\" of it must perform an Emergency Disembarkation:\n- Must be set up wholly within 6\" of it instead of wholly within 3\".\n- Suffer 1 mortal wound for each roll of 1-3, instead of each roll of 1.\n- Any disembarking model that cannot be set up is destroyed."
+        }
       ]
     },
     {
       "name": "1. Hit Roll",
       "text": "[Hit Roll Mechanics]\n- Hit Roll (Ranged Attack): A hit is scored if the D6 result equals or exceeds that attack's BS.\n- Hit Roll (Melee Attack): A hit is scored if the D6 result equals or exceeds that attack's WS.\n\n[Critical Hits and Auto-Failures]\n- Critical Hit: Unmodified Hit roll of 6. Always successful.\n- An unmodified Hit roll of 1 always fails.\n\n[Hit Roll Modifiers]\n- A Hit roll can never be modified by more than -1 or +1.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Ranged Hit Rolls",
+          "text": "Hit Roll (Ranged Attack): A hit is scored if the D6 result equals or exceeds that attack's BS."
+        },
+        {
+          "title": "Melee Hit Rolls",
+          "text": "Hit Roll (Melee Attack): A hit is scored if the D6 result equals or exceeds that attack's WS."
+        },
+        {
+          "title": "Critical Hits & Auto-Failures",
+          "text": "Critical Hit: Unmodified Hit roll of 6. Always successful.\nAn unmodified Hit roll of 1 always fails."
+        },
+        {
+          "title": "Hit Roll Modifiers",
+          "text": "A Hit roll can never be modified by more than -1 or +1."
+        }
+      ]
     },
     {
       "name": "2. Wound Roll",
       "text": "[Wound Roll Table]\n[TABLE: [[\"WOUND ROLLATTACK'S STRENGTH VS TARGET'S TOUGHNESSD6 RESULT REQUIREDStrength is TWICE (or more than twice) the Toughness.+Strength is GREATER than the Toughness.+Strength is EQUAL to the Toughness.+Strength is LESS than the Toughness.+Strength is HALF (or less than half) the Toughness.+\", \"WOUND ROLL\", \"ATTACK'S STRENGTH VS TARGET'S TOUGHNESS\", \"D6 RESULT REQUIRED\", \"Strength is TWICE (or more than twice) the Toughness.\", \"+\", \"Strength is GREATER than the Toughness.\", \"+\", \"Strength is EQUAL to the Toughness.\", \"+\", \"Strength is LESS than the Toughness.\", \"+\", \"Strength is HALF (or less than half) the Toughness.\", \"+\"], [\"WOUND ROLL\"], [\"ATTACK'S STRENGTH VS TARGET'S TOUGHNESS\", \"D6 RESULT REQUIRED\"], [\"Strength is TWICE (or more than twice) the Toughness.\", \"+\"], [\"Strength is GREATER than the Toughness.\", \"+\"], [\"Strength is EQUAL to the Toughness.\", \"+\"], [\"Strength is LESS than the Toughness.\", \"+\"], [\"Strength is HALF (or less than half) the Toughness.\", \"+\"]]]\n\n[Special Wound Roll Rules]\n- Critical Wound: Unmodified Wound roll of 6. Always successful.\n- An unmodified Wound roll of 1 always fails.\n- A Wound roll can never be modified by more than -1 or +1.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Critical Wounds & Failures",
+          "text": "Critical Wound: Unmodified Wound roll of 6. Always successful.\n- An unmodified Wound roll of 1 always fails."
+        },
+        {
+          "title": "Wound Roll Modifiers",
+          "text": "A Wound roll can never be modified by more than -1 or +1."
+        }
+      ]
     },
     {
       "name": "3. Allocate Attack",
       "text": "[Allocating Attacks to Models]\n- If a model in the target unit has already lost any wounds or had other attacks allocated to it this phase, the attack must be allocated to that model.\n\n[Making Saving Throws]\nThe player controlling the target unit then makes one saving throw. By default, this will be an armour saving throw using their model's Save (Sv) characteristic, but some models have invulnerable saves that can be used instead (see below). \n\nTo make an armour saving throw, roll one D6, then modify the result by the Armour Penetration (AP) characteristic of the attack. For example, if the attack has an AP of -1, then 1 is subtracted from the saving throw. If the result is greater than or equal to the Save characteristic of the model the attack was allocated to, then that saving throw is successful and the ends. Otherwise, that saving throw fails and that model suffers damage An unmodified saving throw of 1 always fails. A saving throw can never be improved by more than +1.\n\n[Saving Throw Summary]\n- Saving Throw: Roll one D6 and modify by the attack's AP. If the result is less than the Save of the model being rolled for, the saving throw is failed and that model suffers damage. Otherwise, that attack is saved.\n- An unmodified saving throw of 1 always fails.\n- A saving throw can never be improved by more than +1.\n\n[Invulnerable Saves]\nSome models have an invulnerable save listed on their . Each time an attack is allocated to a model with an invulnerable save, the controlling player must choose to use either that model's Save characteristic or its invulnerable save, but not both. If a model has more than one invulnerable save, it can only use one of them – choose which it will use. Unlike armour saving throws (which use a model's Save characteristic), invulnerable saving throws are never modified by an attack's Armour Penetration characteristic, but otherwise follow the normal rules for saving throws\n\n- Invulnerable Save: Never modified by an attack's AP.\n- The controlling player can choose to use either a model's invulnerable save or its Save characteristic.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Allocating Attacks",
+          "text": "If a model in the target unit has already lost any wounds or had other attacks allocated to it this phase, the attack must be allocated to that model."
+        },
+        {
+          "title": "Armour Saving Throws",
+          "text": "The player controlling the target unit then makes one saving throw. By default, this will be an armour saving throw using their model's Save (Sv) characteristic, but some models have invulnerable saves that can be used instead (see below).\n\nTo make an armour saving throw, roll one D6, then modify the result by the Armour Penetration (AP) characteristic of the attack. For example, if the attack has an AP of -1, then 1 is subtracted from the saving throw. If the result is greater than or equal to the Save characteristic of the model the attack was allocated to, then that saving throw is successful and the ends. Otherwise, that saving throw fails and that model suffers damage An unmodified saving throw of 1 always fails. A saving throw can never be improved by more than +1."
+        },
+        {
+          "title": "Saving Throw Summary",
+          "text": "- Saving Throw: Roll one D6 and modify by the attack's AP. If the result is less than the Save of the model being rolled for, the saving throw is failed and that model suffers damage. Otherwise, that attack is saved.\n- An unmodified saving throw of 1 always fails.\n- A saving throw can never be improved by more than +1."
+        },
+        {
+          "title": "Invulnerable Saves",
+          "text": "Some models have an invulnerable save listed on their . Each time an attack is allocated to a model with an invulnerable save, the controlling player must choose to use either that model's Save characteristic or its invulnerable save, but not both. If a model has more than one invulnerable save, it can only use one of them – choose which it will use. Unlike armour saving throws (which use a model's Save characteristic), invulnerable saving throws are never modified by an attack's Armour Penetration characteristic, but otherwise follow the normal rules for saving throws\n\n- Invulnerable Save: Never modified by an attack's AP.\n- The controlling player can choose to use either a model's invulnerable save or its Save characteristic."
+        }
+      ]
     },
     {
       "name": "4. Saving Throw",
       "text": "[Saving Throw Roll]\n- Saving Throw: Roll one D6 and modify by the attack's AP. If the result is less than the Save of the model being rolled for, the saving throw is failed and that model suffers damage. Otherwise, that attack is saved.\n\n[Saving Throw Modifiers]\n- An unmodified saving throw of 1 always fails.\n- A saving throw can never be improved by more than +1.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Saving Throw Roll",
+          "text": "Saving Throw: Roll one D6 and modify by the attack's AP. If the result is less than the Save of the model being rolled for, the saving throw is failed and that model suffers damage. Otherwise, that attack is saved."
+        },
+        {
+          "title": "Saving Throw Modifiers",
+          "text": "An unmodified saving throw of 1 always fails. A saving throw can never be improved by more than +1."
+        }
+      ]
     },
     {
       "name": "5. Inflict Damage",
       "text": "[Wound Loss]\n- A model loses a number of wounds equal to the attack's Damage characteristic.\n\n[Excess Damage]\n- If a model is destroyed by an attack, any excess damage inflicted by that attack is lost.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Wound Loss",
+          "text": "A model loses a number of wounds equal to the attack's Damage characteristic."
+        },
+        {
+          "title": "Excess Damage",
+          "text": "If a model is destroyed by an attack, any excess damage inflicted by that attack is lost."
+        }
+      ]
     },
     {
       "name": "1. Fights First",
       "text": "FIGHTS FIRST Units with this ability that are eligible to fight do so in the step, provided every model in the unit has this ability.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Fights First",
+          "text": "FIGHTS FIRST Units with this ability that are eligible to fight do so in the step, provided every model in the unit has this ability."
+        }
+      ]
     },
     {
       "name": "2. Remaining Combats",
       "text": "[Fight Phase Structure]\nThe Fight phase is split into two steps. Units that have the ability to Fight First do so, followed by any remaining eligible units.\n\n[Unit Selection and Alternating]\nIn both steps of the Fight phase, players alternate selecting eligible units from their army, one at a time, starting with the player whose turn is not taking place, and fighting with them. Note that a player cannot pass or opt not to fight when they have one or more eligible units that could fight – they must select one of them to fight.\n\n[Eligibility to Fight]\nIn both steps, a unit is eligible to fight if either or both of the following apply:\n- It is within Engagement Range of one or more enemy units.\n- It made a Charge move this turn.\n\nNo unit can fight more than once in the Fight phase.\n\n[Step Completion]\nIn each step, if all of one player's eligible units that can fight during that step have fought, the opposing player can then fight with all of their remaining eligible units that can fight during that step, one at a time. Once neither player has any eligible units to fight with during the current step, you progress to the next step. Once all eligible units have fought in every step, the Fight phase ends. The player's turn then ends and, unless the battle ends, the next player's turn begins.\n\nNote that after an enemy unit has fought and finished its Consolidation move, it might be that previously ineligible units are now eligible – these units can then be selected to fight during the step.\n\n[Fights First Step]\nIn this step, all eligible units with the Fights First ability fight. Remember that this will include units that made a Charge move this turn and that have a Charge bonus.\n\nFIGHTS FIRST\nUnits with this ability that are eligible to fight do so in the step, provided every model in the unit has this ability.\n\n[Remaining Units Step]\nIn this step, all remaining eligible units fight. This includes any units with the Fights First ability that were not eligible to fight at the start of the Fight phase, but have since become eligible to fight.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Fight Phase Steps",
+          "text": "The Fight phase is split into two steps. Units that have the ability to Fight First do so, followed by any remaining eligible units."
+        },
+        {
+          "title": "Unit Selection",
+          "text": "In both steps of the Fight phase, players alternate selecting eligible units from their army, one at a time, starting with the player whose turn is not taking place, and fighting with them. Note that a player cannot pass or opt not to fight when they have one or more eligible units that could fight – they must select one of them to fight."
+        },
+        {
+          "title": "Eligibility to Fight",
+          "text": "In both steps, a unit is eligible to fight if either or both of the following apply:\n- It is within Engagement Range of one or more enemy units.\n- It made a Charge move this turn.\n\nNo unit can fight more than once in the Fight phase."
+        },
+        {
+          "title": "Step Completion",
+          "text": "In each step, if all of one player's eligible units that can fight during that step have fought, the opposing player can then fight with all of their remaining eligible units that can fight during that step, one at a time. Once neither player has any eligible units to fight with during the current step, you progress to the next step. Once all eligible units have fought in every step, the Fight phase ends. The player's turn then ends and, unless the battle ends, the next player's turn begins.\n\nNote that after an enemy unit has fought and finished its Consolidation move, it might be that previously ineligible units are now eligible – these units can then be selected to fight during the step."
+        },
+        {
+          "title": "Fights First Step",
+          "text": "In this step, all eligible units with the Fights First ability fight. Remember that this will include units that made a Charge move this turn and that have a Charge bonus.\n\nFIGHTS FIRST\nUnits with this ability that are eligible to fight do so in the step, provided every model in the unit has this ability."
+        },
+        {
+          "title": "Remaining Units Step",
+          "text": "In this step, all remaining eligible units fight. This includes any units with the Fights First ability that were not eligible to fight at the start of the Fight phase, but have since become eligible to fight."
+        }
+      ]
     },
     {
       "name": "1. Pile In",
       "text": "[Pile-in Move]\n- Pile-in Move: Up to 3\".\n\n[Movement Requirements]\n- Every model that moves must end closer to the closest enemy model, and in base-to-base contact with an enemy model if possible. The unit must end in Unit Coherency and within Engagement Range of at least one enemy unit (or no models can Pile In).",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Pile-in Move",
+          "text": "Pile-in Move: Up to 3\"."
+        },
+        {
+          "title": "Movement Requirements",
+          "text": "Every model that moves must end closer to the closest enemy model, and in base-to-base contact with an enemy model if possible. The unit must end in Unit Coherency and within Engagement Range of at least one enemy unit (or no models can Pile In)."
+        }
+      ]
     },
     {
       "name": "2. Make Melee Attacks",
@@ -163,48 +635,194 @@ export const CORE_RULES: GeneralRulesDocument | null = {
         "Select Weapon",
         "Select Targets",
         "Make Attacks"
+      ],
+      "accordion": [
+        {
+          "title": "Which Models Fight",
+          "text": "- A model can fight if it is within Engagement Range of an enemy unit.\n- A model can fight if it is in base-to-base contact with another model from its own unit that is itself in base-to-base contact with an enemy unit."
+        },
+        {
+          "title": "Select Weapon",
+          "text": "- Each model that can fight does so using one of its melee weapons.\n- Each model makes a number of attacks equal to the Attacks characteristic of its selected weapon."
+        },
+        {
+          "title": "Select Targets",
+          "text": "- Select targets for all attacks before any are resolved.\n- Attacking model must either be within Engagement Range of an enemy unit to target it, or in base-to-base contact with another model in its unit that is itself in base-to-base contact with that enemy unit."
+        },
+        {
+          "title": "Make Attacks",
+          "text": "- Resolve all attacks against one unit before moving onto the next.\n- Resolve all attacks with the same weapon profile before resolving any made with a different weapon profile.\n- All attacks declared against a target unit are resolved, even if no models in that unit remain within Engagement Range."
+        }
       ]
     },
     {
       "name": "3. Consolidate",
       "text": "- Consolidation Move: Up to 3\".\n\n[Movement Requirements]\n- Every model that moves must end closer to the closest enemy model, and in base-to-base contact with an enemy model if possible. The unit must end in Unit Coherency and within Engagement Range of at least one enemy unit if possible.\n\n[Alternative Movement]\n- If the above is not possible, each model can move towards the closest objective marker, but this must result in the unit being within range of it and in Unit Coherency.\n\n[No Movement Option]\n- If the above is also not possible, no models can Consolidate.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Consolidation Move",
+          "text": "Consolidation Move: Up to 3\"."
+        },
+        {
+          "title": "Movement Requirements",
+          "text": "Every model that moves must end closer to the closest enemy model, and in base-to-base contact with an enemy model if possible. The unit must end in Unit Coherency and within Engagement Range of at least one enemy unit if possible."
+        },
+        {
+          "title": "Alternative Movement",
+          "text": "If the above is not possible, each model can move towards the closest objective marker, but this must result in the unit being within range of it and in Unit Coherency."
+        },
+        {
+          "title": "No Movement Option",
+          "text": "If the above is also not possible, no models can Consolidate."
+        }
+      ]
     },
     {
       "name": "Craters and Rubble",
       "text": "[Movement]\nMany battlefields bear the scars of heavy and sustained bombardment. MOVEMENT Models can be moved over this terrain feature, as described here VISIBILITY apply.\n\n[Benefit of Cover]\nBENEFIT OF COVER Each time a ranged attack is allocated to an INFANTRY model that is wholly on top of this terrain feature, that model has the Benefit Cover against that attack.\n\n[Keywords]\nKEYWORDS: AREA TERRAIN CRATER",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Movement",
+          "text": "Many battlefields bear the scars of heavy and sustained bombardment. MOVEMENT Models can be moved over this terrain feature, as described here VISIBILITY apply."
+        },
+        {
+          "title": "Benefit of Cover",
+          "text": "BENEFIT OF COVER Each time a ranged attack is allocated to an INFANTRY model that is wholly on top of this terrain feature, that model has the Benefit Cover against that attack."
+        },
+        {
+          "title": "Keywords",
+          "text": "KEYWORDS: AREA TERRAIN CRATER"
+        }
+      ]
     },
     {
       "name": "Barricades and Fuel Pipes",
       "text": "[Movement]\nModels can move up, over and down this terrain feature, but they cannot be set up or end any kind of move on top of it. VISIBILITY apply.\n\n[Engagement Range]\n- In the Charge phase, if an enemy unit is within 1\" of this terrain feature, a charging unit on the opposite side of this terrain feature can still make a Charge move against that enemy unit provided it ends that Charge move as close as possible to this terrain feature and within 2\" of that enemy unit.\n- In the Fight phase, units are eligible to fight – and models can make attacks – if their target is on the opposite side of this terrain feature and within 2\" of them.\n\n[Benefit of Cover]\nEach time a ranged attack is allocated to an INFANTRY model that is wholly within 3\" of this terrain feature, if that model is not fully visible to every model in the attacking unit because of this terrain feature, that model has the Benefit Cover against that attack.\n\nKEYWORDS: OBSTACLE BARRICADE",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Movement",
+          "text": "Models can move up, over and down this terrain feature, but they cannot be set up or end any kind of move on top of it. VISIBILITY apply."
+        },
+        {
+          "title": "Engagement Range",
+          "text": "- In the Charge phase, if an enemy unit is within 1\" of this terrain feature, a charging unit on the opposite side of this terrain feature can still make a Charge move against that enemy unit provided it ends that Charge move as close as possible to this terrain feature and within 2\" of that enemy unit.\n- In the Fight phase, units are eligible to fight – and models can make attacks – if their target is on the opposite side of this terrain feature and within 2\" of them."
+        },
+        {
+          "title": "Benefit of Cover",
+          "text": "Each time a ranged attack is allocated to an INFANTRY model that is wholly within 3\" of this terrain feature, if that model is not fully visible to every model in the attacking unit because of this terrain feature, that model has the Benefit Cover against that attack."
+        }
+      ]
     },
     {
       "name": "Battlefield Debris and Statuary",
       "text": "[Battlefield Debris and Statuary]\n\nDiscarded industrial machinery, power reactors, ancient statuary and other detritus of war litter the battlefields of the 41st Millennium.\n\n[Movement]\n\nModels can move up, over and down this terrain feature, but they cannot be set up or end any kind of move on top of it.\n\n[Visibility]\n\nVISIBILITY apply.\n\n[Benefit of Cover]\n\nEach time a ranged attack is allocated to a model, if that model is not fully visible to every model in the attacking unit because of this terrain feature, that model has the Benefit Cover against that attack.\n\nKEYWORDS: OBSTACLE BATTLEFIELD DEBRIS",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Battlefield Debris Description",
+          "text": "Discarded industrial machinery, power reactors, ancient statuary and other detritus of war litter the battlefields of the 41st Millennium."
+        },
+        {
+          "title": "Movement Rules",
+          "text": "Models can move up, over and down this terrain feature, but they cannot be set up or end any kind of move on top of it."
+        },
+        {
+          "title": "Visibility",
+          "text": "VISIBILITY apply."
+        },
+        {
+          "title": "Benefit of Cover",
+          "text": "Each time a ranged attack is allocated to a model, if that model is not fully visible to every model in the attacking unit because of this terrain feature, that model has the Benefit Cover against that attack."
+        },
+        {
+          "title": "Keywords",
+          "text": "KEYWORDS: OBSTACLE BATTLEFIELD DEBRIS"
+        }
+      ]
     },
     {
       "name": "Hills, Industrial Structures, Sealed Buildings and Armoured Containers",
       "text": "[Movement]\nA sealed bunker, Mechanicus gantry-way, armoured container or even a simple hill can shelter troops from the enemy's sight and provide a superior vantage point to those atop it. MOVEMENT These terrain features are raised areas that models can be set up on top of or end a move on top of, provided the model's base does not overhang the terrain feature (if the model does not have a base, no part of that model that would be in contact with the battlefield at ground level can overhang that terrain feature). In addition, other terrain features can be set up on top of a HILL terrain feature, provided no part of those terrain features overhangs that HILL terrain feature.\n\n[Visibility]\nVISIBILITY apply.\n\n[Benefit of Cover]\nBENEFIT OF COVER Each time a ranged attack is allocated to a model, if that model is not fully visible to every model in the attacking unit because of this terrain feature, that model has the Benefit Cover against that attack.\n\nKEYWORDS: HILL",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Movement Rules",
+          "text": "These terrain features are raised areas that models can be set up on top of or end a move on top of, provided the model's base does not overhang the terrain feature (if the model does not have a base, no part of that model that would be in contact with the battlefield at ground level can overhang that terrain feature). In addition, other terrain features can be set up on top of a HILL terrain feature, provided no part of those terrain features overhangs that HILL terrain feature."
+        },
+        {
+          "title": "Visibility",
+          "text": "VISIBILITY apply."
+        },
+        {
+          "title": "Benefit of Cover",
+          "text": "Each time a ranged attack is allocated to a model, if that model is not fully visible to every model in the attacking unit because of this terrain feature, that model has the Benefit Cover against that attack."
+        }
+      ]
     },
     {
       "name": "Woods",
       "text": "Twisted woodlands and alien flora grow on many corpse-strewn battlefields, obscuring lines of fire and slowing the advance.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Woods",
+          "text": "Twisted woodlands and alien flora grow on many corpse-strewn battlefields, obscuring lines of fire and slowing the advance."
+        }
+      ]
     },
     {
       "name": "Ruins",
       "text": "[Overview]\nThe galaxy is littered with the shattered remains of once-proud cities, and countless troops have sought shelter from enemy bombardment within their husks.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Ruins",
+          "text": "The galaxy is littered with the shattered remains of once-proud cities, and countless troops have sought shelter from enemy bombardment within their husks."
+        }
+      ]
     },
     {
       "name": "Example Battlefields",
       "text": "[Battlefield Setup Guidelines]\nBattlefields are typically created by placing Battlezones next to each other. Battlezones are Citadel terrain sets that include two boards (each approximately 22\" by 30\" in size) and a range of designed to be set up evenly on those boards for the best Warhammer 40,000 gaming experience. Don't worry if your battlefield doesn't match these requirements, but keep in mind that playing on a battlefield that is either a barren wasteland or filled to overflowing with terrain features may give an advantage to one side or the other.\n\nBelow is an example of a battlefield set up for a Strike Force battle, with a good mixture of different terrain features fairly distributed across the battlefield. Their placement will create a dynamic gaming experience that doesn't favour one player over the other. Importantly, some terrain features that block visibility have been placed near the middle of the battlefield, ensuring that it is not easy to see from one side of the battlefield to the other. Battlefields where this is not the case can advantage armies that rely on shooting, or disadvantage armies that rely on melee. There is also sufficient room for larger models such as vehicles to manoeuvre around the terrain features, especially near the edges, without getting trapped.\n\n[Strike Force Battlefield Examples]\nMatched Play Focused: This is a Strike Force battlefield (44\" x 60\") set up with an aspirational number and mixture of terrain features. Their placement creates a battlefield that does not give an advantage to one player or the other, making it well suited to an aspirational matched play game. While this battlefield uses lots of Battlezone: Fronteris terrain features, you could achieve the same gaming experience using many different kinds of terrain, bearing in mind the concepts discussed above.\n\nMatched Play Focused: This Strike Force battlefield has fewer terrain features set up on it than the one below. The terrain has still been set up so as not to give an advantage to one player or the other, and there is still terrain set up in the middle that blocks visibility from one side of the battlefield to the other. As a result, this battlefield would make for an ideal matched play game. Battlefields with less terrain than this will start to advantage armies that rely on shooting over melee.\n\nNarrative Play Focused: This Strike Force battlefield has an ideal number and mixture of terrain features. The largest pieces of AREA TERRAIN have been set up along the two long battlefield edges, while the middle of the battlefield only has a scattering of OBSTACLES to provide any kind of shelter from enemy fire. While this battlefield is not ideal for a matched play game, it would make for a very thematic set-up for a narrative play game.\n\nMatched Play Focused: This Strike Force battlefield is very similar to the one above in terms of number and types of terrain features, but they have been set up more evenly across the battlefield, and the middle contains terrain features that block visibility from one side of the battlefield to the other. This battlefield doesn't give an advantage to one player or the other, and is far more suited to a typical matched play game.\n\n[Combat Patrol Battlefield Examples]\nMatched Play Focused: This Combat Patrol battlefield (44\" x 30\") has an ideal number and mixture of terrain features. These are set up evenly across the battlefield, there is still space for units to manoeuvre around them, and lines of sight cannot easily be drawn from one edge to the other, giving neither player a clear advantage.\n\nMatched Play Focused: This Combat Patrol battlefield has been set up with fewer terrain features than the battlefield above, but the positioning of these does not favour one player over the other. A battlefield with fewer terrain features than this will afford units no way to gain protection from ranged attacks, and so will give a strong advantage to armies that rely on shooting, while disadvantaging armies that rely on melee.\n\nNarrative Play Focused: This Combat Patrol battlefield has an ideal number and mixture of terrain features, and has been set up to create a strong thematic battlefield that, while not ideally suited to all play styles, sets the scene for a thrilling narrative encounter.\n\n[Aircraft]\nSome models have the AIRCRAFT keyword. The following rules describe how such models operate on the battlefield.\n\n[Deploying Aircraft]\nWhen you are instructed to AIRCRAFT models must start the battle in instead of being set up on the battlefield. Once the battle has started, AIRCRAFT models are then treated as units for all rules purposes. Only units that are themselves placed into Reserves can start the battle embarked within AIRCRAFT TRANSPORT models that are in Reserves.\n\nHOVER Some models have 'Hover' listed in their abilities. When you are instructed to , before doing anything else, you must first declare which models from your army with this ability will be in Hover mode. If a model is in Hover mode, then until the end of the battle, its Move characteristic is changed to 20\", it loses the AIRCRAFT keyword and it loses all associated rules for being an AIRCRAFT model. Models in Hover mode do not start the battle in , but you can choose to place them into following the normal rules if you wish.\n\n[Aircraft in the Movement Phase]\nAIRCRAFT models cannot Advance Fall Back Remain Stationary . If, when an AIRCRAFT model is selected to move in the , any enemy units are within Engagement Range of it, that AIRCRAFT model can still make a Normal move Each time an AIRCRAFT model makes a Normal move, first move the model straight forward, and it must move a minimum of 20\" – all parts of the model's base must end the move at least this far from where they started. After it has moved, it can pivot on the spot up to 90° – this does not contribute to how far the model moves. If, when making a Normal move, any part of an AIRCRAFT model's base crosses the edge of the battlefield, or it cannot move a minimum of 20\", that model's move ends and it is placed into . There is no upper limit to how far AIRCRAFT models can move, and their Move characteristic is therefore 20+\". If placed into Strategic Reserves, an AIRCRAFT model will always arrive from Strategic Reserves in your next turn.\n\n- AIRCRAFT can only make a Normal move, and can do so even when within Engagement Range of enemy models.\n- AIRCRAFT must move straight forward at least 20\", and can then make one pivot of up to 90°.\n- AIRCRAFT that cross the edge of the battlefield, or that cannot make their minimum move, are placed into Strategic Reserves.\n\n[Aircraft and the Movement of Other Models]\nWhen a unit is selected to move in the , if the only enemy models that are within Engagement Range of that unit are AIRCRAFT models, then that unit can still make a Normal Advance move Whenever a model makes any kind of move, it can be moved over enemy AIRCRAFT models as if they were not there, and can be moved within Engagement Range of enemy AIRCRAFT models, but it cannot end that move on top of another model or within Engagement Range of any enemy AIRCRAFT models.\n\n- Units can still make a Normal or Advance move if they are only within Engagement Range of enemy AIRCRAFT.\n- Models can move within Engagement Range of enemy AIRCRAFT, but cannot end a move within Engagement Range of enemy AIRCRAFT.\n- Models can move over AIRCRAFT when they make any kind of move.\n\n[Aircraft in the Charge and Fight Phases]\nAIRCRAFT units cannot , and only units that can can select an AIRCRAFT unit as a target of their charge. Such units can end their Charge move within Engagement Range of one or more enemy AIRCRAFT units. AIRCRAFT model is only eligible to fight if it is within Engagement Range of one or more enemy units that can , and it can only against units that can . Only models that can can make melee attacks against AIRCRAFT units. AIRCRAFT models cannot make Pile-in Consolidation moves . Each time a model makes a Pile-in or Consolidation move, unless that model can AIRCRAFT models are ignored for the purposes of moving closer to the closest enemy model.\n\n- Only units that can FLY can charge at or make melee attacks against AIRCRAFT.\n- AIRCRAFT cannot charge, Pile In or Consolidate, and can only make melee attacks against units that can FLY.\n- When a model Piles In or Consolidates, unless it can FLY, ignore AIRCRAFT when determining the closest enemy model.\n\n[TABLE: [[\"AThe Stormtalon Gunship begins the Movement phase within Engagement Range of the Tyranid Prime. The Stormtalon is an AIRCRAFT model and is not in Hover mode, so is free to make a Normal move.BThe Stormtalon must move a minimum of 20\\\" straight forward, even though this would bring it within Engagement Range of an enemy unit.\", \"A\", \"The Stormtalon Gunship begins the Movement phase within Engagement Range of the Tyranid Prime. The Stormtalon is an AIRCRAFT model and is not in Hover mode, so is free to make a Normal move.\", \"B\", \"The Stormtalon must move a minimum of 20\\\" straight forward, even though this would bring it within Engagement Range of an enemy unit.\"], [\"A\", \"The Stormtalon Gunship begins the Movement phase within Engagement Range of the Tyranid Prime. The Stormtalon is an AIRCRAFT model and is not in Hover mode, so is free to make a Normal move.\"], [\"B\", \"The Stormtalon must move a minimum of 20\\\" straight forward, even though this would bring it within Engagement Range of an enemy unit.\"]]]\n\n[TABLE: [[\"CAfter finishing its Normal move, the Stormtalon can then pivot on the spot up to 90\\u00ba.Note that if at any point during its move the Stormtalon would leave the battlefield due to the minimum movement requirement, it is placed into Strategic Reserves and will arrive in its controlling player\\u2019s next turn.\", \"C\", \"After finishing its Normal move, the Stormtalon can then pivot on the spot up to 90\\u00ba.\", \"Note that if at any point during its move the Stormtalon would leave the battlefield due to the minimum movement requirement, it is placed into Strategic Reserves and will arrive in its controlling player\\u2019s next turn.\"], [\"C\", \"After finishing its Normal move, the Stormtalon can then pivot on the spot up to 90\\u00ba.\"], [\"Note that if at any point during its move the Stormtalon would leave the battlefield due to the minimum movement requirement, it is placed into Strategic Reserves and will arrive in its controlling player\\u2019s next turn.\"]]]",
       "subsections": [
         "Aircraft"
+      ],
+      "accordion": [
+        {
+          "title": "Battlefield Setup Guidelines",
+          "text": "Battlefields are typically created by placing Battlezones next to each other. Battlezones are Citadel terrain sets that include two boards (each approximately 22\" by 30\" in size) and a range of designed to be set up evenly on those boards for the best Warhammer 40,000 gaming experience. Don't worry if your battlefield doesn't match these requirements, but keep in mind that playing on a battlefield that is either a barren wasteland or filled to overflowing with terrain features may give an advantage to one side or the other.\n\nBelow is an example of a battlefield set up for a Strike Force battle, with a good mixture of different terrain features fairly distributed across the battlefield. Their placement will create a dynamic gaming experience that doesn't favour one player over the other. Importantly, some terrain features that block visibility have been placed near the middle of the battlefield, ensuring that it is not easy to see from one side of the battlefield to the other. Battlefields where this is not the case can advantage armies that rely on shooting, or disadvantage armies that rely on melee. There is also sufficient room for larger models such as vehicles to manoeuvre around the terrain features, especially near the edges, without getting trapped."
+        },
+        {
+          "title": "Strike Force Examples",
+          "text": "Matched Play Focused: This is a Strike Force battlefield (44\" x 60\") set up with an aspirational number and mixture of terrain features. Their placement creates a battlefield that does not give an advantage to one player or the other, making it well suited to an aspirational matched play game. While this battlefield uses lots of Battlezone: Fronteris terrain features, you could achieve the same gaming experience using many different kinds of terrain, bearing in mind the concepts discussed above.\n\nMatched Play Focused: This Strike Force battlefield has fewer terrain features set up on it than the one below. The terrain has still been set up so as not to give an advantage to one player or the other, and there is still terrain set up in the middle that blocks visibility from one side of the battlefield to the other. As a result, this battlefield would make for an ideal matched play game. Battlefields with less terrain than this will start to advantage armies that rely on shooting over melee.\n\nNarrative Play Focused: This Strike Force battlefield has an ideal number and mixture of terrain features. The largest pieces of AREA TERRAIN have been set up along the two long battlefield edges, while the middle of the battlefield only has a scattering of OBSTACLES to provide any kind of shelter from enemy fire. While this battlefield is not ideal for a matched play game, it would make for a very thematic set-up for a narrative play game.\n\nMatched Play Focused: This Strike Force battlefield is very similar to the one above in terms of number and types of terrain features, but they have been set up more evenly across the battlefield, and the middle contains terrain features that block visibility from one side of the battlefield to the other. This battlefield doesn't give an advantage to one player or the other, and is far more suited to a typical matched play game."
+        },
+        {
+          "title": "Combat Patrol Examples",
+          "text": "Matched Play Focused: This Combat Patrol battlefield (44\" x 30\") has an ideal number and mixture of terrain features. These are set up evenly across the battlefield, there is still space for units to manoeuvre around them, and lines of sight cannot easily be drawn from one edge to the other, giving neither player a clear advantage.\n\nMatched Play Focused: This Combat Patrol battlefield has been set up with fewer terrain features than the battlefield above, but the positioning of these does not favour one player over the other. A battlefield with fewer terrain features than this will afford units no way to gain protection from ranged attacks, and so will give a strong advantage to armies that rely on shooting, while disadvantaging armies that rely on melee.\n\nNarrative Play Focused: This Combat Patrol battlefield has an ideal number and mixture of terrain features, and has been set up to create a strong thematic battlefield that, while not ideally suited to all play styles, sets the scene for a thrilling narrative encounter."
+        },
+        {
+          "title": "Aircraft Overview",
+          "text": "Some models have the AIRCRAFT keyword. The following rules describe how such models operate on the battlefield."
+        },
+        {
+          "title": "Deploying Aircraft",
+          "text": "When you are instructed to AIRCRAFT models must start the battle in instead of being set up on the battlefield. Once the battle has started, AIRCRAFT models are then treated as units for all rules purposes. Only units that are themselves placed into Reserves can start the battle embarked within AIRCRAFT TRANSPORT models that are in Reserves.\n\nHOVER Some models have 'Hover' listed in their abilities. When you are instructed to , before doing anything else, you must first declare which models from your army with this ability will be in Hover mode. If a model is in Hover mode, then until the end of the battle, its Move characteristic is changed to 20\", it loses the AIRCRAFT keyword and it loses all associated rules for being an AIRCRAFT model. Models in Hover mode do not start the battle in , but you can choose to place them into following the normal rules if you wish."
+        },
+        {
+          "title": "Aircraft Movement",
+          "text": "AIRCRAFT models cannot Advance Fall Back Remain Stationary . If, when an AIRCRAFT model is selected to move in the , any enemy units are within Engagement Range of it, that AIRCRAFT model can still make a Normal move Each time an AIRCRAFT model makes a Normal move, first move the model straight forward, and it must move a minimum of 20\" – all parts of the model's base must end the move at least this far from where they started. After it has moved, it can pivot on the spot up to 90° – this does not contribute to how far the model moves. If, when making a Normal move, any part of an AIRCRAFT model's base crosses the edge of the battlefield, or it cannot move a minimum of 20\", that model's move ends and it is placed into . There is no upper limit to how far AIRCRAFT models can move, and their Move characteristic is therefore 20+\". If placed into Strategic Reserves, an AIRCRAFT model will always arrive from Strategic Reserves in your next turn.\n\n- AIRCRAFT can only make a Normal move, and can do so even when within Engagement Range of enemy models.\n- AIRCRAFT must move straight forward at least 20\", and can then make one pivot of up to 90°.\n- AIRCRAFT that cross the edge of the battlefield, or that cannot make their minimum move, are placed into Strategic Reserves."
+        },
+        {
+          "title": "Moving Around Aircraft",
+          "text": "When a unit is selected to move in the , if the only enemy models that are within Engagement Range of that unit are AIRCRAFT models, then that unit can still make a Normal Advance move Whenever a model makes any kind of move, it can be moved over enemy AIRCRAFT models as if they were not there, and can be moved within Engagement Range of enemy AIRCRAFT models, but it cannot end that move on top of another model or within Engagement Range of any enemy AIRCRAFT models.\n\n- Units can still make a Normal or Advance move if they are only within Engagement Range of enemy AIRCRAFT.\n- Models can move within Engagement Range of enemy AIRCRAFT, but cannot end a move within Engagement Range of enemy AIRCRAFT.\n- Models can move over AIRCRAFT when they make any kind of move."
+        },
+        {
+          "title": "Aircraft in Combat",
+          "text": "AIRCRAFT units cannot , and only units that can can select an AIRCRAFT unit as a target of their charge. Such units can end their Charge move within Engagement Range of one or more enemy AIRCRAFT units. AIRCRAFT model is only eligible to fight if it is within Engagement Range of one or more enemy units that can , and it can only against units that can . Only models that can can make melee attacks against AIRCRAFT units. AIRCRAFT models cannot make Pile-in Consolidation moves . Each time a model makes a Pile-in or Consolidation move, unless that model can AIRCRAFT models are ignored for the purposes of moving closer to the closest enemy model.\n\n- Only units that can FLY can charge at or make melee attacks against AIRCRAFT.\n- AIRCRAFT cannot charge, Pile In or Consolidate, and can only make melee attacks against units that can FLY.\n- When a model Piles In or Consolidates, unless it can FLY, ignore AIRCRAFT when determining the closest enemy model."
+        }
       ]
     },
     {
@@ -213,17 +831,63 @@ export const CORE_RULES: GeneralRulesDocument | null = {
       "subsections": [
         "Missions",
         "Only War"
+      ],
+      "accordion": [
+        {
+          "title": "Battle Size Selection",
+          "text": "With your opponent, select one of the battle sizes below. This will determine the total number of points each player can spend to build their army and, as a result, how long the battle will last. Points are a measure of a unit's power on the battlefield; the higher a unit's points value, the more powerful that unit is. The points values for units are presented in other publications, such as Codexes and the Munitorum Field Manual. You will need to refer to these when building your army."
+        },
+        {
+          "title": "Army Roster",
+          "text": "The details of your army must be recorded on an Army Roster. This can be written on a piece of paper or recorded using the Warhammer 40,000 app. Players must show their finished Army Roster to their opponent before battle commences. You can download blank Army Roster following"
+        },
+        {
+          "title": "Army Faction",
+          "text": "Note on your Army Roster one to be your army faction."
+        },
+        {
+          "title": "Detachment Rules",
+          "text": "Note on your Army Roster one set of Detachment rules for your army. Some Detachment rules list units that you either must include or cannot include in your army; you must follow all such rules when building your army."
+        },
+        {
+          "title": "Unit Selection",
+          "text": "Select all the units you want to include in your army. Your army must include at least one CHARACTER model that is eligible to be your WARLORD. Some rules grant the BATTLELINE keyword to additional units from your army – typically if you select a particular Detachment or if your WARLORD is a specific model. When mustering your army, treat such units as BATTLELINE units for the purposes of this step, even though the Select Warlord step comes afterwards. Each time you include a unit in your army, it can take any upgrade, Enhancement or options it has access to. Note on your Army Roster the number of models in the unit, any weapons, wargear, upgrades and any Enhancement it has, and its points value. Subtract this points value from the total permitted for your battle size. You can only include a unit in your army if: - That unit has the Faction keyword you chose for your army in step 3. - You have enough points remaining. - Your army does not already contain three units with the same datasheet name as that unit – or six units with the same datasheet name as that unit if it is a BATTLELINE or DEDICATED TRANSPORT* unit. Only CHARACTERS can be given Enhancements and your army cannot include more than three Enhancements in total. No unit can have more than one Enhancement and each Enhancement included in your army must be unique. EPIC HEROES cannot be given any Enhancements. Your army cannot include the same EPIC HERO more than once. Every DEDICATED TRANSPORT unit from your army must start the battle with at least one unit embarked within it, or it cannot be deployed for that battle and will instead count as having been destroyed during the first battle round."
+        },
+        {
+          "title": "Warlord Selection",
+          "text": "Select one CHARACTER model from your army to be your Warlord – this will be the leader of your army – and make a note of this on your Army Roster. Your Warlord gains the WARLORD keyword."
+        }
       ]
     },
     {
       "name": "Objective Markers",
       "text": "- A model is within range of an objective marker if within 3\" horizontally and 5\" vertically. \n- Level of Control: Add together the OC characteristics of all of a player's models within range of the objective marker. \n- An objective marker is controlled by the player with the highest Level of Control over it (in a tie, it is contested). \n- Models cannot end a move on top of an objective marker. \n\n[Hints and Tips - Objective Markers and Terrain Features]\n\nMany players choose to bring the narrative of their missions to life by positioning objective markers within exciting terrain features on the battlefield. When setting up terrain features, you can place them where an objective marker would be, so long as you can reposition that objective marker directly on top of that terrain feature and it lies flat, without overhanging any part of it. That objective marker should still be more than 1\" away from all impassable parts of that terrain feature (such as the walls of a ruin) so that there is sufficient room for models to move around it.\n\nIf it is not possible to set up terrain features or objective markers in this way, and both players agree, you can nudge the positions of any terrain feature or objective marker so that these conditions are satisfied. Of course, the final position of an objective marker should still be as close as possible to the location indicated on your mission's deployment map, but if both players are happy to tweak the battlefield arrangement to forge a stronger narrative, you should feel free to do so.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Range & Control",
+          "text": "A model is within range of an objective marker if within 3\" horizontally and 5\" vertically. Level of Control: Add together the OC characteristics of all of a player's models within range of the objective marker. An objective marker is controlled by the player with the highest Level of Control over it (in a tie, it is contested)."
+        },
+        {
+          "title": "Movement Restrictions",
+          "text": "Models cannot end a move on top of an objective marker."
+        },
+        {
+          "title": "Terrain Placement Tips",
+          "text": "Many players choose to bring the narrative of their missions to life by positioning objective markers within exciting terrain features on the battlefield. When setting up terrain features, you can place them where an objective marker would be, so long as you can reposition that objective marker directly on top of that terrain feature and it lies flat, without overhanging any part of it. That objective marker should still be more than 1\" away from all impassable parts of that terrain feature (such as the walls of a ruin) so that there is sufficient room for models to move around it. If it is not possible to set up terrain features or objective markers in this way, and both players agree, you can nudge the positions of any terrain feature or objective marker so that these conditions are satisfied. Of course, the final position of an objective marker should still be as close as possible to the location indicated on your mission's deployment map, but if both players are happy to tweak the battlefield arrangement to forge a stronger narrative, you should feel free to do so."
+        }
+      ]
     },
     {
       "name": "Mission Map Key",
       "text": "[TABLE: [[\"Attacker\\u2019s Deployment ZoneThe Attacker must set up their army within this area.\", \"\", \"Attacker\\u2019s Deployment ZoneThe Attacker must set up their army within this area.\"], [\"\", \"Attacker\\u2019s Deployment ZoneThe Attacker must set up their army within this area.\"]]] [TABLE: [[\"Defender\\u2019s Deployment ZoneThe Defender must set up their army within this area.\", \"\", \"Defender\\u2019s Deployment ZoneThe Defender must set up their army within this area.\"], [\"\", \"Defender\\u2019s Deployment ZoneThe Defender must set up their army within this area.\"]]] [TABLE: [[\"No Man\\u2019s LandThe region of the battlefield that is not within either player\\u2019s deployment zone is known as No Man\\u2019s Land.\", \"\", \"No Man\\u2019s LandThe region of the battlefield that is not within either player\\u2019s deployment zone is known as No Man\\u2019s Land.\"], [\"\", \"No Man\\u2019s LandThe region of the battlefield that is not within either player\\u2019s deployment zone is known as No Man\\u2019s Land.\"]]] [TABLE: [[\"Objective MarkersThe locations of objective markers on the battlefield are typically shown on the deployment map of the mission being played, and are represented by this icon.\", \"\", \"Objective MarkersThe locations of objective markers on the battlefield are typically shown on the deployment map of the mission being played, and are represented by this icon.\"], [\"\", \"Objective MarkersThe locations of objective markers on the battlefield are typically shown on the deployment map of the mission being played, and are represented by this icon.\"]]] [TABLE: [[\"Attacker\\u2019s Battlefield Edge\", \"\", \"Attacker\\u2019s Battlefield Edge\"], [\"Attacker\\u2019s Battlefield Edge\"]]] [TABLE: [[\"Defender\\u2019s Battlefield Edge\", \"\", \"Defender\\u2019s Battlefield Edge\"], [\"Defender\\u2019s Battlefield Edge\"]]] [TABLE: [[\"Centre of Battlefield\", \"\", \"Centre of Battlefield\"], [\"Centre of Battlefield\"]]]",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Mission Map Key",
+          "text": "] ] ] ] ] ] ]"
+        }
+      ]
     }
   ]
 };
@@ -237,22 +901,74 @@ export const CRUSADE_RULES: GeneralRulesDocument | null = {
       "subsections": [
         "Supply Limit, Points Values and Supply Used",
         "Battle Tally, Requisition Points and other Information"
+      ],
+      "accordion": [
+        {
+          "title": "Crusade Points",
+          "text": "A unit's Crusade points total is a measure of how many upgrades and bonuses it has gained as part of your Crusade force - when first included in your Crusade force it will typically start at 0, but will increase as the unit gains in battle. Make a note of each unit's Crusade points total on your (see to find out more about how Crusade points affect your battles)."
+        },
+        {
+          "title": "Order of Battle Basics",
+          "text": "Order of Battle: List of all the units that are part of this Crusade force, and other important information.Can add or remove units from your Order of Battle at any time.Each unit must have a Crusade card.Units cannot be changed once added to your Order of Battle."
+        },
+        {
+          "title": "Supply Limits",
+          "text": "Supply Used: The combined points value of all units in this Crusade force. Supply Limit: Starts at 1000 pts. Your Supply Used must not exceed this."
+        },
+        {
+          "title": "Battle Resources",
+          "text": "Battle Tally: Number of battles you have played using this Crusade force. Requisition Points: Start at 5RP. Can be spent to use Requisitions."
+        },
+        {
+          "title": "Summoned and Replacement Units",
+          "text": "In Warhammer 40,000 there are some rules that are used during a battle to add new units to your Crusade army. These units are only added to your Crusade army for the duration of that battle - they are not added to your - Summoned and Replacement Units: Units that are added to your Crusade army during the battle, but are not permanently added to your Order of Battle."
+        }
       ]
     },
     {
       "name": "Summoned and Replacement Units",
       "text": "- Summoned and Replacement Units: Units that are added to your Crusade army during the battle, but are not permanently added to your Order of Battle.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Summoned and Replacement Units",
+          "text": "Summoned and Replacement Units: Units that are added to your Crusade army during the battle, but are not permanently added to your Order of Battle."
+        }
+      ]
     },
     {
       "name": "Order of Battle",
       "text": "[Order of Battle Setup]\n- When you first create an Order of Battle, write the name of your Crusade force and your name here. \n- Record the number of battles you have played using this Crusade force (your Battle tally), and the number of victories it has secured. \n- Record the current number of Requisition points (RP) your Crusade force has available. \n- Record the current Supply Limit of your Crusade force, as well as the combined points value of all the units in your Crusade force (the Supply Used). \n- Your Order of Battle lists all the units in your Crusade force - for easy reference, record each unit's points value and Crusade points total. \n- There is space on an Order of Battle for all kinds of narrative information, such as personal goals, notable victories (or defeats), vendettas and more.\n\n[Crusade Force vs Crusade Army]\nA player's Crusade force is every model listed on their . A player's Crusade army is an army selected for use in a single battle from the units in that player's Crusade force. \n\nWhile, to begin with, a player's Crusade army may be their entire Crusade force, as that player's collection of miniatures and their Crusade force grows, this may no longer be the case. For example, if a player's entire Crusade force is a collection of units with a combined points value of 3000 points, each time that player mustered a Crusade army for a Strike Force battle, they would select 2000 points of units from their Crusade force.\n\n[Definitions]\n- Crusade Force: All the units on a player's Order of Battle.\n- Crusade Army: All the units selected from a player's Crusade force that will be used in a single battle.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Order of Battle Setup",
+          "text": "When you first create an Order of Battle, write the name of your Crusade force and your name here. \n- Record the number of battles you have played using this Crusade force (your Battle tally), and the number of victories it has secured. \n- Record the current number of Requisition points (RP) your Crusade force has available. \n- Record the current Supply Limit of your Crusade force, as well as the combined points value of all the units in your Crusade force (the Supply Used). \n- Your Order of Battle lists all the units in your Crusade force - for easy reference, record each unit's points value and Crusade points total. \n- There is space on an Order of Battle for all kinds of narrative information, such as personal goals, notable victories (or defeats), vendettas and more."
+        },
+        {
+          "title": "Crusade Force vs Army",
+          "text": "A player's Crusade force is every model listed on their . A player's Crusade army is an army selected for use in a single battle from the units in that player's Crusade force. \n\nWhile, to begin with, a player's Crusade army may be their entire Crusade force, as that player's collection of miniatures and their Crusade force grows, this may no longer be the case. For example, if a player's entire Crusade force is a collection of units with a combined points value of 3000 points, each time that player mustered a Crusade army for a Strike Force battle, they would select 2000 points of units from their Crusade force."
+        },
+        {
+          "title": "Key Definitions",
+          "text": "- Crusade Force: All the units on a player's Order of Battle.\n- Crusade Army: All the units selected from a player's Crusade force that will be used in a single battle."
+        }
+      ]
     },
     {
       "name": "Crusade Force vs Crusade Army",
       "text": "[Crusade Force]\n- Crusade Force: All the units on a player's Order of Battle.\n\n[Crusade Army]\n- Crusade Army: All the units selected from a player's Crusade force that will be used in a single battle.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Crusade Force",
+          "text": "Crusade Force: All the units on a player's Order of Battle."
+        },
+        {
+          "title": "Crusade Army",
+          "text": "Crusade Army: All the units selected from a player's Crusade force that will be used in a single battle."
+        }
+      ]
     },
     {
       "name": "Crusade Card",
@@ -261,42 +977,182 @@ export const CRUSADE_RULES: GeneralRulesDocument | null = {
         "Requisitions",
         "Ranks and Battle Honours",
         "Mustering a Crusade Army"
+      ],
+      "accordion": [
+        {
+          "title": "Crusade Card Tracking",
+          "text": "- Each unit in your army should have a unique name. - A unit's equipment, upgrades and points value, along with other things you must select. - The number of Experience and Crusade points a unit has acquired. - Keep a tally of how many enemy units a unit has destroyed (and how). - When a unit acquires enough Experience points to be promoted, tick the appropriate box to denote its rank. - All Battle Honours and Battle Scars that a unit currently has."
+        },
+        {
+          "title": "Requisition Points System",
+          "text": "Requisition points (RP) can be used to purchase Requisitions; these can upgrade individual units or your entire . Each time you spend RP to purchase Requisition, reduce your Requisition points total by the cost of the Requisition purchased. Any Requisition points you do not spend are saved and can be used later. As you play more battles, you can gain additional Requisition points, but a Crusade force can never have more than 10 (any additional Requisition points acquired beyond this are lost). Each time you play a battle, you will gain 1RP after that battle has been completed, regardless of the result of the battle itself. Keep track of how many Requisition points you have on your Players can always use the Requisitions found below. Additional Requisitions can be found in other publications. Each Requisition will tell you when it can be purchased; they can never be purchased during a battle (i.e. between the Begin the Battle and End the Battle steps of the mission). So long as you have enough Requisition points, there is no limit on the number of Requisitions you can purchase, the number of times you can purchase each Requisition or the combination of Requisitions you can purchase. If you do not have enough Requisition points to purchase a Requisition, you cannot purchase it. - Requisitions cost RP to purchase. You can never have more than 10RP. - Each battle you play gains you 1RP (win, lose or draw)."
+        },
+        {
+          "title": "Basic Requisitions",
+          "text": "INCREASE SUPPLY LIMIT Purchase this Requisition at any time. Increase your Crusade force's by 200 points. REARM AND RESUPPLY Purchase this Requisition before a battle. Select one unit from your . You can change any wargear options models in that unit are equipped with as described on that unit's . If you replace a weapon that is a or a weapon upgraded by , that Crusade Relic or any Weapon Modifications are lost. Recalculate the unit's points value as a result of any of these changes and update its . You cannot make any changes that would cause you to exceed your"
+        },
+        {
+          "title": "Character Enhancement Requisitions",
+          "text": "RENOWNED HEROES 1-3RP When you first start a , you can purchase this Requisition the first time you add a CHARACTER unit to your . After that point, you can purchase this Requisition each time a unit from your Order of Battle gains a . In either case, you cannot select an EPIC HERO unit, a unit that already has an Enhancement, or a unit that has either the Disgraced or Mark of Shame You can select one Enhancement that unit has access to (if using this Requisition when that unit gains a rank, this is instead of it gaining a Battle Honour ). When doing so, that unit has access to any Enhancements described within any Detachment rules that it could use, even though you have not yet started to muster your army and so have not selected any Detachment rules yet. If the selected Enhancement replaces a weapon that is a or a weapon upgraded by , that Crusade Relic or Weapon Modifications are lost. Recalculate the unit's points value as a result of gaining this Enhancement and update its . You cannot make any changes that would cause you to exceed your This Requisition costs 1RP plus 1 additional RP for each other Enhancement that your Order of Battle contains (to a maximum of 3RP). Example: If this Requisition was used to give a unit an Enhancement and one other unit in your Order of Battle already had an Enhancement, it would cost 2RP."
+        },
+        {
+          "title": "Unit Management Requisitions",
+          "text": "LEGENDARY VETERANS Purchase this Requisition when a unit from your (excluding CHARACTER units) reaches 30XP. That unit's total is no longer limited to a maximum of 30 and it can now be promoted above the Battle-hardened . In addition, the maximum number of Battle Honours that unit can have is increased to 6. REPAIR AND RECUPERATE 1-5RP Purchase this Requisition after a battle. Select one unit from your that has one or more . Select one of that unit's Battle Scars and remove it from its (for each Battle Scar removed, that unit's total will increase by 1). This Requisition costs 1RP plus 1 additional RP for each Battle Honour that unit has (to a maximum of 5RP). Example: If this Requisition was used to remove a Battle Scar from a unit with three Battle Honours, it would cost 4RP. FRESH RECRUITS 1-4RP Purchase this Requisition at any time. Select one unit from your . You can add additional models to that unit, up to the maximum listed on its . Recalculate the unit's points value as a result of any of these changes and update its . You cannot make any changes that would cause you to exceed your This Requisition costs 1RP plus 1 additional RP for every 2 Battle Honours the unit has, rounding up (to a maximum of 4RP). Example: If this Requisition was used to add additional models to a unit with three Battle Honours, it would cost 3RP."
+        },
+        {
+          "title": "Ranks and Experience",
+          "text": "If a unit has gained enough , before its next battle it will earn a promotion and gain a rank (from Battle-ready to Blooded, for example). Each time a unit gains a rank, make a note of it on the unit's Only CHARACTER units can gain the Heroic or Legendary ranks. Other units cannot be promoted above the Battle-hardened rank and the maximum number of Experience points they can gain is therefore 30 (any gained beyond this are lost). The Legendary Veterans Requisition is an exception to this rule, enabling a unit without the CHARACTER keyword to gain these ranks. - Once a unit gains enough XP it will gain a rank. - Only CHARACTER units can gain the Heroic or Legendary ranks. - Each time a unit gains a rank, it can gain a Battle Honour."
+        },
+        {
+          "title": "Battle Honours Overview",
+          "text": "Battle Traits are skills or upgrades that units have acquired during their years of warfare, and help to give them a vital edge on the battlefield. Each time a unit gains a Battle Trait, select a Battle Traits table for that unit and either roll one D6 to randomly determine which Battle Trait the unit has gained, or choose the Battle Trait that you think tells the best narrative. A unit can have more than one Battle Trait but it cannot have the same Battle Trait more than once (if a duplicate result is rolled, roll again until a different result is rolled). Battle Traits can be found in many books, including this one (see ), as well as in Codexes and other publications. Each time you give a unit a Battle Trait, make a note of it on its and increase its total accordingly. Each time a unit gains a rank, it can gain one Battle Honour. Units can also gain additional Battle Honours by other means (such as by winning certain missions, fulfilling certain Agendas, etc.). Each time a unit gains a Battle Honour, increase its total by 1 (if the unit is TITANIC , increase its Crusade points total by 2 instead). Make a note of each Battle Honour a unit has on its . A unit can never have more than three Battle Honours unless it is a CHARACTER , in which case it can have up to six Battle Honours. Once the maximum is reached, each time a unit gains a new Battle Honour it must first remove one of its existing Battle Honours. There are several categories of Battle Honours that can be bestowed upon a unit, such as . Other categories of Battle Honour may be found in other publications. Each time a unit gains a Battle Honour, you can select from any category. - There are several categories of Battle Honours, which include:Battle Traits: New skills and abilities.Weapon Modifications: Upgrade an item of wargear.Crusade Relic: Gain a rare and powerful artefact. - Each time a unit gains a Battle Honour, increase its Crusade points total by 1 (or by 2 if TITANIC)."
+        },
+        {
+          "title": "Weapon Modifications",
+          "text": "Weapon Modifications are upgrades made to a warriors armaments that improve their lethality in combat. Each time a unit gains this Battle Honour , you must select one model in that unit (if the unit includes a CHARACTER model or Unit Champion, you must select that model), then you must select one weapon equipped by that model. You cannot select a weapon that has already been upgraded by this Battle Honour and you cannot select a weapon that has already been replaced by an Enhancement or a Crusade Relic - such artefacts cannot be modified. Each time you select a weapon, roll two D6 and consult the table below to randomly determine which two Weapon Modifications it gains (if a duplicate result is rolled, roll both dice again until two different results are rolled), or choose the two different Weapon Modifications that you think tell the best narrative."
+        },
+        {
+          "title": "Crusade Relics",
+          "text": "Crusade Relics are rare items of power that your warriors discover as they quest across the galaxy. Only CHARACTER models can gain Crusade Relics. When a model gains a Crusade Relic, simply select the Crusade Relic that you want that model to have. A CHARACTER model can have any number of Crusade Relics, but the same Crusade Relic cannot be included in your more than once. Crusade Relics can be found in many books, including this one (see Crusade Relics). There are three categories of Crusade Relics: Artificer Relics, Antiquity Relics and Legendary Relics. Some categories of Crusade Relic can only be given to CHARACTER models if their unit has achieved a particular , as shown in the table below. Unlike other Battle Honours , which increase a unit's total by 1 (or 2 if the CHARACTER unit is TITANIC ), each time you give a CHARACTER model a Crusade Relic, you must increase its unit's Crusade points total by the amount shown in the table below instead. Each time you give a CHARACTER model a Crusade Relic, make a note of it on its"
+        },
+        {
+          "title": "Out of Action Tests",
+          "text": "After a battle, all models from your Crusade army that are destroyed at the end of the battle are restored to your and all wounds they have lost are regained. This represents units replenishing their numbers, wounded warriors returning to the fray and battle tanks being recovered and repaired. The only lasting effects are any the unit acquires, as described below. At the end of each Crusade battle, you must take an Out of Action test for each unit from your Crusade army that is destroyed. To do so, roll one D6. On a 2+, the test is passed and nothing happens. On a 1, the test is failed; you must now choose one of the following options for that unit. - Out of Action: At the end of the battle, if a unit is destroyed, you must take an Out of Action test for it. - Roll one D6: on a 1, that test is failed. Choose one of the following for that unit:Devastating Blow: Lose one Battle Honour.Battle Scar: Gain one Battle Scar. Subtract 1 from a unit's Crusade points total for each Battle Scar it currently has."
+        },
+        {
+          "title": "Devastating Blow & Battle Scars",
+          "text": "[1. Devastating Blow] You can only select this result for units that have one or more Battle Honours . Select one of that unit's Battle Honours and remove it. Update that unit's and reduce its total by 1 (or by 2 if that unit is TITANIC ) to account for the lost Battle Honour. [2. Battle Scar] That unit gains one (see below). This must be determined before your next battle and that unit's must be updated to reflect any changes. Each time a unit gains a Battle Scar, either roll one D6 and consult the table below to randomly determine which Battle Scar that unit has gained, or choose the Battle Scar that you think tells the best narrative. A unit can have more than one Battle Scar, but it cannot have the same Battle Scar more than once (if a duplicate result is rolled, roll again until a different result is rolled). A unit cannot have more than three Battle Scars; each time a unit with three Battle Scars fails an , you must select the result for it. If the unit has no Battle Honours remaining, you must instead remove that unit from your - it is permanently destroyed or otherwise unable to fight any more. Make a note of each Battle Scar a unit has on its and subtract 1 from its total for each Battle Scar it currently has. Note that this can mean a unit has a negative Crusade points total."
+        },
+        {
+          "title": "Leaders and Attached Units",
+          "text": "Leaders can merge together with Bodyguard units using the Leader ability. While a Bodyguard unit contains a Leader unit, it is known as an Attached unit and all Battle Honours that the individual Leader and Bodyguard units have apply to that Attached unit. Rules that only apply if every model in the unit has that rule are an exception to this, and will only apply if both the Leader and Bodyguard units have the same rule. For example, the Infiltrators Scouts Deep Strike Stealth abilities are just some examples of rules that specify 'If every model in this unit has this ability...' and as such, they only apply if all the units in an Attached unit (i.e. all the Leader and Bodyguard units that make it up) have that same ability. If an individual Leader or Bodyguard unit is destroyed at the end of the battle, you must make an individual (see above) for that separate unit. Every individual unit that makes up an Attached unit gains 1XP for after each battle as normal. Each time an Attached unit adds to any Combat tallies for units destroyed or Agendas achieved, and each time an Attached unit gains any bonus XP for any reason (such as for achieving an Agenda or being ), those tallies and bonus XP can be marked on the of, or awarded to either the Leader or the Bodyguard unit (your choice), but not both."
+        },
+        {
+          "title": "Mustering Crusade Army",
+          "text": "In order to play a Crusade game of Warhammer 40,000, you will need to muster a Crusade army. To do so, follow the sequence below. [1. Select Battle Size] Select one of the following battle sizes; this will determine the total number of points each player will have to spend to build their Crusade army and as a result, how long the battle will last. Note that you will have to select units from your when mustering your Crusade army, therefore it must contain sufficient units for the points specified for your selected battle size. Points are a measure of a unit's power on the battlefield; the higher a unit's points value is, the more powerful that unit is. The points values for units are presented in other publications, such as Codexes and the Munitorum Field Manual. You will need to refer to these when building your army. [2. Start Your Army Roster] The details of your Crusade army must be recorded on an Army Roster; this can be recorded on the Warhammer 40,000 app, a blank Army Roster or a piece of paper. Players must show their finished Army Roster to their opponent before battle commences. You can download blank Army Roster following [3. Select Army Faction] Note on your Army Roster one to be your Army faction. [4. Select Detachment Rules] Note on your Army Roster one set of Detachment rules for your Crusade army. Some Detachment rules list units that you either must or cannot include in your Crusade army; you must conform to all such rules when building your Crusade army. [5. Select Units] Select all the units from your that you want to include in your Crusade army. Subtract each unit's points value from the total permitted for your battle size. You can only include a unit in your Crusade army if: - That unit has the Faction keyword you chose for your Crusade army in step 3. - You have enough points remaining. - Your Crusade army does not already contain three units with the same datasheet name as that unit - or six units with the same datasheet name as that unit if it is a BATTLELINE or DEDICATED TRANSPORT* unit. Your Crusade army must include at least one CHARACTER unit. Your Crusade army cannot include the same EPIC HERO more than once. *Every DEDICATED TRANSPORT unit in your Crusade army will need to start the battle with at least one unit embarked inside it, or it will not be able to be deployed for that battle and will instead count as having been destroyed during your first battle round. [6. Select Warlord] Select one CHARACTER model from your Crusade army to be your Warlord - this will be the leader of your Crusade army - and make a note of this on your Army Roster. Your Warlord gains the WARLORD keyword."
+        }
       ]
     },
     {
       "name": "Battle Traits",
       "text": "[Battle Traits Overview]\nBattle Traits are skills or upgrades that units have acquired during their years of warfare, and help to give them a vital edge on the battlefield.\n\n[Gaining Battle Traits]\nEach time a unit gains a Battle Trait, select a Battle Traits table for that unit and either roll one D6 to randomly determine which Battle Trait the unit has gained, or choose the Battle Trait that you think tells the best narrative.\n\n[Battle Trait Limitations]\nA unit can have more than one Battle Trait but it cannot have the same Battle Trait more than once (if a duplicate result is rolled, roll again until a different result is rolled).\n\n[Battle Trait Sources and Recording]\nBattle Traits can be found in many books, including this one (see ), as well as in Codexes and other publications. Each time you give a unit a Battle Trait, make a note of it on its and increase its total accordingly.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "What Are Battle Traits",
+          "text": "Battle Traits are skills or upgrades that units have acquired during their years of warfare, and help to give them a vital edge on the battlefield."
+        },
+        {
+          "title": "Gaining Battle Traits",
+          "text": "Each time a unit gains a Battle Trait, select a Battle Traits table for that unit and either roll one D6 to randomly determine which Battle Trait the unit has gained, or choose the Battle Trait that you think tells the best narrative."
+        },
+        {
+          "title": "Battle Trait Limitations",
+          "text": "A unit can have more than one Battle Trait but it cannot have the same Battle Trait more than once (if a duplicate result is rolled, roll again until a different result is rolled)."
+        },
+        {
+          "title": "Sources and Recording",
+          "text": "Battle Traits can be found in many books, including this one (see ), as well as in Codexes and other publications. Each time you give a unit a Battle Trait, make a note of it on its and increase its total accordingly."
+        }
+      ]
     },
     {
       "name": "Battle Honours",
       "text": "[Ranking Up]\n- Once a unit gains enough XP it will gain a rank. \n- Only CHARACTER units can gain the Heroic or Legendary ranks. \n- Each time a unit gains a rank, it can gain a Battle Honour.\n\n[Battle Honour Categories]\n- There are several categories of Battle Honours, which include:\n\nBattle Traits: New skills and abilities.\n\nWeapon Modifications: Upgrade an item of wargear.\n\nCrusade Relic: Gain a rare and powerful artefact.\n\n[Crusade Points]\n- Each time a unit gains a Battle Honour, increase its Crusade points total by 1 (or by 2 if TITANIC).",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Ranking Up",
+          "text": "Once a unit gains enough XP it will gain a rank. Only CHARACTER units can gain the Heroic or Legendary ranks. Each time a unit gains a rank, it can gain a Battle Honour."
+        },
+        {
+          "title": "Battle Honour Categories",
+          "text": "There are several categories of Battle Honours, which include:\n\nBattle Traits: New skills and abilities.\n\nWeapon Modifications: Upgrade an item of wargear.\n\nCrusade Relic: Gain a rare and powerful artefact."
+        },
+        {
+          "title": "Crusade Points",
+          "text": "Each time a unit gains a Battle Honour, increase its Crusade points total by 1 (or by 2 if TITANIC)."
+        }
+      ]
     },
     {
       "name": "Weapon Modifications",
       "text": "[TABLE: [[\"WEAPON MODIFICATIOND6FINELY BALANCEDPerfectly weighted for the weapon\\u2019s owner, this weapons feels to be on extension of their own limbs.Improve this weapon\\u2019s Ballistic Skill or Weapon Skill characteristic by 1.BRUTALEnhanced with hyper-dense metalloids or empowered by advanced energies, this weapon can be wielded with meteoric force.Add 1 to this weapon\\u2019s Strength characteristic.ARMOUR PIERCINGHoned to a razor-edged sharpness or invested with crackling energy fields, this weapon can crack the heaviest enemy battle plate.Improve this weapon\\u2019s Armour Penetration characteristic by 1.MASTER-WORKEDForged by master-smiths and hand-worked over generations by skilled artificers, this weapon\\u2019s deadly killing power matches its martial elegance.Add 1 to this weapon\\u2019s Damage characteristic.HEIRLOOMHanded to worthy scions or claimed by ruthless victors, the greatest weapons are valued for their quality.Add 1 to this weapon\\u2019s Attacks characteristic.PRECISEWhether fitted with superior scopes or crafted by master duellists, this weapon has been modified with the sole purpose of executing enemy heroes and commanders.Each time a Critical Wound is scored for an attack made with this weapon, that attack has the Precision ability.\", \"WEAPON MODIFICATION\", \"D6\", \"FINELY BALANCEDPerfectly weighted for the weapon\\u2019s owner, this weapons feels to be on extension of their own limbs.Improve this weapon\\u2019s Ballistic Skill or Weapon Skill characteristic by 1.\", \"\", \"BRUTALEnhanced with hyper-dense metalloids or empowered by advanced energies, this weapon can be wielded with meteoric force.Add 1 to this weapon\\u2019s Strength characteristic.\", \"\", \"ARMOUR PIERCINGHoned to a razor-edged sharpness or invested with crackling energy fields, this weapon can crack the heaviest enemy battle plate.Improve this weapon\\u2019s Armour Penetration characteristic by 1.\", \"\", \"MASTER-WORKEDForged by master-smiths and hand-worked over generations by skilled artificers, this weapon\\u2019s deadly killing power matches its martial elegance.Add 1 to this weapon\\u2019s Damage characteristic.\", \"\", \"HEIRLOOMHanded to worthy scions or claimed by ruthless victors, the greatest weapons are valued for their quality.Add 1 to this weapon\\u2019s Attacks characteristic.\", \"\", \"PRECISEWhether fitted with superior scopes or crafted by master duellists, this weapon has been modified with the sole purpose of executing enemy heroes and commanders.Each time a Critical Wound is scored for an attack made with this weapon, that attack has the Precision ability.\", \"\"], [\"WEAPON MODIFICATION\", \"D6\"], [\"FINELY BALANCEDPerfectly weighted for the weapon\\u2019s owner, this weapons feels to be on extension of their own limbs.Improve this weapon\\u2019s Ballistic Skill or Weapon Skill characteristic by 1.\", \"\"], [\"BRUTALEnhanced with hyper-dense metalloids or empowered by advanced energies, this weapon can be wielded with meteoric force.Add 1 to this weapon\\u2019s Strength characteristic.\", \"\"], [\"ARMOUR PIERCINGHoned to a razor-edged sharpness or invested with crackling energy fields, this weapon can crack the heaviest enemy battle plate.Improve this weapon\\u2019s Armour Penetration characteristic by 1.\", \"\"], [\"MASTER-WORKEDForged by master-smiths and hand-worked over generations by skilled artificers, this weapon\\u2019s deadly killing power matches its martial elegance.Add 1 to this weapon\\u2019s Damage characteristic.\", \"\"], [\"HEIRLOOMHanded to worthy scions or claimed by ruthless victors, the greatest weapons are valued for their quality.Add 1 to this weapon\\u2019s Attacks characteristic.\", \"\"], [\"PRECISEWhether fitted with superior scopes or crafted by master duellists, this weapon has been modified with the sole purpose of executing enemy heroes and commanders.Each time a Critical Wound is scored for an attack made with this weapon, that attack has the Precision ability.\", \"\"]]]",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Weapon Modifications",
+          "text": "]"
+        }
+      ]
     },
     {
       "name": "Crusade Relics",
       "text": "[TABLE: [[\"CRUSADE RELICSRELIC CATEGORYRANK REQUIREDCRUSADE POINTS INCREASEArtificerAny+1AntiquityHeroic or Legendary+2LegendaryLegendary+3\", \"CRUSADE RELICS\", \"RELIC CATEGORY\", \"RANK REQUIRED\", \"CRUSADE POINTS INCREASE\", \"Artificer\", \"Any\", \"+1\", \"Antiquity\", \"Heroic or Legendary\", \"+2\", \"Legendary\", \"Legendary\", \"+3\"], [\"CRUSADE RELICS\"], [\"RELIC CATEGORY\", \"RANK REQUIRED\", \"CRUSADE POINTS INCREASE\"], [\"Artificer\", \"Any\", \"+1\"], [\"Antiquity\", \"Heroic or Legendary\", \"+2\"], [\"Legendary\", \"Legendary\", \"+3\"]]]",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Crusade Relics",
+          "text": "]"
+        }
+      ]
     },
     {
       "name": "Out of Action",
       "text": "[Devastating Blow]\nYou can only select this result for units that have one or more Battle Honours . Select one of that unit's Battle Honours and remove it. Update that unit's and reduce its total by 1 (or by 2 if that unit is TITANIC ) to account for the lost Battle Honour. \n\n[Battle Scar]\nThat unit gains one (see below). This must be determined before your next battle and that unit's must be updated to reflect any changes.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Out of Action",
+          "text": "You can only select this result for units that have one or more Battle Honours . Select one of that unit's Battle Honours and remove it. Update that unit's and reduce its total by 1 (or by 2 if that unit is TITANIC ) to account for the lost Battle Honour. \n\nThat unit gains one (see below). This must be determined before your next battle and that unit's must be updated to reflect any changes."
+        }
+      ]
     },
     {
       "name": "Battle Scars",
       "text": "[Out of Action Tests]\n- Out of Action: At the end of the battle, if a unit is destroyed, you must take an Out of Action test for it. - Roll one D6: on a 1, that test is failed. Choose one of the following for that unit:Devastating Blow: Lose one Battle Honour.Battle Scar: Gain one Battle Scar. Subtract 1 from a unit's Crusade points total for each Battle Scar it currently has.\n\n[Battle Scars Table]\n[TABLE: [[\"BATTLE SCARD6CRIPPLING DAMAGEReduced to walking wounded, plagued by engine faults or hobbled by lacerations, the impaired still limp stoically into battle.This unit cannot Advance and you must subtract 1\\\" from the Move characteristic of models in this unit.BATTLE-WEARYSapped of energy and impetus, fighting formations that endure extended tours can be psychologically crippled by constant attack.Each time this unit takes a Battle-shock, Leadership, Desperate Escape or Out of Action test, subtract 1 from that test.FATIGUEDThese fighters have suffered heavily in war, indecision and disorganisation hampering their ability at effective battlefield cohesion.Subtract 1 from the Objective Control characteristic of models in this unit and this unit never receives a Charge bonus.DISGRACEDHaving committed some gross failure in battle, these warriors are excluded from high strategies and tasked with unheroic actions.You cannot use any Stratagems to affect this unit and this unit cannot be Marked for Greatness.MARK OF SHAMEHumiliated, cursed or haunted by terrible injury, these fighters are shunned or avoided and few will acknowledge them even in war.This unit cannot form an Attached unit, it is unaffected by the Aura abilities of friendly units, and it cannot be Marked for Greatness.DEEP SCARSBattle damage and grievous injuries can linger and fester, worsening until they severely hamper a unit\\u2019s constitution.Each time a Critical Hit is scored against this unit, that attack automatically wounds this unit.\", \"BATTLE SCAR\", \"D6\", \"CRIPPLING DAMAGEReduced to walking wounded, plagued by engine faults or hobbled by lacerations, the impaired still limp stoically into battle.This unit cannot Advance and you must subtract 1\\\" from the Move characteristic of models in this unit.\", \"\", \"BATTLE-WEARYSapped of energy and impetus, fighting formations that endure extended tours can be psychologically crippled by constant attack.Each time this unit takes a Battle-shock, Leadership, Desperate Escape or Out of Action test, subtract 1 from that test.\", \"\", \"FATIGUEDThese fighters have suffered heavily in war, indecision and disorganisation hampering their ability at effective battlefield cohesion.Subtract 1 from the Objective Control characteristic of models in this unit and this unit never receives a Charge bonus.\", \"\", \"DISGRACEDHaving committed some gross failure in battle, these warriors are excluded from high strategies and tasked with unheroic actions.You cannot use any Stratagems to affect this unit and this unit cannot be Marked for Greatness.\", \"\", \"MARK OF SHAMEHumiliated, cursed or haunted by terrible injury, these fighters are shunned or avoided and few will acknowledge them even in war.This unit cannot form an Attached unit, it is unaffected by the Aura abilities of friendly units, and it cannot be Marked for Greatness.\", \"\", \"DEEP SCARSBattle damage and grievous injuries can linger and fester, worsening until they severely hamper a unit\\u2019s constitution.Each time a Critical Hit is scored against this unit, that attack automatically wounds this unit.\", \"\"], [\"BATTLE SCAR\", \"D6\"], [\"CRIPPLING DAMAGEReduced to walking wounded, plagued by engine faults or hobbled by lacerations, the impaired still limp stoically into battle.This unit cannot Advance and you must subtract 1\\\" from the Move characteristic of models in this unit.\", \"\"], [\"BATTLE-WEARYSapped of energy and impetus, fighting formations that endure extended tours can be psychologically crippled by constant attack.Each time this unit takes a Battle-shock, Leadership, Desperate Escape or Out of Action test, subtract 1 from that test.\", \"\"], [\"FATIGUEDThese fighters have suffered heavily in war, indecision and disorganisation hampering their ability at effective battlefield cohesion.Subtract 1 from the Objective Control characteristic of models in this unit and this unit never receives a Charge bonus.\", \"\"], [\"DISGRACEDHaving committed some gross failure in battle, these warriors are excluded from high strategies and tasked with unheroic actions.You cannot use any Stratagems to affect this unit and this unit cannot be Marked for Greatness.\", \"\"], [\"MARK OF SHAMEHumiliated, cursed or haunted by terrible injury, these fighters are shunned or avoided and few will acknowledge them even in war.This unit cannot form an Attached unit, it is unaffected by the Aura abilities of friendly units, and it cannot be Marked for Greatness.\", \"\"], [\"DEEP SCARSBattle damage and grievous injuries can linger and fester, worsening until they severely hamper a unit\\u2019s constitution.Each time a Critical Hit is scored against this unit, that attack automatically wounds this unit.\", \"\"]]]\n\n[Attached Units and Battle Scars]\nLeaders can merge together with Bodyguard units using the Leader ability. While a Bodyguard unit contains a Leader unit, it is known as an Attached unit and all Battle Honours that the individual Leader and Bodyguard units have apply to that Attached unit.\n\nRules that only apply if every model in the unit has that rule are an exception to this, and will only apply if both the Leader and Bodyguard units have the same rule. For example, the Infiltrators Scouts Deep Strike Stealth abilities are just some examples of rules that specify 'If every model in this unit has this ability...' and as such, they only apply if all the units in an Attached unit (i.e. all the Leader and Bodyguard units that make it up) have that same ability.\n\n[Out of Action Tests for Attached Units]\nIf an individual Leader or Bodyguard unit is destroyed at the end of the battle, you must make an individual (see above) for that separate unit.\n\n[Experience Points and Tallies for Attached Units]\nEvery individual unit that makes up an Attached unit gains 1XP for after each battle as normal. Each time an Attached unit adds to any Combat tallies for units destroyed or Agendas achieved, and each time an Attached unit gains any bonus XP for any reason (such as for achieving an Agenda or being ), those tallies and bonus XP can be marked on the of, or awarded to either the Leader or the Bodyguard unit (your choice), but not both.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Out of Action Tests",
+          "text": "Out of Action: At the end of the battle, if a unit is destroyed, you must take an Out of Action test for it. - Roll one D6: on a 1, that test is failed. Choose one of the following for that unit:Devastating Blow: Lose one Battle Honour.Battle Scar: Gain one Battle Scar. Subtract 1 from a unit's Crusade points total for each Battle Scar it currently has."
+        },
+        {
+          "title": "Attached Units Overview",
+          "text": "Leaders can merge together with Bodyguard units using the Leader ability. While a Bodyguard unit contains a Leader unit, it is known as an Attached unit and all Battle Honours that the individual Leader and Bodyguard units have apply to that Attached unit.\n\nRules that only apply if every model in the unit has that rule are an exception to this, and will only apply if both the Leader and Bodyguard units have the same rule. For example, the Infiltrators Scouts Deep Strike Stealth abilities are just some examples of rules that specify 'If every model in this unit has this ability...' and as such, they only apply if all the units in an Attached unit (i.e. all the Leader and Bodyguard units that make it up) have that same ability."
+        },
+        {
+          "title": "Attached Unit Out of Action",
+          "text": "If an individual Leader or Bodyguard unit is destroyed at the end of the battle, you must make an individual (see above) for that separate unit."
+        },
+        {
+          "title": "Attached Unit Experience",
+          "text": "Every individual unit that makes up an Attached unit gains 1XP for after each battle as normal. Each time an Attached unit adds to any Combat tallies for units destroyed or Agendas achieved, and each time an Attached unit gains any bonus XP for any reason (such as for achieving an Agenda or being ), those tallies and bonus XP can be marked on the of, or awarded to either the Leader or the Bodyguard unit (your choice), but not both."
+        }
+      ]
     },
     {
       "name": "Attached Units",
       "text": "[Formation of Attached Units]\nLeaders can merge together with Bodyguard units using the Leader ability. While a Bodyguard unit contains a Leader unit, it is known as an Attached unit and all Battle Honours that the individual Leader and Bodyguard units have apply to that Attached unit.\n\n[Special Rules Application]\nRules that only apply if every model in the unit has that rule are an exception to this, and will only apply if both the Leader and Bodyguard units have the same rule. For example, the Infiltrators Scouts Deep Strike Stealth abilities are just some examples of rules that specify 'If every model in this unit has this ability...' and as such, they only apply if all the units in an Attached unit (i.e. all the Leader and Bodyguard units that make it up) have that same ability.\n\n[Unit Destruction and Out of Action Tests]\nIf an individual Leader or Bodyguard unit is destroyed at the end of the battle, you must make an individual (see above) for that separate unit.\n\n[Experience Points and Progression]\nEvery individual unit that makes up an Attached unit gains 1XP for after each battle as normal. Each time an Attached unit adds to any Combat tallies for units destroyed or Agendas achieved, and each time an Attached unit gains any bonus XP for any reason (such as for achieving an Agenda or being ), those tallies and bonus XP can be marked on the of, or awarded to either the Leader or the Bodyguard unit (your choice), but not both.",
-      "subsections": []
+      "subsections": [],
+      "accordion": [
+        {
+          "title": "Formation of Attached Units",
+          "text": "Leaders can merge together with Bodyguard units using the Leader ability. While a Bodyguard unit contains a Leader unit, it is known as an Attached unit and all Battle Honours that the individual Leader and Bodyguard units have apply to that Attached unit."
+        },
+        {
+          "title": "Special Rules Application",
+          "text": "Rules that only apply if every model in the unit has that rule are an exception to this, and will only apply if both the Leader and Bodyguard units have the same rule. For example, the Infiltrators Scouts Deep Strike Stealth abilities are just some examples of rules that specify 'If every model in this unit has this ability...' and as such, they only apply if all the units in an Attached unit (i.e. all the Leader and Bodyguard units that make it up) have that same ability."
+        },
+        {
+          "title": "Unit Destruction Tests",
+          "text": "If an individual Leader or Bodyguard unit is destroyed at the end of the battle, you must make an individual (see above) for that separate unit."
+        },
+        {
+          "title": "Experience and Progression",
+          "text": "Every individual unit that makes up an Attached unit gains 1XP for after each battle as normal. Each time an Attached unit adds to any Combat tallies for units destroyed or Agendas achieved, and each time an Attached unit gains any bonus XP for any reason (such as for achieving an Agenda or being ), those tallies and bonus XP can be marked on the of, or awarded to either the Leader or the Bodyguard unit (your choice), but not both."
+        }
+      ]
     }
   ]
 };

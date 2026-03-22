@@ -217,115 +217,58 @@ export default function RuleDetail() {
   };
 
   // Render a general rules section (core or crusade)
-  // Parses [Section Headers] into separate visual cards instead of one big text block
+  // ALL content rendered as clickable accordion dropdowns — no walls of text
   const renderSection = (section: RulesSection) => {
-    const text = section.text || '';
+    // Use pre-split accordion data if available
+    const items = section.accordion && section.accordion.length > 0
+      ? section.accordion
+      : section.subsections.length > 0
+        ? section.subsections.map(sub => ({
+            title: sub,
+            text: extractSubsectionText(section.text, sub) || ''
+          }))
+        : [{ title: section.name, text: (section.text || '').replace(/\[TABLE:\s*\[[\s\S]*?\]\]\s*/g, '').replace(/\[[A-Za-z][^\]]*\]/g, '').trim() }];
 
-    // Remove [TABLE:...] blocks first
-    const withoutTables = text.replace(/\[TABLE:\s*\[[\s\S]*?\]\]\s*/g, '');
+    // Filter out empty items
+    const validItems = items.filter(item => item.text && item.text.trim().length > 0);
 
-    // Parse into sections using [Header] markers
-    const hasSectionHeaders = /\[([A-Za-z0-9][A-Za-z0-9\s&,.'()\-–]+)\]/.test(withoutTables);
-    const sections = hasSectionHeaders
-      ? parseTextWithSectionHeaders(withoutTables)
-      : [{ text: withoutTables.replace(/\[|\]/g, '').trim() }];
+    if (validItems.length === 0) {
+      return (
+        <div className="text-center py-8 text-stone-500">
+          No content available for this section.
+        </div>
+      );
+    }
 
     return (
-      <div className="space-y-4">
-        {/* Sectioned content — each [Header] becomes its own card */}
-        {sections.map((block, idx) => {
-          if (!block.text && !block.header) return null;
-
-          // Split text into bullet items and paragraphs
-          const lines = block.text.split(/(?= - )/);
-          const bullets: string[] = [];
-          const paragraphs: string[] = [];
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed) continue;
-            if (trimmed.startsWith('- ')) {
-              bullets.push(trimmed.slice(2));
-            } else {
-              paragraphs.push(trimmed);
-            }
-          }
-
-          // Skip empty blocks
-          if (paragraphs.length === 0 && bullets.length === 0 && !block.header) return null;
+      <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900">
+        {validItems.map((item, idx) => {
+          const key = `acc-${idx}`;
+          const isExpanded = expandedSubsections.has(key);
 
           return (
-            <div
-              key={idx}
-              className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4"
-            >
-              {/* Section header */}
-              {block.header && (
-                <h3 className="text-sm font-bold text-emerald-400 mb-3 tracking-wide uppercase border-b border-emerald-500/20 pb-2">
-                  {block.header}
-                </h3>
-              )}
-
-              {/* Paragraphs */}
-              {paragraphs.length > 0 && (
-                <div className="space-y-2 mb-2">
-                  {paragraphs.map((p, pIdx) => (
-                    <p key={pIdx} className="text-stone-300 text-sm leading-relaxed">{p}</p>
-                  ))}
+            <div key={idx} className={idx !== validItems.length - 1 ? "border-b border-stone-800/60" : ""}>
+              <button
+                onClick={() => toggleSubsection(key)}
+                className="w-full px-4 py-3 flex items-center justify-between hover:bg-emerald-500/5 transition-all"
+              >
+                <span className="text-sm text-emerald-400 font-medium text-left">{item.title}</span>
+                {isExpanded ? (
+                  <ChevronDown className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                ) : (
+                  <ChevronRight className="w-4 h-4 text-stone-500 flex-shrink-0" />
+                )}
+              </button>
+              {isExpanded && (
+                <div className="px-4 pb-3 border-t border-stone-800/30">
+                  <div className="pt-3">
+                    <FormattedRuleText text={item.text} className="text-sm" />
+                  </div>
                 </div>
-              )}
-
-              {/* Bullet/numbered items */}
-              {bullets.length > 0 && (
-                <ol className="space-y-1.5 list-decimal list-inside">
-                  {bullets.map((item, bIdx) => (
-                    <li key={bIdx} className="text-stone-300 text-sm leading-relaxed marker:text-emerald-500">
-                      {item}
-                    </li>
-                  ))}
-                </ol>
               )}
             </div>
           );
         })}
-
-        {/* Subsections — expandable/collapsible */}
-        {section.subsections.length > 0 && (
-          <div className="space-y-2">
-            <h2 className="text-lg font-bold text-stone-200 tracking-wide">
-              Subsections
-            </h2>
-            <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900">
-              {section.subsections.map((sub, idx) => {
-                const key = `sub-${idx}`;
-                const isExpanded = expandedSubsections.has(key);
-                const subText = extractSubsectionText(section.text, sub);
-                return (
-                  <div key={idx} className={idx !== section.subsections.length - 1 ? "border-b border-stone-800/60" : ""}>
-                    <button
-                      onClick={() => toggleSubsection(key)}
-                      className="w-full px-4 py-3 flex items-center justify-between hover:bg-emerald-500/5 transition-all"
-                    >
-                      <span className="text-sm text-emerald-400 font-medium text-left">{sub}</span>
-                      {isExpanded ? (
-                        <ChevronDown className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4 text-stone-500 flex-shrink-0" />
-                      )}
-                    </button>
-                    {isExpanded && subText && (
-                      <div className="px-4 pb-3 border-t border-stone-800/30">
-                        <div className="pt-3">
-                          <FormattedRuleText text={subText} className="text-sm" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
     );
   };
