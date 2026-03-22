@@ -8,10 +8,7 @@ export default function CampaignHistory() {
   const navigate = useNavigate();
   const { campaignHistory } = useCrusade();
 
-  const handleCampaignClick = (campaignId: string) => {
-    // Navigate to archived campaign view
-    navigate(`/campaign/${campaignId}/archive`);
-  };
+  // Archive detail view not yet implemented — cards are display-only for now
 
   const getRecordColor = (record: { wins: number; losses: number; draws: number }) => {
     if (record.wins > record.losses) return "text-emerald-400";
@@ -86,19 +83,18 @@ export default function CampaignHistory() {
             const factionIcon = getFactionIcon(campaign.faction_id as FactionId);
 
             return (
-              <button
+              <div
                 key={campaign.id}
-                onClick={() => handleCampaignClick(campaign.id)}
-                className="w-full relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group"
+                className="w-full relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 transition-all"
               >
 
                 <div className="relative p-4">
                   {/* Campaign Name */}
                   <div className="flex items-start justify-between mb-3">
-                    <h2 className="text-lg font-bold text-stone-100 tracking-wide group-hover:text-amber-400 transition-colors">
+                    <h2 className="text-lg font-bold text-stone-100 tracking-wide transition-colors">
                       {campaign.name}
                     </h2>
-                    <Trophy className="w-5 h-5 text-amber-500/50 group-hover:text-amber-500 transition-colors" />
+                    <Trophy className="w-5 h-5 text-amber-500/50 transition-colors" />
                   </div>
 
                   {/* Date Range */}
@@ -134,7 +130,7 @@ export default function CampaignHistory() {
                     </div>
                   </div>
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>
