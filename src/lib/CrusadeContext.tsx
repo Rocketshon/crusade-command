@@ -199,7 +199,12 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
 
     // Push to cloud
     if (isSupabaseConfigured() && authUser?.id) {
-      sync.createCampaignCloud(newCampaign, player).catch(console.warn);
+      sync.createCampaignCloud(newCampaign, player).then(ok => {
+        if (!ok) alert('[DEBUG] Campaign cloud push failed — check console');
+        else console.log('[Sync] Campaign pushed to cloud successfully');
+      }).catch(err => alert('[DEBUG] Cloud push error: ' + err.message));
+    } else {
+      console.warn('[Sync] Skipped cloud push — configured:', isSupabaseConfigured(), 'authUser:', authUser?.id);
     }
   }, [authUser]);
 
