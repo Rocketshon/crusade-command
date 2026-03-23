@@ -42,6 +42,11 @@ interface CrusadeState {
   spendRequisition: (amount: number) => boolean;
   awardRequisition: (amount: number) => void;
 
+  // CM Actions
+  updateCampaignSettings: (updates: Partial<Campaign>) => void;
+  removePlayer: (playerId: string) => void;
+  postAnnouncement: (text: string) => void;
+
   // Campaign History
   campaignHistory: storage.ArchivedCampaign[];
 }
@@ -311,6 +316,8 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
         notes: '',
         is_destroyed: false,
         is_warlord: false,
+        status: 'ready',
+        faction_legacy: {},
         created_at: new Date().toISOString(),
       };
       setUnits(prev => [...prev, unit]);
@@ -463,6 +470,47 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const updateCampaignSettings = useCallback((updates: Partial<Campaign>) => {
+    setCampaign(prev => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...updates };
+      // Persist to cloud
+      if (isSupabaseConfigured()) {
+        sync.pushCampaignToCloud(updated).catch(console.warn);
+      }
+      return updated;
+    });
+  }, []);
+
+  const removePlayerFn = useCallback((playerId: string) => {
+    // Remove player from local state
+    setPlayers(prev => prev.filter(p => p.id !== playerId));
+    // Remove from cloud
+    if (isSupabaseConfigured()) {
+      sync.leaveCampaignCloud(playerId).catch(console.warn);
+    }
+  }, []);
+
+  const postAnnouncement = useCallback((text: string) => {
+    setCampaign(prev => {
+      if (!prev) return prev;
+      const announcement = {
+        id: storage.generateId(),
+        text,
+        created_at: new Date().toISOString(),
+      };
+      const updated = {
+        ...prev,
+        announcements: [announcement, ...(prev.announcements ?? [])],
+      };
+      // Persist to cloud
+      if (isSupabaseConfigured()) {
+        sync.pushCampaignToCloud(updated).catch(console.warn);
+      }
+      return updated;
+    });
+  }, []);
+
   return (
     <CrusadeContext.Provider value={{
       campaign, players, currentPlayer,
@@ -470,6 +518,7 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
       units, addUnit: addUnitFn, updateUnit: updateUnitFn, removeUnit: removeUnitFn,
       battles, logBattle, getPlayerBattles,
       awardXP, addBattleHonour, addBattleScar, removeBattleScar, markDestroyed, spendRequisition, awardRequisition,
+      updateCampaignSettings, removePlayer: removePlayerFn, postAnnouncement,
       campaignHistory,
     }}>
       {children}

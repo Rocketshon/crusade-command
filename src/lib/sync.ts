@@ -22,6 +22,7 @@ export async function pushCampaignToCloud(campaign: Campaign): Promise<boolean> 
       current_round: campaign.current_round,
       owner_id: campaign.owner_id,
       created_at: campaign.created_at,
+      announcements: campaign.announcements ?? [],
     });
     if (error) {
       console.error('[Sync] pushCampaignToCloud error:', error.message);
@@ -303,6 +304,7 @@ export async function createCampaignCloud(
       current_round: campaign.current_round,
       owner_id: campaign.owner_id,
       created_at: campaign.created_at,
+      announcements: campaign.announcements ?? [],
     });
     if (campErr) {
       console.error('[Sync] createCampaignCloud campaign error:', campErr.message);

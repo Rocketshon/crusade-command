@@ -46,3 +46,5 @@ Crusader App Design/
 assets/
 guidelines/
 .claude/settings.local.json
+.claude/settings.local.json
+.nexus/

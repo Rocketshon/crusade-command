@@ -257,4 +257,36 @@
       opacity: 0.2;
     }
   }
+
+  /* Dice Roller Animations */
+  @keyframes diceTumble {
+    0% {
+      transform: rotateX(0deg) rotateY(0deg) scale(1);
+    }
+    25% {
+      transform: rotateX(90deg) rotateY(45deg) scale(0.9);
+    }
+    50% {
+      transform: rotateX(180deg) rotateY(90deg) scale(1.05);
+    }
+    75% {
+      transform: rotateX(270deg) rotateY(135deg) scale(0.95);
+    }
+    100% {
+      transform: rotateX(360deg) rotateY(180deg) scale(1);
+    }
+  }
+
+  .animate-dice-tumble {
+    animation: diceTumble 0.4s ease-in-out infinite;
+  }
+
+  /* Hide scrollbar for combat tracker unit chips */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
 }

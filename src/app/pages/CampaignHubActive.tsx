@@ -1,15 +1,17 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
-import { Copy, Check, Skull, Plus, Swords } from "lucide-react";
+import { Copy, Check, Skull, Plus, Swords, AlertCircle, Trophy, Megaphone, Map } from "lucide-react";
 import { toast } from "sonner";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFactionName, getFactionIcon } from "../../lib/factions";
 import { getResultColor } from "../../lib/ranks";
 import { getResultLabel, formatRecord } from "../../lib/formatText";
+import { getUnitAttentionItems } from "../../lib/attention";
+import type { AttentionItem } from "../../lib/attention";
 
 export default function CampaignHubActive() {
   const navigate = useNavigate();
-  const { campaign, players, currentPlayer, battles } = useCrusade();
+  const { campaign, players, currentPlayer, battles, units } = useCrusade();
   const [copied, setCopied] = useState(false);
 
   // If no campaign, redirect to home
@@ -34,6 +36,13 @@ export default function CampaignHubActive() {
   // Recent battles: last 5, sorted newest first (battles are already sorted newest first from context)
   const recentBattles = playerBattles.slice(0, 5);
 
+  // Attention items for current player's units
+  const playerUnits = units.filter(u => u.player_id === currentPlayer?.id);
+  const attentionItems: AttentionItem[] = useMemo(
+    () => playerUnits.flatMap(u => getUnitAttentionItems(u)),
+    [playerUnits]
+  );
+
   const handleCopyJoinCode = () => {
     navigator.clipboard.writeText(campaign.join_code)
       .then(() => {
@@ -52,6 +61,22 @@ export default function CampaignHubActive() {
 
   const handleLogBattle = () => {
     navigate("/log-battle");
+  };
+
+  const formatAnnouncementDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+    if (diffMins < 1) return "Just now";
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffDays === 1) return "Yesterday";
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
   };
 
   const formatBattleDate = (dateStr: string) => {
@@ -101,6 +126,29 @@ export default function CampaignHubActive() {
           </button>
         </div>
 
+        {/* Attention Banner */}
+        {attentionItems.length > 0 && (
+          <div className="mb-6 rounded-sm border border-amber-500/40 bg-amber-500/10 p-4">
+            <div className="flex items-center gap-2 mb-2">
+              <AlertCircle className="w-4 h-4 text-amber-500 flex-shrink-0" />
+              <span className="text-sm font-semibold text-amber-400">
+                Action Required ({attentionItems.length})
+              </span>
+            </div>
+            <div className="space-y-1.5">
+              {attentionItems.map((item, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => navigate(item.actionUrl)}
+                  className="block w-full text-left text-xs text-amber-300/80 hover:text-amber-300 transition-colors"
+                >
+                  &bull; {item.message}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3 mb-6">
           {/* Current Round */}
@@ -139,6 +187,31 @@ export default function CampaignHubActive() {
             </div>
           </div>
         </div>
+
+        {/* Announcements */}
+        {campaign.announcements && campaign.announcements.length > 0 && (
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-3">
+              <Megaphone className="w-4 h-4 text-amber-500" />
+              <span className="text-xs text-stone-500 uppercase tracking-wider font-semibold">
+                Announcements
+              </span>
+            </div>
+            <div className="space-y-2">
+              {campaign.announcements.slice(0, 5).map((a) => (
+                <div
+                  key={a.id}
+                  className="rounded-sm border border-stone-700/60 bg-stone-900 p-3"
+                >
+                  <p className="text-sm text-stone-200">{a.text}</p>
+                  <p className="text-xs text-stone-500 mt-1">
+                    {formatAnnouncementDate(a.created_at)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Players Section Header */}
         <div className="flex items-center gap-2 mb-4">
@@ -271,6 +344,42 @@ export default function CampaignHubActive() {
             </div>
           )}
         </div>
+
+        {/* Battle Mode Link */}
+        <button
+          onClick={() => navigate("/battle-lobby")}
+          className="mt-6 w-full rounded-sm border border-stone-700/60 bg-stone-900 p-4 flex items-center gap-3 hover:border-red-500/50 hover:shadow-[0_0_15px_rgba(239,68,68,0.15)] transition-all group"
+        >
+          <Swords className="w-5 h-5 text-red-500 group-hover:text-red-400 transition-colors" />
+          <span className="text-sm font-semibold text-stone-100 group-hover:text-red-400 transition-colors">
+            Battle Mode
+          </span>
+          <span className="ml-auto text-xs text-stone-500">Live Combat</span>
+        </button>
+
+        {/* Hall of Fame Link */}
+        <button
+          onClick={() => navigate("/hall-of-fame")}
+          className="mt-3 w-full rounded-sm border border-stone-700/60 bg-stone-900 p-4 flex items-center gap-3 hover:border-amber-500/50 hover:shadow-[0_0_15px_rgba(245,158,11,0.15)] transition-all group"
+        >
+          <Trophy className="w-5 h-5 text-amber-500 group-hover:text-amber-400 transition-colors" />
+          <span className="text-sm font-semibold text-stone-100 group-hover:text-amber-400 transition-colors">
+            Hall of Fame
+          </span>
+          <span className="ml-auto text-xs text-stone-500">Stats &amp; Achievements</span>
+        </button>
+
+        {/* Campaign Map Link */}
+        <button
+          onClick={() => navigate("/campaign-map")}
+          className="mt-3 w-full rounded-sm border border-stone-700/60 bg-stone-900 p-4 flex items-center gap-3 hover:border-emerald-500/50 hover:shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all group"
+        >
+          <Map className="w-5 h-5 text-emerald-500 group-hover:text-emerald-400 transition-colors" />
+          <span className="text-sm font-semibold text-stone-100 group-hover:text-emerald-400 transition-colors">
+            Campaign Map
+          </span>
+          <span className="ml-auto text-xs text-stone-500">Territory Control</span>
+        </button>
       </div>
 
       {/* Floating Action Button - Log Battle */}

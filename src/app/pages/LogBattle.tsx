@@ -1,10 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { ArrowLeft, Swords, ChevronDown, Shield, Star, FileText } from "lucide-react";
+import { ArrowLeft, Swords, ChevronDown, Shield, Star, FileText, ScrollText } from "lucide-react";
 import { toast } from "sonner";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFactionName } from "../../lib/factions";
 import type { Battle } from "../../types";
+
+const CRUSADE_AGENDAS = [
+  { id: "assassinate", name: "Assassinate", xp: "+3 XP", description: "Destroy an enemy CHARACTER unit" },
+  { id: "behind_enemy_lines", name: "Behind Enemy Lines", xp: "+3 XP", description: "Units in enemy deployment zone at end" },
+  { id: "marked_for_death", name: "Marked for Death", xp: "+3 XP", description: "Destroy your marked target" },
+  { id: "recover_archeotech", name: "Recover Archeotech", xp: "+3 XP", description: "Control objective markers" },
+  { id: "secure_and_control", name: "Secure and Control", xp: "+2 XP", description: "Units on objectives at battle end" },
+  { id: "overwhelming_force", name: "Overwhelming Force", xp: "+2 XP", description: "Destroy 3+ enemy units in a single turn" },
+  { id: "seek_and_destroy", name: "Seek and Destroy", xp: "+1 XP", description: "Per enemy unit destroyed by your units" },
+  { id: "hold_the_line", name: "Hold the Line", xp: "+2 XP", description: "Units that don't move for a full turn" },
+] as const;
 
 const BATTLE_SIZES = [
   "Combat Patrol",
@@ -33,6 +44,7 @@ export default function LogBattle() {
   const [winner, setWinner] = useState("you");
   const [selectedUnitIds, setSelectedUnitIds] = useState<string[]>([]);
   const [markedForGreatness, setMarkedForGreatness] = useState<string | null>(null);
+  const [selectedAgendas, setSelectedAgendas] = useState<string[]>([]);
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -44,6 +56,19 @@ export default function LogBattle() {
 
   // Units that have been selected/fielded (for Marked for Greatness selection)
   const fieldedUnits = availableUnits.filter(u => selectedUnitIds.includes(u.id));
+
+  const toggleAgenda = (agendaId: string) => {
+    setSelectedAgendas((prev) => {
+      if (prev.includes(agendaId)) {
+        return prev.filter((id) => id !== agendaId);
+      }
+      if (prev.length >= 2) {
+        toast.error("You can only select 2 agendas");
+        return prev;
+      }
+      return [...prev, agendaId];
+    });
+  };
 
   const toggleUnitSelection = (unitId: string) => {
     setSelectedUnitIds(prev => {
@@ -111,6 +136,8 @@ export default function LogBattle() {
       result,
       units_fielded: selectedUnitIds,
       marked_for_greatness: markedForGreatness,
+      agendas: selectedAgendas,
+      combat_log: [],
       notes: notes.trim(),
     });
 
@@ -246,6 +273,73 @@ export default function LogBattle() {
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* Agendas */}
+          <div>
+            <label className="flex items-center gap-2 text-sm font-medium text-stone-300 mb-2 tracking-wide">
+              <ScrollText className="w-4 h-4 text-emerald-500/70" />
+              Agendas
+            </label>
+            <p className="text-xs text-stone-400 mb-3">
+              Select exactly 2 agendas for this battle
+            </p>
+            <div className="space-y-2">
+              {CRUSADE_AGENDAS.map((agenda) => {
+                const isSelected = selectedAgendas.includes(agenda.id);
+                return (
+                  <button
+                    key={agenda.id}
+                    type="button"
+                    onClick={() => toggleAgenda(agenda.id)}
+                    className={`w-full text-left rounded-sm px-4 py-3 transition-all ${
+                      isSelected
+                        ? "bg-gradient-to-br from-emerald-900/40 to-emerald-950/30 border border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                        : "bg-stone-900 border border-stone-700/60 hover:border-emerald-500/50"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-5 h-5 rounded border flex-shrink-0 flex items-center justify-center transition-all ${
+                          isSelected
+                            ? "bg-emerald-600 border-emerald-500"
+                            : "border-stone-600 bg-stone-800"
+                        }`}
+                      >
+                        {isSelected && (
+                          <svg className="w-3 h-3 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`text-sm font-medium ${isSelected ? "text-emerald-300" : "text-stone-200"}`}>
+                            {agenda.name}
+                          </span>
+                          <span className="text-xs text-amber-500 font-mono flex-shrink-0">
+                            {agenda.xp}
+                          </span>
+                        </div>
+                        <p className="text-xs text-stone-500 mt-0.5">
+                          {agenda.description}
+                        </p>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            {selectedAgendas.length > 0 && (
+              <p className="text-xs text-stone-400 mt-2">
+                {selectedAgendas.length}/2 agenda{selectedAgendas.length !== 1 ? "s" : ""} selected
+              </p>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="flex items-center gap-2 py-2">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
           </div>
 
           {/* Scores */}

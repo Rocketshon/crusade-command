@@ -22,8 +22,13 @@ import SignUp from "./pages/SignUp";
 import SignIn from "./pages/SignIn";
 import PostBattleWizard from "./pages/PostBattleWizard";
 import RequisitionSpending from "./pages/RequisitionSpending";
+import RequisitionStore from "./pages/RequisitionStore";
 import BattleDetail from "./pages/BattleDetail";
 import TacticalCheatSheet from "./pages/TacticalCheatSheet";
+import HallOfFame from "./pages/HallOfFame";
+import CampaignMap from "./pages/CampaignMap";
+import BattleLobby from "./pages/BattleLobby";
+import CombatTracker from "./pages/CombatTracker";
 import { redirect } from "react-router";
 import { loadUser } from "../lib/storage";
 
@@ -50,6 +55,7 @@ export const router = createBrowserRouter(
         { path: "/post-battle", Component: PostBattleWizard },
         { path: "/battle/:id", Component: BattleDetail },
         { path: "/requisition", Component: RequisitionSpending },
+        { path: "/requisition-store", Component: RequisitionStore },
         { path: "/roster", Component: Roster },
         { path: "/add-unit", Component: AddUnit },
         { path: "/unit/:unitId", Component: UnitDetail },
@@ -67,6 +73,10 @@ export const router = createBrowserRouter(
         // Settings
         { path: "/settings", Component: Settings },
         { path: "/campaign-history", Component: CampaignHistory },
+        { path: "/hall-of-fame", Component: HallOfFame },
+        { path: "/campaign-map", Component: CampaignMap },
+        { path: "/battle-lobby", Component: BattleLobby },
+        { path: "/battle-live/:opponentId", Component: CombatTracker },
         { path: "*", lazy: () => import('./pages/NotFound').then(m => ({ Component: m.default })) },
       ],
     },

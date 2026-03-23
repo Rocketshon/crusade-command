@@ -19,6 +19,31 @@ export default function SignIn() {
   const isFormValid = email.trim() && password.trim();
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) {
+      setErrorMessage("Enter your email address first, then tap Forgot Password.");
+      return;
+    }
+    setIsResetting(true);
+    setErrorMessage("");
+    try {
+      const { supabase } = await import("../../lib/supabase");
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/sign-in`,
+      });
+      if (error) {
+        setErrorMessage(error.message);
+      } else {
+        setResetSent(true);
+      }
+    } catch {
+      setErrorMessage("Failed to send reset email. Try again.");
+    }
+    setIsResetting(false);
+  };
 
   const handleSignIn = async () => {
     setErrorMessage("");
@@ -132,6 +157,27 @@ export default function SignIn() {
               </button>
             </div>
           </div>
+
+          {/* Forgot Password */}
+          <div className="text-right -mt-2">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={isResetting}
+              className="text-emerald-500/70 hover:text-emerald-400 text-xs font-medium transition-colors"
+            >
+              {isResetting ? "Sending..." : "Forgot Password?"}
+            </button>
+          </div>
+
+          {/* Reset Email Sent */}
+          {resetSent && (
+            <div className="rounded-lg border border-emerald-500/30 bg-gradient-to-br from-emerald-950/40 to-stone-950 p-4">
+              <p className="text-emerald-300 text-sm">
+                Password reset link sent to <strong>{email}</strong>. Check your inbox.
+              </p>
+            </div>
+          )}
 
           {/* Sign In Button */}
           <button

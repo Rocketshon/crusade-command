@@ -10,16 +10,21 @@ import {
   Database,
   Info,
   Pencil,
-  LogOut
+  LogOut,
+  Shield,
+  UserMinus,
+  Megaphone,
+  ChevronUp,
 } from "lucide-react";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { useAuth } from "../../lib/AuthContext";
 import { saveCampaign, savePlayer, saveUnits, saveBattles } from "../../lib/storage";
 import { getAllFactionSlugs, getAllUnits } from "../../data";
+import { getFactionName, getFactionIcon } from "../../lib/factions";
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { campaign, currentPlayer, units, battles, leaveCampaign } = useCrusade();
+  const { campaign, currentPlayer, players, units, battles, leaveCampaign, updateCampaignSettings, removePlayer, postAnnouncement } = useCrusade();
   const { user: authUser, profile, signOut } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -27,6 +32,13 @@ export default function Settings() {
   const [showShareSuccess, setShowShareSuccess] = useState(false);
   const [showExportSuccess, setShowExportSuccess] = useState(false);
   const [showImportSuccess, setShowImportSuccess] = useState(false);
+
+  // CM Admin state
+  const isCampaignMaster = !!(campaign && authUser && campaign.owner_id === authUser.id);
+  const [cmSupplyLimit, setCmSupplyLimit] = useState(campaign?.supply_limit ?? 1000);
+  const [cmStartingRp, setCmStartingRp] = useState(campaign?.starting_rp ?? 5);
+  const [announcementText, setAnnouncementText] = useState("");
+  const [showRemovePlayerDialog, setShowRemovePlayerDialog] = useState<string | null>(null);
 
   // Profile state
   const displayName = profile?.display_name ?? authUser?.user_metadata?.display_name ?? authUser?.email?.split("@")[0] ?? "Commander";
@@ -291,6 +303,146 @@ export default function Settings() {
           </div>
         </div>
 
+        {/* Campaign Administration — CM Only */}
+        {isCampaignMaster && (
+          <div className="mb-6">
+            <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3 px-1">
+              Campaign Administration
+            </h2>
+            <div className="relative overflow-hidden rounded-sm border border-emerald-500/30 bg-stone-900 p-5 space-y-5">
+              <div className="flex items-center gap-2 mb-1">
+                <Shield className="w-5 h-5 text-emerald-500" />
+                <span className="text-stone-200 font-semibold">Campaign Master Controls</span>
+              </div>
+
+              {/* Adjust Supply Limit */}
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">Supply Limit</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min={0}
+                    step={50}
+                    value={cmSupplyLimit}
+                    onChange={(e) => setCmSupplyLimit(Number(e.target.value))}
+                    className="flex-1 px-3 py-2 rounded-sm border border-stone-700 bg-stone-800 text-stone-200 font-mono focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    onClick={() => updateCampaignSettings({ supply_limit: cmSupplyLimit })}
+                    className="px-4 py-2 rounded-sm bg-emerald-600 hover:bg-emerald-500 text-black font-bold text-sm transition-colors"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+
+              {/* Adjust Starting RP */}
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">Starting RP</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    min={0}
+                    step={1}
+                    value={cmStartingRp}
+                    onChange={(e) => setCmStartingRp(Number(e.target.value))}
+                    className="flex-1 px-3 py-2 rounded-sm border border-stone-700 bg-stone-800 text-stone-200 font-mono focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    onClick={() => updateCampaignSettings({ starting_rp: cmStartingRp })}
+                    className="px-4 py-2 rounded-sm bg-emerald-600 hover:bg-emerald-500 text-black font-bold text-sm transition-colors"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+
+              {/* Advance Round */}
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">
+                  Current Round: <span className="text-stone-200 font-mono">{campaign?.current_round ?? 1}</span>
+                </label>
+                <button
+                  onClick={() => updateCampaignSettings({ current_round: (campaign?.current_round ?? 1) + 1 })}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-sm border border-emerald-500/30 bg-stone-800 hover:bg-emerald-500/10 hover:border-emerald-500/50 text-emerald-400 font-semibold transition-all"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                  Advance to Round {(campaign?.current_round ?? 1) + 1}
+                </button>
+              </div>
+
+              {/* Post Announcement */}
+              <div>
+                <label className="block text-sm text-stone-400 mb-1">Post Announcement</label>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={announcementText}
+                    onChange={(e) => setAnnouncementText(e.target.value)}
+                    placeholder="Write an announcement..."
+                    className="flex-1 px-3 py-2 rounded-sm border border-stone-700 bg-stone-800 text-stone-200 placeholder-stone-600 focus:outline-none focus:border-emerald-500"
+                  />
+                  <button
+                    onClick={() => {
+                      if (announcementText.trim()) {
+                        postAnnouncement(announcementText.trim());
+                        setAnnouncementText("");
+                      }
+                    }}
+                    disabled={!announcementText.trim()}
+                    className="flex items-center gap-2 px-4 py-2 rounded-sm bg-emerald-600 hover:bg-emerald-500 text-black font-bold text-sm transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <Megaphone className="w-4 h-4" />
+                    Post
+                  </button>
+                </div>
+              </div>
+
+              {/* Player Management */}
+              <div>
+                <label className="block text-sm text-stone-400 mb-2">Player Management</label>
+                <div className="space-y-2">
+                  {players.map((player) => {
+                    const isOwner = player.user_id === campaign?.owner_id;
+                    return (
+                      <div
+                        key={player.id}
+                        className="flex items-center justify-between p-3 rounded-sm border border-stone-700/60 bg-stone-800"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-lg">{getFactionIcon(player.faction_id)}</span>
+                          <div>
+                            <div className="text-sm font-semibold text-stone-200">
+                              {player.name}
+                              {isOwner && (
+                                <span className="ml-2 text-xs text-emerald-400 font-normal">(CM)</span>
+                              )}
+                            </div>
+                            <div className="text-xs text-stone-500">
+                              {getFactionName(player.faction_id)}
+                            </div>
+                          </div>
+                        </div>
+                        {!isOwner && (
+                          <button
+                            onClick={() => setShowRemovePlayerDialog(player.id)}
+                            className="p-2 rounded-sm hover:bg-red-500/10 transition-colors group"
+                          >
+                            <UserMinus className="w-4 h-4 text-stone-500 group-hover:text-red-400 transition-colors" />
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {players.length === 0 && (
+                    <p className="text-sm text-stone-600 text-center py-2">No players in campaign</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Data Section */}
         <div className="mb-6">
           <h2 className="text-xs font-semibold text-stone-500 uppercase tracking-wider mb-3 px-1">
@@ -423,6 +575,41 @@ export default function Settings() {
                 className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-black font-bold hover:from-red-500 hover:to-red-400 transition-all"
               >
                 Leave Campaign
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Remove Player Confirmation Dialog */}
+      {showRemovePlayerDialog && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+          <div className="relative w-full max-w-md rounded-sm border border-red-500/30 bg-stone-900 p-6 shadow-2xl">
+            <div className="flex items-start gap-3 mb-4">
+              <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="text-xl font-bold text-stone-100 mb-2">Remove Player?</h3>
+                <p className="text-stone-400 text-sm leading-relaxed">
+                  Are you sure you want to remove this player from the campaign? Their roster and battle history will be deleted.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => setShowRemovePlayerDialog(null)}
+                className="flex-1 px-4 py-3 rounded-sm border border-stone-700/60 bg-stone-900 text-stone-300 font-semibold hover:border-emerald-500/50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  removePlayer(showRemovePlayerDialog);
+                  setShowRemovePlayerDialog(null);
+                }}
+                className="flex-1 px-4 py-3 rounded-lg bg-gradient-to-r from-red-600 to-red-500 text-black font-bold hover:from-red-500 hover:to-red-400 transition-all"
+              >
+                Remove Player
               </button>
             </div>
           </div>

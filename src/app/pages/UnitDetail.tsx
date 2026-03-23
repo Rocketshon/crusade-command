@@ -6,10 +6,12 @@ import { useCrusade } from "../../lib/CrusadeContext";
 import { getFactionName, getDataFactionId } from "../../lib/factions";
 import { getRankFromXP, getRankColor } from "../../lib/ranks";
 import { getUnitsForFaction, getRulesForFaction } from "../../data";
-import type { Datasheet } from "../../types";
+import type { Datasheet, UnitStatus } from "../../types";
 import WeaponStatTable from "../components/WeaponStatTable";
 import WargearOptionsPanel, { WargearAbilitiesPanel } from "../components/WargearOptionsPanel";
 import { FormattedRuleText } from "../../lib/formatText";
+import FactionLegacy from "../components/FactionLegacy";
+import { getFactionLegacyConfig } from "../../lib/factionLegacy";
 
 export default function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
@@ -36,6 +38,7 @@ export default function UnitDetail() {
   const [editPoints, setEditPoints] = useState(0);
   const [editNotes, setEditNotes] = useState("");
   const [showEnhancementPicker, setShowEnhancementPicker] = useState(false);
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
 
   // If no campaign, redirect to /home
   useEffect(() => {
@@ -158,6 +161,42 @@ export default function UnitDetail() {
     );
   }
 
+  // Compute effective status (auto-set for destroyed / scarred)
+  const effectiveStatus: UnitStatus = unit.is_destroyed
+    ? 'destroyed'
+    : unit.battle_scars.length > 0
+      ? 'battle_scarred'
+      : unit.status;
+
+  // Auto-sync status if it diverges
+  if (effectiveStatus !== unit.status) {
+    updateUnit(unit.id, { status: effectiveStatus });
+  }
+
+  const statusLabel = (s: UnitStatus) => {
+    switch (s) {
+      case 'ready': return 'Ready';
+      case 'battle_scarred': return 'Battle Scarred';
+      case 'recovering': return 'Recovering';
+      case 'destroyed': return 'Destroyed';
+    }
+  };
+
+  const statusBadgeColor = (s: UnitStatus) => {
+    switch (s) {
+      case 'ready': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
+      case 'battle_scarred': return 'bg-amber-500/20 text-amber-400 border-amber-500/40';
+      case 'recovering': return 'bg-stone-500/20 text-stone-400 border-stone-500/40';
+      case 'destroyed': return 'bg-red-500/20 text-red-400 border-red-500/40';
+    }
+  };
+
+  const handleSetStatus = (newStatus: UnitStatus) => {
+    updateUnit(unit.id, { status: newStatus });
+    setShowStatusDropdown(false);
+    toast.success(`Status set to ${statusLabel(newStatus)}`);
+  };
+
   const factionName = getFactionName(currentPlayer.faction_id);
   const rank = getRankFromXP(unit.experience_points);
   const rankColor = getRankColor(rank);
@@ -278,7 +317,35 @@ export default function UnitDetail() {
               <h1 className="text-2xl font-bold text-stone-100 tracking-wider drop-shadow-[0_0_10px_rgba(16,185,129,0.3)] mb-1">
                 {unit.custom_name}
               </h1>
-              <p className="text-stone-400 text-sm italic">{unit.datasheet_name}</p>
+              <p className="text-stone-400 text-sm italic mb-2">{unit.datasheet_name}</p>
+              {/* Status Badge + Dropdown */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border ${statusBadgeColor(effectiveStatus)}`}
+                >
+                  {statusLabel(effectiveStatus)}
+                  <ChevronDown className="w-3 h-3" />
+                </button>
+                {showStatusDropdown && (
+                  <div className="absolute top-full left-0 mt-1 z-20 rounded-sm border border-stone-700/60 bg-stone-950/98 backdrop-blur-sm shadow-xl min-w-[140px]">
+                    {(['ready', 'recovering'] as UnitStatus[]).map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => handleSetStatus(s)}
+                        className={`w-full text-left px-3 py-2 text-xs hover:bg-emerald-500/10 transition-colors border-b border-stone-800/50 last:border-b-0 ${
+                          effectiveStatus === s ? 'text-emerald-400' : 'text-stone-300'
+                        }`}
+                      >
+                        {statusLabel(s)}
+                      </button>
+                    ))}
+                    <div className="px-3 py-1.5 text-[10px] text-stone-600 border-t border-stone-800/50">
+                      Scarred &amp; Destroyed are auto-set
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
             <div className="text-right">
               <div className="text-xl font-bold text-emerald-500 font-mono">
@@ -592,6 +659,25 @@ export default function UnitDetail() {
               )}
             </div>
           </div>
+
+          {/* Faction Legacy */}
+          {currentPlayer && getFactionLegacyConfig(currentPlayer.faction_id) && (
+            <div className="mb-4">
+              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider flex items-center gap-2 mb-3">
+                <Sparkles className="w-4 h-4 text-purple-400" />
+                Faction Legacy
+              </h3>
+              <FactionLegacy
+                factionId={currentPlayer.faction_id}
+                legacy={unit.faction_legacy ?? {}}
+                onUpdate={(key, value) => {
+                  updateUnit(unit.id, {
+                    faction_legacy: { ...(unit.faction_legacy ?? {}), [key]: value },
+                  });
+                }}
+              />
+            </div>
+          )}
 
           {/* Notes */}
           {unit.notes && (

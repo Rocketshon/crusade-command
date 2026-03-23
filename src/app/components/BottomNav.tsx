@@ -1,5 +1,7 @@
 import { useLocation, useNavigate } from 'react-router';
 import { Swords, BookOpen, ScrollText, Target, Settings } from 'lucide-react';
+import { useCrusade } from '../../lib/CrusadeContext';
+import { getPlayerAttentionCount } from '../../lib/attention';
 
 const NAV_ITEMS = [
   { path: '/home', label: 'Campaign', icon: Swords },
@@ -12,6 +14,12 @@ const NAV_ITEMS = [
 export default function BottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { units, currentPlayer } = useCrusade();
+
+  const playerUnits = currentPlayer
+    ? units.filter(u => u.player_id === currentPlayer.id)
+    : [];
+  const attentionCount = getPlayerAttentionCount(playerUnits);
 
   // Hide nav on auth pages
   const authPaths = ['/sign-in', '/sign-up'];
@@ -84,7 +92,12 @@ export default function BottomNav() {
               {isActive && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-amber-500 rounded-full" />
               )}
-              <Icon className="w-5 h-5" strokeWidth={isActive ? 2 : 1.5} />
+              <div className="relative">
+                <Icon className="w-5 h-5" strokeWidth={isActive ? 2 : 1.5} />
+                {item.path === '/home' && attentionCount > 0 && (
+                  <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-amber-500" />
+                )}
+              </div>
               <span className={`text-[10px] tracking-wide ${isActive ? 'font-bold' : 'font-normal'}`}>
                 {item.label}
               </span>

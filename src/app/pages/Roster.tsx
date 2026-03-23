@@ -1,16 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { ArrowLeft, Plus, Sword, Skull, Award, AlertTriangle, ChevronDown, ScrollText } from "lucide-react";
+import { ArrowLeft, Plus, Sword, Skull, Award, AlertTriangle, ChevronDown, ChevronUp, ScrollText, Store } from "lucide-react";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFactionName, getDataFactionId } from "../../lib/factions";
-import { getRankFromXP, getRankColor } from "../../lib/ranks";
+import { getRankFromXP, getRankColor, getXPThresholdForRank } from "../../lib/ranks";
 import { getRulesForFaction } from "../../data";
+import { getUnitAttentionItems } from "../../lib/attention";
+import type { UnitRank, UnitStatus } from "../../types";
 
 export default function Roster() {
   const navigate = useNavigate();
   const { campaign, currentPlayer, units, removeUnit, setDetachment } = useCrusade();
   const [showRemove, setShowRemove] = useState<string | null>(null);
   const [showDetachmentPicker, setShowDetachmentPicker] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<UnitStatus | 'all'>('all');
+  const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
 
   // If no campaign, redirect to /home
   useEffect(() => {
@@ -35,7 +39,7 @@ export default function Roster() {
     if (showRemove === unitId) {
       setShowRemove(null);
     } else {
-      navigate(`/unit/${unitId}`);
+      setExpandedUnitId(expandedUnitId === unitId ? null : unitId);
     }
   };
 
@@ -44,6 +48,48 @@ export default function Roster() {
   };
 
   const playerUnits = units.filter(u => u.player_id === currentPlayer.id);
+
+  const filteredUnits = statusFilter === 'all'
+    ? playerUnits
+    : playerUnits.filter(u => u.status === statusFilter);
+
+  const supplyBarColor = supplyPercent > 95
+    ? 'bg-red-500'
+    : supplyPercent >= 80
+      ? 'bg-amber-500'
+      : 'bg-emerald-500';
+
+  const statusDotColor = (status: UnitStatus) => {
+    switch (status) {
+      case 'ready': return 'bg-emerald-500';
+      case 'battle_scarred': return 'bg-amber-500';
+      case 'recovering': return 'bg-stone-400';
+      case 'destroyed': return 'bg-red-500';
+    }
+  };
+
+  const RANK_ORDER: UnitRank[] = ['Battle-ready', 'Blooded', 'Battle-hardened', 'Heroic', 'Legendary'];
+
+  const getNextRankXP = (xp: number): { current: number; next: number; progress: number } => {
+    const rank = getRankFromXP(xp);
+    const rankIdx = RANK_ORDER.indexOf(rank);
+    const currentThreshold = getXPThresholdForRank(rank);
+    if (rankIdx >= RANK_ORDER.length - 1) {
+      return { current: currentThreshold, next: currentThreshold, progress: 100 };
+    }
+    const nextRank = RANK_ORDER[rankIdx + 1];
+    const nextThreshold = getXPThresholdForRank(nextRank);
+    const progress = ((xp - currentThreshold) / (nextThreshold - currentThreshold)) * 100;
+    return { current: currentThreshold, next: nextThreshold, progress: Math.min(progress, 100) };
+  };
+
+  const statusFilterOptions: { label: string; value: UnitStatus | 'all' }[] = [
+    { label: 'All', value: 'all' },
+    { label: 'Ready', value: 'ready' },
+    { label: 'Scarred', value: 'battle_scarred' },
+    { label: 'Recovering', value: 'recovering' },
+    { label: 'Destroyed', value: 'destroyed' },
+  ];
 
   if (playerUnits.length === 0) {
     // Empty State
@@ -125,9 +171,8 @@ export default function Roster() {
           <p className="text-stone-400 text-sm">{factionName}</p>
         </div>
 
-        {/* Supply and Requisition */}
-        <div className="mb-6 space-y-4">
-          {/* Supply Bar */}
+        {/* Sticky Supply Header */}
+        <div className="sticky top-0 z-10 -mx-6 px-6 pb-4 bg-black">
           <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4">
             <div className="relative">
               <div className="flex items-center justify-between mb-2">
@@ -135,21 +180,23 @@ export default function Roster() {
                   Supply
                 </span>
                 <span className="text-sm font-bold text-stone-100 font-mono">
-                  {supplyUsed} <span className="text-stone-500">/ {supplyLimit}</span>
+                  {supplyUsed.toLocaleString()} <span className="text-stone-500">/ {supplyLimit.toLocaleString()} pts</span>
                 </span>
               </div>
 
               {/* Progress bar */}
-              <div className="relative h-2 bg-stone-950 rounded-full overflow-hidden border border-emerald-500/10">
+              <div className="relative h-2 bg-stone-950 rounded-full overflow-hidden border border-stone-700/30">
                 <div
-                  className="absolute inset-y-0 left-0 bg-gradient-to-r from-emerald-600 to-emerald-500 transition-all duration-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"
+                  className={`absolute inset-y-0 left-0 ${supplyBarColor} transition-all duration-500`}
                   style={{ width: `${Math.min(supplyPercent, 100)}%` }}
                 />
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Requisition Points */}
+        {/* Requisition Points */}
+        <div className="mb-6">
           <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4">
             <div className="relative flex items-center justify-between">
               <span className="text-xs text-stone-500 uppercase tracking-wider">
@@ -161,6 +208,24 @@ export default function Roster() {
             </div>
           </div>
         </div>
+
+        {/* Requisition Store Button */}
+        <button
+          onClick={() => navigate('/requisition-store')}
+          className="w-full mb-6 relative overflow-hidden rounded-sm border border-emerald-500/30 bg-stone-900 p-4 hover:border-emerald-500/50 transition-all group"
+        >
+          <div className="relative flex items-center gap-3">
+            <Store className="w-5 h-5 text-emerald-500" />
+            <div className="text-left">
+              <span className="text-sm font-semibold text-stone-100 block">
+                Requisition Store
+              </span>
+              <span className="text-xs text-stone-500">
+                Spend RP on upgrades, recruits, and more
+              </span>
+            </div>
+          </div>
+        </button>
 
         {/* Detachment Picker */}
         {detachments.length > 0 && (
@@ -225,11 +290,34 @@ export default function Roster() {
           </button>
         )}
 
+        {/* Status Filter Chips */}
+        <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-1">
+          {statusFilterOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setStatusFilter(opt.value)}
+              className={`px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
+                statusFilter === opt.value
+                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                  : 'bg-stone-800 text-stone-400 border border-stone-700/60 hover:border-stone-600'
+              }`}
+            >
+              {opt.value !== 'all' && (
+                <span className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${statusDotColor(opt.value as UnitStatus)}`} />
+              )}
+              {opt.label}
+            </button>
+          ))}
+        </div>
+
         {/* Units List */}
         <div className="space-y-3 mb-6">
-          {playerUnits.map((unit) => {
+          {filteredUnits.map((unit) => {
             const rank = getRankFromXP(unit.experience_points);
             const rankColor = getRankColor(rank);
+            const isExpanded = expandedUnitId === unit.id;
+            const unitAttention = getUnitAttentionItems(unit);
+            const xpProgress = getNextRankXP(unit.experience_points);
 
             return (
               <div
@@ -253,18 +341,26 @@ export default function Roster() {
                     {/* Unit Header */}
                     <div className="flex items-start justify-between gap-3 mb-3">
                       <div className="flex-1">
-                        <h3 className={`text-base font-semibold mb-0.5 ${
-                          unit.is_destroyed ? "line-through text-stone-500" : "text-stone-100"
-                        }`}>
-                          {unit.custom_name}
-                        </h3>
-                        {/* Datasheet name subtitle — only if different from custom name */}
+                        <div className="flex items-center gap-2 mb-0.5">
+                          {/* Status dot */}
+                          <span className={`w-2 h-2 rounded-full flex-shrink-0 ${statusDotColor(unit.status)}`} />
+                          <h3 className={`text-base font-semibold ${
+                            unit.is_destroyed ? "line-through text-stone-500" : "text-stone-100"
+                          }`}>
+                            {unit.custom_name}
+                          </h3>
+                          {/* Attention badge */}
+                          {unitAttention.length > 0 && (
+                            <span className="w-2 h-2 rounded-full bg-amber-500 flex-shrink-0" />
+                          )}
+                        </div>
+                        {/* Datasheet name subtitle */}
                         {unit.custom_name !== unit.datasheet_name && (
-                          <p className="text-xs text-stone-500 italic mb-1">
+                          <p className="text-xs text-stone-500 italic mb-1 ml-4">
                             {unit.datasheet_name}
                           </p>
                         )}
-                        <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 ml-4">
                           <span className={`text-xs ${rankColor} font-medium`}>
                             {rank}
                           </span>
@@ -276,74 +372,113 @@ export default function Roster() {
                           )}
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-sm font-bold text-emerald-500 font-mono mb-0.5">
-                          {unit.points_cost} pts
-                        </div>
-                        {unit.model_count && (
-                          <div className="text-xs text-stone-400 font-mono mb-0.5">
-                            {unit.model_count} models
+                      <div className="text-right flex items-start gap-2">
+                        <div>
+                          <div className="text-sm font-bold text-emerald-500 font-mono mb-0.5">
+                            {unit.points_cost} pts
                           </div>
-                        )}
-                        <div className="text-xs text-stone-500 font-mono">
-                          {unit.experience_points} XP
+                          {unit.model_count && (
+                            <div className="text-xs text-stone-400 font-mono mb-0.5">
+                              {unit.model_count} models
+                            </div>
+                          )}
+                          <div className="text-xs text-stone-500 font-mono">
+                            {unit.experience_points} XP
+                          </div>
                         </div>
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4 text-stone-500 mt-0.5" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-stone-500 mt-0.5" />
+                        )}
                       </div>
                     </div>
 
-                    {/* Stats Row — Honours and Scars with names */}
-                    <div className="flex flex-col gap-2 text-xs">
-                      <div className="flex items-center gap-4">
+                    {/* Collapsed: compact stats */}
+                    {!isExpanded && (
+                      <div className="flex items-center gap-4 text-xs">
                         <div className="flex items-center gap-1.5 text-amber-400">
-                          <Award className="w-4 h-4" />
+                          <Award className="w-3.5 h-3.5" />
                           <span className="font-mono">{unit.battle_honours.length}</span>
-                          <span className="text-stone-500">Honors</span>
                         </div>
                         <div className="flex items-center gap-1.5 text-red-400">
-                          <AlertTriangle className="w-4 h-4" />
+                          <AlertTriangle className="w-3.5 h-3.5" />
                           <span className="font-mono">{unit.battle_scars.length}</span>
-                          <span className="text-stone-500">Scars</span>
                         </div>
                       </div>
+                    )}
 
-                      {/* Honour name badges */}
-                      {unit.battle_honours.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-1">
-                          {unit.battle_honours.slice(0, 2).map((honour) => (
-                            <span
-                              key={honour.id}
-                              className="px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[10px] font-medium"
-                            >
-                              {honour.name}
-                            </span>
-                          ))}
-                          {unit.battle_honours.length > 2 && (
-                            <span className="text-stone-500 text-[10px]">
-                              +{unit.battle_honours.length - 2} more
-                            </span>
-                          )}
+                    {/* Expanded View */}
+                    {isExpanded && (
+                      <div className="transition-all duration-300 ease-in-out">
+                        {/* XP Progress Bar */}
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between text-[10px] text-stone-500 mb-1">
+                            <span>{rank}</span>
+                            <span>{unit.experience_points} / {xpProgress.next} XP</span>
+                          </div>
+                          <div className="h-1.5 bg-stone-800 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${rankColor.replace('text-', 'bg-').replace('-400', '-500')} transition-all duration-500`}
+                              style={{ width: `${xpProgress.progress}%` }}
+                            />
+                          </div>
                         </div>
-                      )}
 
-                      {/* Scar name badges */}
-                      {unit.battle_scars.length > 0 && (
-                        <div className="flex flex-wrap items-center gap-1">
-                          {unit.battle_scars.slice(0, 2).map((scar) => (
-                            <span
-                              key={scar.id}
-                              className="px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-medium"
-                            >
-                              {scar.name}
-                            </span>
-                          ))}
-                          {unit.battle_scars.length > 2 && (
-                            <span className="text-stone-500 text-[10px]">
-                              +{unit.battle_scars.length - 2} more
-                            </span>
-                          )}
+                        {/* Battle Honours chips */}
+                        {unit.battle_honours.length > 0 && (
+                          <div className="mb-2">
+                            <div className="flex flex-wrap gap-1">
+                              {unit.battle_honours.map((honour) => (
+                                <span
+                                  key={honour.id}
+                                  className="px-1.5 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[10px] font-medium"
+                                >
+                                  {honour.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Battle Scars chips */}
+                        {unit.battle_scars.length > 0 && (
+                          <div className="mb-2">
+                            <div className="flex flex-wrap gap-1">
+                              {unit.battle_scars.map((scar) => (
+                                <span
+                                  key={scar.id}
+                                  className="px-1.5 py-0.5 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-[10px] font-medium"
+                                >
+                                  {scar.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Battles fought / survived */}
+                        <div className="flex items-center gap-4 text-xs text-stone-400 mb-3">
+                          <span>
+                            <span className="text-stone-100 font-mono">{unit.battles_played}</span> fought
+                          </span>
+                          <span>
+                            <span className="text-stone-100 font-mono">{unit.battles_survived}</span> survived
+                          </span>
                         </div>
-                      )}
-                    </div>
+
+                        {/* View Full Card button */}
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/unit/${unit.id}`);
+                          }}
+                          className="w-full py-2 rounded-sm border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-colors"
+                        >
+                          View Full Card
+                        </button>
+                      </div>
+                    )}
                   </div>
 
                   <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />

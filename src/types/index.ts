@@ -50,6 +50,7 @@ export interface Campaign {
   created_at: string;
   current_round: number;
   owner_id: string;
+  announcements?: { id: string; text: string; created_at: string }[];
 }
 
 export interface CampaignPlayer {
@@ -71,6 +72,8 @@ export interface CampaignPlayer {
 // --- Crusade Units ---
 export type UnitRank = 'Battle-ready' | 'Blooded' | 'Battle-hardened' | 'Heroic' | 'Legendary';
 
+export type UnitStatus = 'ready' | 'battle_scarred' | 'recovering' | 'destroyed';
+
 export interface CrusadeUnit {
   id: string;
   player_id: string;
@@ -89,6 +92,8 @@ export interface CrusadeUnit {
   notes: string;
   is_destroyed: boolean;
   is_warlord: boolean;
+  status: UnitStatus;
+  faction_legacy: Record<string, unknown>;
   created_at: string;
 }
 
@@ -120,7 +125,49 @@ export interface Battle {
   result: 'victory' | 'defeat' | 'draw';
   units_fielded: string[];
   marked_for_greatness: string | null;
+  agendas: string[];
+  combat_log: CombatEngagement[];
   notes: string;
+  created_at: string;
+}
+
+// --- Combat Tracker ---
+export interface CombatEngagement {
+  id: string;
+  turn: number;
+  phase: 'shooting' | 'melee';
+  attacker_unit_id: string;
+  attacker_unit_name: string;
+  attacker_weapon: string;
+  defender_unit_id: string;
+  defender_unit_name: string;
+  defender_player_id: string;
+  attacks: number;
+  hits: number;
+  wounds: number;
+  failed_saves: number;
+  damage_dealt: number;
+  models_destroyed: number;
+  timestamp: string;
+}
+
+// --- Territories ---
+export interface Territory {
+  id: string;
+  campaign_id: string;
+  name: string;
+  controlled_by: string | null;
+  position_x: number;
+  position_y: number;
+  bonus_text: string;
+  created_at: string;
+}
+
+// --- Campaign Announcements ---
+export interface Announcement {
+  id: string;
+  text: string;
+  author: string;
   created_at: string;
 }
 
