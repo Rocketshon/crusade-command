@@ -87,7 +87,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [fetchProfile, syncUserToStorage]);
 
   const signUp = useCallback(async (email: string, password: string, displayName: string): Promise<{ error?: string }> => {
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -102,7 +102,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error.message.includes('Password')) {
         return { error: 'Password is too weak. Please use at least 8 characters.' };
       }
+      if (error.message.includes('Database error')) {
+        return { error: 'Account creation failed. Please try again.' };
+      }
       return { error: error.message };
+    }
+
+    // Create profile row (instead of relying on DB trigger)
+    if (data.user) {
+      try {
+        await supabase.from('cc_profiles').upsert({
+          id: data.user.id,
+          display_name: displayName || email.split('@')[0],
+        }, { onConflict: 'id' });
+      } catch {
+        // Profile creation failed — non-critical, will retry on next auth state change
+      }
     }
 
     return {};
