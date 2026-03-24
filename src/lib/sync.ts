@@ -175,22 +175,29 @@ export async function pullCampaignFromCloud(userId: string): Promise<{
 
     const campaign = campaignRow as Campaign;
 
-    // Fetch units for this player
+    // Fetch ALL players in this campaign
+    const { data: allPlayers } = await supabase
+      .from('cc_campaign_players')
+      .select('id')
+      .eq('campaign_id', campaign.id);
+    const allPlayerIds = (allPlayers ?? []).map((p: { id: string }) => p.id);
+
+    // Fetch units for ALL players in the campaign
     const { data: unitRows, error: unitErr } = await supabase
       .from('cc_crusade_units')
       .select('*')
-      .eq('player_id', player.id);
+      .in('player_id', allPlayerIds.length > 0 ? allPlayerIds : ['__none__']);
 
     if (unitErr) {
       console.error('[Sync] pullCampaignFromCloud units error:', unitErr.message);
       return null;
     }
 
-    // Fetch battles for this player
+    // Fetch battles for the entire campaign
     const { data: battleRows, error: battleErr } = await supabase
       .from('cc_battles')
       .select('*')
-      .eq('player_id', player.id)
+      .eq('campaign_id', campaign.id)
       .order('created_at', { ascending: false });
 
     if (battleErr) {

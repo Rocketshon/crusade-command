@@ -1,13 +1,13 @@
 import { useLocation, useNavigate } from 'react-router';
-import { Swords, BookOpen, ScrollText, Target, Settings } from 'lucide-react';
+import { Swords, BookOpen, ScrollText, Crosshair, Settings } from 'lucide-react';
 import { useCrusade } from '../../lib/CrusadeContext';
 import { getPlayerAttentionCount } from '../../lib/attention';
 
 const NAV_ITEMS = [
   { path: '/home', label: 'Campaign', icon: Swords },
+  { path: '/battle-lobby', label: 'Battle', icon: Crosshair },
   { path: '/codex', label: 'Codex', icon: BookOpen },
   { path: '/rules', label: 'Rules', icon: ScrollText },
-  { path: '/tracker', label: 'Tracker', icon: Target },
   { path: '/settings', label: 'Settings', icon: Settings },
 ] as const;
 
@@ -40,7 +40,7 @@ export default function BottomNav() {
         location.pathname.startsWith('/player') ||
         location.pathname.startsWith('/log-battle') ||
         location.pathname.startsWith('/post-battle') ||
-        location.pathname.startsWith('/battle') ||
+        location.pathname.startsWith('/battle/') ||
         location.pathname.startsWith('/requisition') ||
         location.pathname.startsWith('/roster') ||
         location.pathname.startsWith('/add-unit') ||
@@ -63,8 +63,11 @@ export default function BottomNav() {
         location.pathname.startsWith('/rule/')
       );
     }
-    if (item.path === '/tracker') {
-      return location.pathname === '/tracker';
+    if (item.path === '/battle-lobby') {
+      return (
+        location.pathname === '/battle-lobby' ||
+        location.pathname.startsWith('/battle-live')
+      );
     }
     return location.pathname === item.path;
   })?.path ?? '/home';
