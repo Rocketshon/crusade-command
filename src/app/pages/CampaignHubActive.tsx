@@ -18,6 +18,24 @@ export default function CampaignHubActive() {
   const [copied, setCopied] = useState(false);
   const [showAllBattles, setShowAllBattles] = useState(true);
 
+  const currentPlayerId = guard.ready ? guard.currentPlayer?.id : '';
+
+  // Build a lookup for player names by player_id
+  const playerNameMap = useMemo(() => {
+    const map: Record<string, string> = {};
+    for (const p of players) {
+      map[p.id] = p.name;
+    }
+    return map;
+  }, [players]);
+
+  // Attention items for current player's units
+  const playerUnits = useMemo(() => units.filter(u => u.player_id === currentPlayerId), [units, currentPlayerId]);
+  const attentionItems: AttentionItem[] = useMemo(
+    () => playerUnits.flatMap(u => getUnitAttentionItems(u)),
+    [playerUnits]
+  );
+
   if (!guard.ready) return null;
   const { campaign, currentPlayer } = guard;
 
@@ -34,22 +52,6 @@ export default function CampaignHubActive() {
   // Recent battles: last 5, sorted newest first (battles are already sorted newest first from context)
   const displayedBattles = showAllBattles ? battles : playerBattles;
   const recentBattles = displayedBattles.slice(0, 5);
-
-  // Build a lookup for player names by player_id
-  const playerNameMap = useMemo(() => {
-    const map: Record<string, string> = {};
-    for (const p of players) {
-      map[p.id] = p.name;
-    }
-    return map;
-  }, [players]);
-
-  // Attention items for current player's units
-  const playerUnits = useMemo(() => units.filter(u => u.player_id === currentPlayer?.id), [units, currentPlayer?.id]);
-  const attentionItems: AttentionItem[] = useMemo(
-    () => playerUnits.flatMap(u => getUnitAttentionItems(u)),
-    [playerUnits]
-  );
 
   const handleCopyJoinCode = () => {
     navigator.clipboard.writeText(campaign.join_code)

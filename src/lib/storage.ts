@@ -13,8 +13,6 @@ export const STORAGE_KEYS = {
   DICE_MODE: 'crusade_dice_mode',
   REQUISITION_HISTORY: 'crusade_requisition_history',
   TUTORIAL_COMPLETED: 'crusade_tutorial_completed',
-  LAST_PROCESSED_BATTLE: 'crusade_last_processed_battle',
-  BATTLE_STORIES: 'crusade_battle_stories',
 } as const;
 
 /** Safely write to localStorage with quota error handling */

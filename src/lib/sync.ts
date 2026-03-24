@@ -446,61 +446,6 @@ export async function updateUnitInCloud(unit: CrusadeUnit): Promise<boolean> {
 // ---------------------------------------------------------------------------
 
 /**
- * Full sync: pull from cloud, write to localStorage.
- * Then push any local-only data that isn't yet in the cloud.
- */
-export async function syncAll(userId: string): Promise<void> {
-  if (!isSupabaseConfigured()) return;
-
-  try {
-    const cloudData = await pullCampaignFromCloud(userId);
-    if (!cloudData) return;
-
-    // Capture local state BEFORE cloud overwrite
-    const localCampaign = storage.loadCampaign();
-    const localPlayer = storage.loadPlayer();
-    const localUnits = storage.loadUnits();
-    const localBattles = storage.loadBattles();
-
-    // If we have cloud data, write it to localStorage
-    if (cloudData.campaign) {
-      storage.saveCampaign(cloudData.campaign);
-    }
-    if (cloudData.player) {
-      storage.savePlayer(cloudData.player);
-    }
-    storage.saveUnits(cloudData.units);
-    storage.saveBattles(cloudData.battles);
-
-    // Push local units not present in cloud
-    const cloudUnitIds = new Set(cloudData.units.map(u => u.id));
-    for (const unit of localUnits) {
-      if (!cloudUnitIds.has(unit.id)) {
-        await pushUnitToCloud(unit);
-      }
-    }
-
-    // Push local battles not present in cloud
-    const cloudBattleIds = new Set(cloudData.battles.map(b => b.id));
-    for (const battle of localBattles) {
-      if (!cloudBattleIds.has(battle.id)) {
-        await pushBattleToCloud(battle);
-      }
-    }
-
-    // Push campaign/player if we have them locally but not in cloud
-    if (localCampaign && !cloudData.campaign) {
-      await pushCampaignToCloud(localCampaign);
-    }
-    if (localPlayer && !cloudData.player) {
-      await pushPlayerToCloud(localPlayer);
-    }
-  } catch (e) {
-    console.error('[Sync] syncAll exception:', e);
-  }
-}
-
-/**
  * Migrate existing localStorage data to Supabase (one-time).
  * Re-maps owner_id / user_id to the authenticated Supabase user UUID.
  */

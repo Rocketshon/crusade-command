@@ -19,19 +19,13 @@ export default function Roster() {
   const [statusFilter, setStatusFilter] = useState<UnitStatus | 'all'>('all');
   const [expandedUnitId, setExpandedUnitId] = useState<string | null>(null);
 
-  if (!guard.ready) return null;
-  const { campaign, currentPlayer } = guard;
+  const currentPlayerId = guard.ready ? guard.currentPlayer.id : '';
+  const currentFactionId = guard.ready ? guard.currentPlayer.faction_id : null;
+  const campaignSupplyLimit = guard.ready ? guard.campaign.supply_limit : 1000;
 
-  const factionName = getFactionName(currentPlayer.faction_id);
-  const dataFactionId = getDataFactionId(currentPlayer.faction_id);
-  const factionRules = getRulesForFaction(dataFactionId);
-  const detachments = factionRules?.detachments ?? [];
-  const currentDetachment = detachments.find(d => d.name === currentPlayer.detachment_id);
-
-  const playerUnits = useMemo(() => units.filter(u => u.player_id === currentPlayer.id), [units, currentPlayer.id]);
+  const playerUnits = useMemo(() => units.filter(u => u.player_id === currentPlayerId), [units, currentPlayerId]);
   const supplyUsed = useMemo(() => playerUnits.reduce((sum, u) => sum + u.points_cost, 0), [playerUnits]);
-  const supplyLimit = campaign.supply_limit;
-  const supplyPercent = supplyLimit > 0 ? (supplyUsed / supplyLimit) * 100 : 0;
+  const supplyPercent = campaignSupplyLimit > 0 ? (supplyUsed / campaignSupplyLimit) * 100 : 0;
 
   const filteredUnits = useMemo(() => statusFilter === 'all' ? playerUnits : playerUnits.filter(u => u.status === statusFilter), [playerUnits, statusFilter]);
 
@@ -40,6 +34,16 @@ export default function Roster() {
     for (const u of playerUnits) m[u.id] = getUnitAttentionItems(u);
     return m;
   }, [playerUnits]);
+
+  if (!guard.ready) return null;
+  const { campaign, currentPlayer } = guard;
+
+  const factionName = getFactionName(currentPlayer.faction_id);
+  const dataFactionId = getDataFactionId(currentPlayer.faction_id);
+  const factionRules = getRulesForFaction(dataFactionId);
+  const detachments = factionRules?.detachments ?? [];
+  const currentDetachment = detachments.find(d => d.name === currentPlayer.detachment_id);
+  const supplyLimit = campaign.supply_limit;
 
   const handleUnitClick = (unitId: string) => {
     if (showRemove === unitId) {

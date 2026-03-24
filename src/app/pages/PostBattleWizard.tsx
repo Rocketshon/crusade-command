@@ -69,7 +69,7 @@ export default function PostBattleWizard() {
     }
     // Fall back to current player's roster units only (not all units in the campaign)
     return units.filter(u => u.player_id === guard.currentPlayer?.id);
-  }, [latestBattle, units, guard.currentPlayer]);
+  }, [latestBattle, units, guard.currentPlayer?.id]);
 
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -751,7 +751,7 @@ export default function PostBattleWizard() {
                 disabled={currentStep === 4 && changesApplied}
                 className="w-full py-4 rounded-lg font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 text-black hover:from-emerald-500 hover:to-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {currentStep === 4 ? "Confirm & Apply Changes" : "Next"}
+                {currentStep === 4 ? (changesApplied ? 'Changes Applied \u2713' : 'Confirm & Apply Changes') : 'Next'}
               </button>
               {currentStep === 4 && (
                 <p className="text-xs text-amber-400 text-center mt-2">
