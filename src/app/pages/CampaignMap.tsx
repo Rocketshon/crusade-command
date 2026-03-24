@@ -19,6 +19,7 @@ export default function CampaignMap() {
   const [showAssignModal, setShowAssignModal] = useState<Territory | null>(null);
   const [newName, setNewName] = useState("");
   const [newBonus, setNewBonus] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const isCM = campaign?.owner_id === user?.id;
 
@@ -77,65 +78,77 @@ export default function CampaignMap() {
   }
 
   const handleAddTerritory = async () => {
+    if (submitting) return;
     if (!newName.trim()) {
       toast.error("Please enter a territory name");
       return;
     }
 
-    const nextIndex = territories.length;
-    const cols = 4;
-    const posX = nextIndex % cols;
-    const posY = Math.floor(nextIndex / cols);
+    setSubmitting(true);
+    try {
+      const nextIndex = territories.length;
+      const cols = 4;
+      const posX = nextIndex % cols;
+      const posY = Math.floor(nextIndex / cols);
 
-    const { data, error } = await supabase
-      .from("cc_territories")
-      .insert({
-        campaign_id: campaign.id,
-        name: newName.trim(),
-        bonus_text: newBonus.trim(),
-        controlled_by: null,
-        position_x: posX,
-        position_y: posY,
-      })
-      .select()
-      .single();
+      const { data, error } = await supabase
+        .from("cc_territories")
+        .insert({
+          campaign_id: campaign.id,
+          name: newName.trim(),
+          bonus_text: newBonus.trim(),
+          controlled_by: null,
+          position_x: posX,
+          position_y: posY,
+        })
+        .select()
+        .single();
 
-    if (error) {
-      toast.error("Failed to create territory");
-      return;
+      if (error) {
+        toast.error("Failed to create territory");
+        return;
+      }
+
+      setTerritories((prev) => [...prev, data as Territory]);
+      setNewName("");
+      setNewBonus("");
+      setShowAddModal(false);
+      toast.success(`Territory "${newName.trim()}" created!`);
+    } finally {
+      setSubmitting(false);
     }
-
-    setTerritories((prev) => [...prev, data as Territory]);
-    setNewName("");
-    setNewBonus("");
-    setShowAddModal(false);
-    toast.success(`Territory "${newName.trim()}" created!`);
   };
 
   const handleAssign = async (playerId: string | null) => {
     if (!showAssignModal) return;
+    if (submitting) return;
 
-    const { error } = await supabase
-      .from("cc_territories")
-      .update({ controlled_by: playerId })
-      .eq("id", showAssignModal.id);
+    setSubmitting(true);
+    try {
+      const { error } = await supabase
+        .from("cc_territories")
+        .update({ controlled_by: playerId })
+        .eq("id", showAssignModal.id);
 
-    if (error) {
-      toast.error("Failed to assign territory");
-      return;
+      if (error) {
+        toast.error("Failed to assign territory");
+        return;
+      }
+
+      setTerritories((prev) =>
+        prev.map((t) =>
+          t.id === showAssignModal.id ? { ...t, controlled_by: playerId } : t
+        )
+      );
+
+      const label = playerId
+        ? players.find((p) => p.id === playerId)?.name ?? "player"
+        : "nobody";
+      toast.success(`Territory assigned to ${label}`);
+      setShowAssignModal(null);
+    } finally {
+      setSubmitting(false);
     }
-
-    setTerritories((prev) =>
-      prev.map((t) =>
-        t.id === showAssignModal.id ? { ...t, controlled_by: playerId } : t
-      )
-    );
-
-    const label = playerId
-      ? players.find((p) => p.id === playerId)?.name ?? "player"
-      : "nobody";
-    toast.success(`Territory assigned to ${label}`);
-    setShowAssignModal(null);
   };
 
   // Build color map from players
@@ -332,9 +345,10 @@ export default function CampaignMap() {
               </button>
               <button
                 onClick={handleAddTerritory}
-                className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold transition-all"
+                disabled={submitting}
+                className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold transition-all disabled:opacity-50"
               >
-                Add
+                {submitting ? "Adding..." : "Add"}
               </button>
             </div>
           </div>
@@ -357,7 +371,8 @@ export default function CampaignMap() {
               {/* Unclaimed option */}
               <button
                 onClick={() => handleAssign(null)}
-                className="w-full text-left rounded-sm px-4 py-3 bg-stone-800 border border-stone-700/60 hover:border-emerald-500/40 transition-all"
+                disabled={submitting}
+                className="w-full text-left rounded-sm px-4 py-3 bg-stone-800 border border-stone-700/60 hover:border-emerald-500/40 transition-all disabled:opacity-50"
               >
                 <span className="text-sm text-stone-400 italic">Unclaimed</span>
               </button>
@@ -365,7 +380,8 @@ export default function CampaignMap() {
                 <button
                   key={p.id}
                   onClick={() => handleAssign(p.id)}
-                  className={`w-full text-left rounded-sm px-4 py-3 border transition-all ${
+                  disabled={submitting}
+                  className={`w-full text-left rounded-sm px-4 py-3 border transition-all disabled:opacity-50 ${
                     showAssignModal.controlled_by === p.id
                       ? "bg-emerald-900/30 border-emerald-500/40"
                       : "bg-stone-800 border-stone-700/60 hover:border-emerald-500/40"

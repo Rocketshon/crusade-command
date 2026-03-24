@@ -163,45 +163,49 @@ export default function LogBattle() {
 
     setIsSubmitting(true);
 
-    // Determine result
-    let result: Battle['result'];
-    if (winner === "you") result = "victory";
-    else if (winner === "opponent") result = "defeat";
-    else result = "draw";
+    try {
+      // Determine result
+      let result: Battle['result'];
+      if (winner === "you") result = "victory";
+      else if (winner === "opponent") result = "defeat";
+      else result = "draw";
 
-    // Resolve opponent details
-    const selectedOpponent = otherPlayers.find(p => p.id === opponentId);
-    const finalOpponentName = selectedOpponent?.name || opponentName.trim();
-    const finalOpponentFaction = selectedOpponent
-      ? getFactionName(selectedOpponent.faction_id)
-      : opponentFaction.trim();
+      // Resolve opponent details
+      const selectedOpponent = otherPlayers.find(p => p.id === opponentId);
+      const finalOpponentName = selectedOpponent?.name || opponentName.trim();
+      const finalOpponentFaction = selectedOpponent
+        ? getFactionName(selectedOpponent.faction_id)
+        : opponentFaction.trim();
 
-    const newBattleId = logBattle({
-      campaign_id: campaign.id,
-      player_id: currentPlayer.id,
-      opponent_id: opponentId || '',
-      opponent_name: finalOpponentName,
-      opponent_faction: finalOpponentFaction,
-      mission_name: missionName.trim(),
-      battle_size: battleSize as Battle['battle_size'],
-      player_vp: parseInt(yourScore) || 0,
-      opponent_vp: parseInt(opponentScore) || 0,
-      result,
-      units_fielded: selectedUnitIds,
-      marked_for_greatness: markedForGreatness,
-      agendas: selectedAgendas,
-      combat_log: [],
-      notes: notes.trim(),
-    });
+      const newBattleId = logBattle({
+        campaign_id: campaign.id,
+        player_id: currentPlayer.id,
+        opponent_id: opponentId || '',
+        opponent_name: finalOpponentName,
+        opponent_faction: finalOpponentFaction,
+        mission_name: missionName.trim(),
+        battle_size: battleSize as Battle['battle_size'],
+        player_vp: parseInt(yourScore) || 0,
+        opponent_vp: parseInt(opponentScore) || 0,
+        result,
+        units_fielded: selectedUnitIds,
+        marked_for_greatness: markedForGreatness,
+        agendas: selectedAgendas,
+        combat_log: [],
+        notes: notes.trim(),
+      });
 
-    // Clear draft on successful submit
-    sessionStorage.removeItem(DRAFT_KEY);
+      // Clear draft on successful submit
+      sessionStorage.removeItem(DRAFT_KEY);
 
-    toast.success(`Battle recorded vs ${finalOpponentName}!`, {
-      duration: 3000,
-    });
+      toast.success(`Battle recorded vs ${finalOpponentName}!`, {
+        duration: 3000,
+      });
 
-    navigate("/post-battle", { state: { battleId: newBattleId } });
+      navigate("/post-battle", { state: { battleId: newBattleId } });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (

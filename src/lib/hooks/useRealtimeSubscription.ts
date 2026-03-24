@@ -35,7 +35,6 @@ export function useRealtimeSubscription(
   useEffect(() => {
     if (!campaignId || !isSupabaseConfigured()) return;
 
-    const currentPlayerIds = playerIdsRef.current;
     const channel = subscribeToCampaign(campaignId, {
       onPlayerChange: (payload) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
@@ -63,6 +62,13 @@ export function useRealtimeSubscription(
         }
       },
       onUnitChange: (payload) => {
+        // Read playerIds at callback time, not at subscribe time (Bug 4 fix)
+        const currentPlayerIds = playerIdsRef.current;
+        const incoming = (payload.new ?? payload.old ?? {}) as Record<string, unknown>;
+        if (currentPlayerIds.length > 0 && incoming.player_id && !currentPlayerIds.includes(incoming.player_id as string)) {
+          return; // Ignore units belonging to players outside this campaign
+        }
+
         if (payload.eventType === 'INSERT') {
           const newUnit = payload.new as unknown as CrusadeUnit;
           setUnits(prev => {
@@ -77,7 +83,7 @@ export function useRealtimeSubscription(
           setUnits(prev => prev.filter(u => u.id !== deleted.id));
         }
       },
-    }, currentPlayerIds);
+    });
     realtimeChannelRef.current = channel;
 
     return () => {

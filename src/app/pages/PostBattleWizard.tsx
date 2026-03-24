@@ -245,10 +245,11 @@ export default function PostBattleWizard() {
       awardRequisition(1);
     }
 
-    setChangesApplied(true);
+    // Persist guard BEFORE state update so it survives unmount mid-update (Bug 6 fix)
     if (latestBattle) {
       sessionStorage.setItem('lastProcessedBattleId', latestBattle.id);
     }
+    setChangesApplied(true);
   };
 
   const goToNextStep = () => {

@@ -9,7 +9,7 @@ import type { CampaignPlayer, Datasheet } from "../../types";
 
 export default function BattleLobby() {
   const navigate = useNavigate();
-  const { players, currentPlayer, units, syncing } = useCrusade();
+  const { players, currentPlayer, units, battles, syncing } = useCrusade();
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
 
   const displayPlayers = players.length > 0
@@ -23,7 +23,8 @@ export default function BattleLobby() {
   };
 
   const handleSelectOpponent = (opponentId: string) => {
-    navigate(`/battle-live/${opponentId}`);
+    const latestBattleId = battles[0]?.id;
+    navigate(`/battle-live/${opponentId}`, { state: { battleId: latestBattleId } });
   };
 
   const getPlayerUnits = (player: CampaignPlayer) => {

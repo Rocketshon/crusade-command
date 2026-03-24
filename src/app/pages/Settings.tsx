@@ -178,7 +178,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-black flex flex-col p-6 pb-24 relative overflow-hidden">
       {/* Hidden file input for import */}
       <input
         ref={fileInputRef}

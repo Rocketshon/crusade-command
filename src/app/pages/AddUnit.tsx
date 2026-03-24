@@ -103,7 +103,7 @@ export default function AddUnit() {
   const wargearOptions = selectedUnit?.wargear_options ?? [];
 
   return (
-    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-8">
+    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-24">
       <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Back button */}
         <button

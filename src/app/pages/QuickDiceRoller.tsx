@@ -4,15 +4,13 @@ import { ArrowLeft, Minus, Plus, Trash2 } from "lucide-react";
 import DiceRoller from "../components/DiceRoller";
 
 interface RollRecord {
-  id: number;
+  id: string;
   count: number;
   target: number;
   passes: number;
   fails: number;
   rolls: number[];
 }
-
-let nextId = 1;
 
 export default function QuickDiceRoller() {
   const navigate = useNavigate();
@@ -27,7 +25,7 @@ export default function QuickDiceRoller() {
       const fails = rolls.length - passes;
       setHistory((prev) => {
         const next = [
-          { id: nextId++, count: diceCount, target: targetNumber, passes, fails, rolls },
+          { id: crypto.randomUUID(), count: diceCount, target: targetNumber, passes, fails, rolls },
           ...prev,
         ];
         return next.slice(0, 10);

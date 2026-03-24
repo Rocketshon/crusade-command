@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 import type { Campaign, CampaignPlayer, CrusadeUnit, Battle, FactionId } from '../types';
 import * as storage from './storage';
 import * as sync from './sync';
@@ -69,6 +69,12 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
   const [units, setUnits] = useState<CrusadeUnit[]>(() => storage.loadUnits());
   const [battles, setBattles] = useState<Battle[]>(() => storage.loadBattles());
   const [campaignHistory, setCampaignHistory] = useState<storage.ArchivedCampaign[]>(() => storage.loadCampaignHistory());
+
+  // Ref to track current player for TOCTOU-safe reads (Bug 2 fix)
+  const currentPlayerRef = useRef(currentPlayer);
+  useEffect(() => {
+    currentPlayerRef.current = currentPlayer;
+  }, [currentPlayer]);
 
   // Initialize offline queue listener
   useEffect(() => {
@@ -403,14 +409,15 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const spendRequisition = useCallback((amount: number) => {
-    if (!currentPlayer || currentPlayer.requisition_points < amount) return false;
-    setCurrentPlayer(cp => {
-      if (!cp || cp.requisition_points < amount) return cp;
-      return { ...cp, requisition_points: cp.requisition_points - amount };
+  const spendRequisition = useCallback((amount: number): boolean => {
+    const cp = currentPlayerRef.current;
+    if (!cp || cp.requisition_points < amount) return false;
+    setCurrentPlayer(prev => {
+      if (!prev || prev.requisition_points < amount) return prev;
+      return { ...prev, requisition_points: prev.requisition_points - amount };
     });
     return true;
-  }, [currentPlayer]);
+  }, []);
 
   const awardRequisition = useCallback((amount: number) => {
     setCurrentPlayer(cp => {

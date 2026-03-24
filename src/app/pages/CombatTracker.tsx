@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback, useEffect } from "react";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import { ArrowLeft, Swords, Target, Shield, Crosshair, Settings2 } from "lucide-react";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFaction } from "../../lib/factions";
@@ -47,6 +47,7 @@ function setDiceMode(mode: "digital" | "manual") {
 export default function CombatTracker() {
   const navigate = useNavigate();
   const { opponentId } = useParams<{ opponentId: string }>();
+  const { battleId } = (useLocation().state ?? {}) as { battleId?: string };
   const { players, currentPlayer, units, battles, updateBattle } = useCrusade();
 
   // State
@@ -296,11 +297,11 @@ export default function CombatTracker() {
 
     setEngagements((prev) => [engagement, ...prev]);
 
-    // Save engagement to the most recent battle
-    const latestBattle = battles[0];
-    if (latestBattle) {
-      const updatedLog = [...(latestBattle.combat_log || []), engagement];
-      updateBattle(latestBattle.id, { combat_log: updatedLog });
+    // Save engagement to the specific battle (by ID) or fall back to most recent
+    const targetBattle = battleId ? battles.find(b => b.id === battleId) : battles[0];
+    if (targetBattle) {
+      const updatedLog = [...(targetBattle.combat_log || []), engagement];
+      updateBattle(targetBattle.id, { combat_log: updatedLog });
     }
 
     resetCombat();

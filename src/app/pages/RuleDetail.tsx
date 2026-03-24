@@ -475,7 +475,7 @@ export default function RuleDetail() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-8">
+    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-24">
       <div className="relative z-10 w-full max-w-2xl mx-auto">
         {/* Back button */}
         <button

@@ -31,7 +31,7 @@ export default function CampaignHistory() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-black flex flex-col p-6 pb-24 relative overflow-hidden">
       <div className="relative z-10 w-full max-w-2xl mx-auto">
         {/* Back button */}
         <button
