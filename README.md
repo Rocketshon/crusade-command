@@ -123,3 +123,7 @@ Private project. All rights reserved.
 ## Disclaimer
 
 This is a fan-made tool for personal use. Warhammer 40,000 and all associated names, logos, and images are trademarks or registered trademarks of Games Workshop Ltd. This project is not affiliated with or endorsed by Games Workshop.
+
+---
+
+If this tool helped your crusade, consider giving it a star — it helps others discover it.
