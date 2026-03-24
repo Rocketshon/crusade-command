@@ -27,7 +27,7 @@ import { toast } from "sonner";
 export default function Settings() {
   const navigate = useNavigate();
   const { campaign, currentPlayer, players, units, battles, leaveCampaign, updateCampaignSettings, removePlayer, postAnnouncement } = useCrusade();
-  const { user: authUser, signOut } = useAuth();
+  const { user: authUser, signOut, updateUsername } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [showLeaveDialog, setShowLeaveDialog] = useState(false);
@@ -93,6 +93,7 @@ export default function Settings() {
     }
     // Update local storage
     saveUser({ id: authUser?.id ?? '', email: '', display_name: tempName.trim() });
+    updateUsername(tempName.trim());
     toast.success('Name updated');
     setIsEditingName(false);
   };

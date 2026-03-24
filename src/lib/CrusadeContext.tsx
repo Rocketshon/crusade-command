@@ -69,6 +69,11 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
 
   const realtimeChannelRef = useRef<RealtimeChannel | null>(null);
 
+  const playerIdsRef = useRef<string[]>([]);
+  useEffect(() => {
+    playerIdsRef.current = players.map(p => p.id);
+  }, [players]);
+
   // Persist on change (localStorage cache)
   useEffect(() => { if (campaign) storage.saveCampaign(campaign); }, [campaign]);
   useEffect(() => { if (currentPlayer) storage.savePlayer(currentPlayer); }, [currentPlayer]);
@@ -76,7 +81,10 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
   useEffect(() => { storage.saveBattles(battles); }, [battles]);
 
   // Initialize offline queue listener
-  useEffect(() => { initOfflineQueue(); }, []);
+  useEffect(() => {
+    const cleanup = initOfflineQueue();
+    return cleanup;
+  }, []);
 
   // Pull from cloud on auth change
   useEffect(() => {
@@ -118,7 +126,7 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!campaign?.id || !isSupabaseConfigured()) return;
 
-    const currentPlayerIds = players.map(p => p.id);
+    const currentPlayerIds = playerIdsRef.current;
     const channel = subscribeToCampaign(campaign.id, {
       onPlayerChange: (payload) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
@@ -166,7 +174,7 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
         realtimeChannelRef.current = null;
       }
     };
-  }, [campaign?.id, authUser?.id, players]);
+  }, [campaign?.id, authUser?.id]);
 
   const createCampaign = useCallback((
     name: string, supplyLimit: number, startingRp: number, playerName: string, factionId: FactionId

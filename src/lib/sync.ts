@@ -87,6 +87,8 @@ export async function pushUnitToCloud(unit: CrusadeUnit): Promise<boolean> {
       notes: unit.notes,
       is_destroyed: unit.is_destroyed,
       is_warlord: unit.is_warlord,
+      status: unit.status ?? 'ready',
+      faction_legacy: unit.faction_legacy ?? {},
       created_at: unit.created_at,
     });
     if (error) {
@@ -119,6 +121,8 @@ export async function pushBattleToCloud(battle: Battle): Promise<boolean> {
       units_fielded: battle.units_fielded,
       marked_for_greatness: battle.marked_for_greatness,
       notes: battle.notes,
+      agendas: battle.agendas ?? [],
+      combat_log: battle.combat_log ?? [],
       created_at: battle.created_at,
     });
     if (error) {

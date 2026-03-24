@@ -16,6 +16,7 @@ interface AuthContextType {
   isLoading: boolean;
   signIn: (username: string) => Promise<{ error?: string }>;
   signOut: () => void;
+  updateUsername: (newName: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -101,13 +102,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {};
   }, []);
 
+  const updateUsername = useCallback((newName: string) => {
+    setUser(prev => prev ? { ...prev, username: newName } : null);
+  }, []);
+
   const signOut = useCallback(() => {
     setUser(null);
     clearUser();
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, isLoading, signIn, signOut, updateUsername }}>
       {children}
     </AuthContext.Provider>
   );

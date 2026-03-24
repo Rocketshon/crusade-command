@@ -3,7 +3,7 @@ import { ArrowLeft, Sword, Trophy, Edit } from "lucide-react";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFactionName, getFactionIcon, FACTIONS } from "../../lib/factions";
 import { getRankColor, getResultColor } from "../../lib/ranks";
-import { formatRecord } from "../../lib/formatText";
+import { formatRecord, getResultLabel } from "../../lib/formatText";
 
 export default function PlayerDetail() {
   const { playerId } = useParams();
@@ -38,15 +38,6 @@ export default function PlayerDetail() {
   const formatDate = (iso: string) => {
     const d = new Date(iso);
     return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-  };
-
-  const getResultLabel = (result: string) => {
-    switch (result) {
-      case "victory": return "Win";
-      case "defeat": return "Loss";
-      case "draw": return "Draw";
-      default: return result;
-    }
   };
 
   /**

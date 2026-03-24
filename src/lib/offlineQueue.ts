@@ -163,14 +163,20 @@ async function processMutation(mutation: QueuedMutation): Promise<boolean> {
 // ---------------------------------------------------------------------------
 
 let listenerAttached = false;
+let onlineHandler: (() => void) | null = null;
 
 /** Attach the online event listener (call once at app startup). */
-export function initOfflineQueue(): void {
-  if (listenerAttached) return;
+export function initOfflineQueue(): () => void {
+  if (listenerAttached) return () => {};
   listenerAttached = true;
-
-  window.addEventListener('online', () => {
+  onlineHandler = () => {
     console.log('[OfflineQueue] Back online — flushing queue');
     flushQueue();
-  });
+  };
+  window.addEventListener('online', onlineHandler);
+  return () => {
+    if (onlineHandler) window.removeEventListener('online', onlineHandler);
+    listenerAttached = false;
+    onlineHandler = null;
+  };
 }

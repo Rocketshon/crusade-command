@@ -47,7 +47,7 @@ self.addEventListener('fetch', (event) => {
   }
 
   // Static assets: cache-first
-  if (url.pathname.match(/\.(js|css|svg|png|jpg|jpeg|webp|woff2?|mp4)$/)) {
+  if (url.pathname.match(/\.(js|css|svg|png|jpg|jpeg|webp|woff2?)$/)) {
     event.respondWith(
       caches.match(request).then((cached) => {
         if (cached) return cached;
