@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Dices } from "lucide-react";
 
 interface DiceRollerProps {
@@ -48,6 +48,19 @@ export default function DiceRoller({ count, target, label, onComplete, mode }: D
   );
   const [submitted, setSubmitted] = useState(false);
 
+  // Timer refs for cleanup on unmount
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      mountedRef.current = false;
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
+
   // Reset when count/label changes
   useEffect(() => {
     setRolls([]);
@@ -63,14 +76,16 @@ export default function DiceRoller({ count, target, label, onComplete, mode }: D
     setRolls([]);
 
     // Animate random faces rapidly for 800ms
-    const interval = setInterval(() => {
+    intervalRef.current = setInterval(() => {
       setAnimValues(
         Array.from({ length: count }, () => Math.floor(Math.random() * 6) + 1)
       );
     }, 60);
 
-    setTimeout(() => {
-      clearInterval(interval);
+    timeoutRef.current = setTimeout(() => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = null;
+      if (!mountedRef.current) return;
       const finalRolls = Array.from({ length: count }, () =>
         Math.floor(Math.random() * 6) + 1
       );

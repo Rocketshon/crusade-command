@@ -1,6 +1,9 @@
 // Battle Narrator — generates immersive Warhammer 40K narrative accounts
 // using the Claude API via direct fetch (no SDK, browser-compatible)
 
+// NOTE: VITE_CLAUDE_API_KEY is exposed in the client bundle.
+// For production, proxy through a Supabase Edge Function.
+// Current usage is acceptable for personal/friends-only use.
 const CLAUDE_API_KEY = import.meta.env.VITE_CLAUDE_API_KEY;
 
 export interface NarratorInput {

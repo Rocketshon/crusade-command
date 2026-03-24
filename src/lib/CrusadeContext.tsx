@@ -92,13 +92,10 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
           setCurrentPlayer(cloudData.player);
           setUnits(cloudData.units);
           setBattles(cloudData.battles);
-          // Load other players in the campaign
-          const { data: allPlayers } = await import('./supabase').then(m =>
-            m.supabase.from('cc_campaign_players').select('*').eq('campaign_id', cloudData.campaign!.id)
-          );
-          if (allPlayers && !cancelled) {
-            setPlayers(allPlayers);
-            localStorage.setItem('crusade_all_players', JSON.stringify(allPlayers));
+          // Use players already fetched by pullCampaignFromCloud (no second round-trip)
+          if (cloudData.players.length > 0 && !cancelled) {
+            setPlayers(cloudData.players);
+            localStorage.setItem('crusade_all_players', JSON.stringify(cloudData.players));
           }
         } else {
           // No cloud campaign — try to migrate local data
@@ -121,6 +118,7 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!campaign?.id || !isSupabaseConfigured()) return;
 
+    const currentPlayerIds = players.map(p => p.id);
     const channel = subscribeToCampaign(campaign.id, {
       onPlayerChange: (payload) => {
         if (payload.eventType === 'INSERT' || payload.eventType === 'UPDATE') {
@@ -159,7 +157,7 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
           setUnits(prev => prev.filter(u => u.id !== deleted.id));
         }
       },
-    });
+    }, currentPlayerIds);
     realtimeChannelRef.current = channel;
 
     return () => {
@@ -168,7 +166,7 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
         realtimeChannelRef.current = null;
       }
     };
-  }, [campaign?.id, authUser?.id]);
+  }, [campaign?.id, authUser?.id, players]);
 
   const createCampaign = useCallback((
     name: string, supplyLimit: number, startingRp: number, playerName: string, factionId: FactionId

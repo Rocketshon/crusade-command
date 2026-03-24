@@ -261,16 +261,11 @@ export default function RequisitionStore() {
     if (!selectedReq) return;
 
     // Special flow: Repair and Recuperate needs unit picker
+    // RP is spent AFTER the scar is actually removed (in handleSelectScar),
+    // not here, to avoid charging RP if the user cancels the picker.
     if (selectedReq.id === "repair-recuperate") {
       if (unitsWithScars.length === 0) {
         toast.info("No units have Battle Scars to remove.");
-        setConfirmOpen(false);
-        setSelectedReq(null);
-        return;
-      }
-      const success = spendRequisition(selectedReq.cost);
-      if (!success) {
-        toast.error("Not enough RP");
         setConfirmOpen(false);
         setSelectedReq(null);
         return;
@@ -319,6 +314,15 @@ export default function RequisitionStore() {
   const handleSelectScar = useCallback(
     (scarId: string, scarName: string) => {
       if (!selectedUnit) return;
+      // Spend RP only after scar is actually selected (not on initial confirm)
+      const success = spendRequisition(1);
+      if (!success) {
+        toast.error("Not enough RP");
+        setScarPickerOpen(false);
+        setSelectedUnit(null);
+        setSelectedReq(null);
+        return;
+      }
       removeBattleScar(selectedUnit.id, scarId);
       toast.success(`Removed "${scarName}" from ${selectedUnit.name}`);
       recordHistory("Repair and Recuperate", 1, selectedUnit.name);
@@ -326,7 +330,7 @@ export default function RequisitionStore() {
       setSelectedUnit(null);
       setSelectedReq(null);
     },
-    [selectedUnit, removeBattleScar, recordHistory]
+    [selectedUnit, removeBattleScar, recordHistory, spendRequisition]
   );
 
   if (!campaign || !currentPlayer) return null;

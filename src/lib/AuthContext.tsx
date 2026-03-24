@@ -2,6 +2,10 @@ import { createContext, useContext, useState, useEffect, useCallback, type React
 import { supabase, isSupabaseConfigured } from './supabase';
 import { saveUser, clearUser, loadUser, generateId } from './storage';
 
+// NOTE: cc_profiles.display_name should have a UNIQUE constraint in Supabase:
+//   ALTER TABLE cc_profiles ADD CONSTRAINT cc_profiles_display_name_unique UNIQUE (display_name);
+// The ilike check below handles the common case, and the 23505 handler catches race conditions.
+
 interface SimpleUser {
   id: string;
   username: string;
@@ -29,6 +33,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
+  // DESIGN DECISION: Username-only auth means anyone can "log in" as any existing user.
+  // This is an intentional tradeoff for simplicity at in-person gaming events.
+  // The user explicitly chose this over email/password auth. For a public deployment,
+  // add proper authentication (e.g. Supabase Auth with email/password or OAuth).
   const signIn = useCallback(async (username: string): Promise<{ error?: string }> => {
     const trimmed = username.trim();
     if (!trimmed) return { error: 'Please enter a username.' };
@@ -60,6 +68,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .insert({ id: newId, display_name: trimmed });
 
         if (error) {
+          // Handle race condition: another client inserted the same username
+          if (error.code === '23505') {
+            return { error: 'Username already taken.' };
+          }
           console.warn('Failed to create cloud profile:', error.message);
           // Fall through to local-only
         } else {

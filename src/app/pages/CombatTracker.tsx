@@ -17,6 +17,21 @@ import DiceRoller from "../components/DiceRoller";
 import CombatLog from "../components/CombatLog";
 import type { CrusadeUnit, Datasheet, WeaponProfile, CombatEngagement } from "../../types";
 
+/** Parse attack count from weapon profile, handling dice notation like "D6", "2D6+1" */
+function parseAttackCount(a: string): number {
+  const num = parseInt(a);
+  if (!isNaN(num)) return num;
+  // Handle "D6", "D3", "2D6", "2D6+1", etc. — use average (rounded up)
+  const match = a.match(/^(\d*)D(\d+)([+-]\d+)?$/i);
+  if (match) {
+    const multiplier = parseInt(match[1]) || 1;
+    const sides = parseInt(match[2]);
+    const modifier = parseInt(match[3]) || 0;
+    return Math.max(1, multiplier * Math.ceil(sides / 2) + modifier);
+  }
+  return 1;
+}
+
 type Phase = "shooting" | "melee";
 type CombatStep = "select" | "weapon" | "preview" | "roll-hit" | "roll-wound" | "roll-save" | "result";
 
@@ -561,7 +576,7 @@ export default function CombatTracker() {
           {/* Step: Roll Hits */}
           {step === "roll-hit" && preview && selectedWeapon && (
             <DiceRoller
-              count={parseInt(selectedWeapon.A) || 1}
+              count={parseAttackCount(selectedWeapon.A)}
               target={preview.hitTarget}
               label="Hit Rolls"
               mode={diceMode}
@@ -684,7 +699,15 @@ export default function CombatTracker() {
               );
             })}
             {opponentUnits.length === 0 && (
-              <p className="text-xs text-stone-600 py-2">No units in opponent&apos;s roster</p>
+              <div className="text-center py-4">
+                <p className="text-stone-400 text-sm">Opponent's units haven't synced yet.</p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="mt-2 px-3 py-1 text-xs rounded-sm border border-stone-700 text-stone-400 hover:text-stone-200"
+                >
+                  Refresh
+                </button>
+              </div>
             )}
           </div>
         </div>

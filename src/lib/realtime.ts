@@ -31,6 +31,7 @@ export interface CampaignRealtimeCallbacks {
 export function subscribeToCampaign(
   campaignId: string,
   callbacks: CampaignRealtimeCallbacks,
+  playerIds: string[] = [],
 ): RealtimeChannel {
   const channel = supabase
     .channel(`campaign-${campaignId}`)
@@ -74,6 +75,11 @@ export function subscribeToCampaign(
         table: 'cc_crusade_units',
       },
       (payload) => {
+        // Filter incoming unit events to only players in this campaign
+        const incoming = (payload.new ?? payload.old ?? {}) as Record<string, unknown>;
+        if (playerIds.length > 0 && incoming.player_id && !playerIds.includes(incoming.player_id as string)) {
+          return; // Ignore units belonging to players outside this campaign
+        }
         callbacks.onUnitChange({
           eventType: payload.eventType as 'INSERT' | 'UPDATE' | 'DELETE',
           new: (payload.new ?? {}) as Record<string, unknown>,

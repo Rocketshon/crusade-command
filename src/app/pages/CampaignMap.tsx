@@ -4,7 +4,7 @@ import { ArrowLeft, Map, Plus, X } from "lucide-react";
 import { toast } from "sonner";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { useAuth } from "../../lib/AuthContext";
-import { supabase } from "../../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../../lib/supabase";
 import type { Territory } from "../../types";
 
 export default function CampaignMap() {
@@ -23,6 +23,10 @@ export default function CampaignMap() {
 
   const fetchTerritories = useCallback(async () => {
     if (!campaign) return;
+    if (!isSupabaseConfigured()) {
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     const { data, error } = await supabase
       .from("cc_territories")
@@ -46,6 +50,24 @@ export default function CampaignMap() {
   }, [campaign, navigate]);
 
   if (!campaign) return null;
+
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center p-6">
+        <div className="text-center">
+          <Map className="w-12 h-12 text-stone-700 mx-auto mb-3" strokeWidth={1.5} />
+          <p className="text-stone-400 text-sm">Campaign Map requires an internet connection.</p>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-4 flex items-center gap-2 text-stone-400 hover:text-emerald-500 transition-colors mx-auto"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            <span className="text-sm">Back</span>
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const handleAddTerritory = async () => {
     if (!newName.trim()) {

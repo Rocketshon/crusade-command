@@ -50,6 +50,16 @@ export default function HallOfFame() {
       });
   }, [displayPlayers, allUnits, battles]);
 
+  // Static Tailwind class lookup (dynamic `bg-${color}-500` doesn't work with Tailwind purge)
+  const factionBgColors: Record<string, string> = {
+    blue: 'bg-blue-500', cyan: 'bg-cyan-500', slate: 'bg-slate-500',
+    red: 'bg-red-500', amber: 'bg-amber-500', orange: 'bg-orange-500',
+    green: 'bg-green-500', yellow: 'bg-yellow-500', purple: 'bg-purple-500',
+    zinc: 'bg-zinc-500', lime: 'bg-lime-500', rose: 'bg-rose-500',
+    stone: 'bg-stone-500', emerald: 'bg-emerald-500', violet: 'bg-violet-500',
+    sky: 'bg-sky-500', indigo: 'bg-indigo-500',
+  };
+
   // Faction win rates
   const factionStats = useMemo(() => {
     const fMap = new Map<
@@ -342,7 +352,7 @@ export default function HallOfFame() {
                     const pct = total > 0 ? Math.round((wins / total) * 100) : 0;
                     const faction = getFaction(factionId);
                     const colorClass = faction
-                      ? `bg-${faction.color}-500`
+                      ? (factionBgColors[faction.color] || 'bg-emerald-500')
                       : "bg-emerald-500";
                     return (
                       <div

@@ -140,6 +140,7 @@ export async function pushBattleToCloud(battle: Battle): Promise<boolean> {
 export async function pullCampaignFromCloud(userId: string): Promise<{
   campaign: Campaign | null;
   player: CampaignPlayer | null;
+  players: CampaignPlayer[];
   units: CrusadeUnit[];
   battles: Battle[];
 } | null> {
@@ -157,7 +158,7 @@ export async function pullCampaignFromCloud(userId: string): Promise<{
       console.error('[Sync] pullCampaignFromCloud player error:', playerErr.message);
       return null;
     }
-    if (!playerRow) return { campaign: null, player: null, units: [], battles: [] };
+    if (!playerRow) return { campaign: null, player: null, players: [], units: [], battles: [] };
 
     const player = playerRow as CampaignPlayer;
 
@@ -175,12 +176,13 @@ export async function pullCampaignFromCloud(userId: string): Promise<{
 
     const campaign = campaignRow as Campaign;
 
-    // Fetch ALL players in this campaign
+    // Fetch ALL players in this campaign (full rows to avoid a second round-trip)
     const { data: allPlayers } = await supabase
       .from('cc_campaign_players')
-      .select('id')
+      .select('*')
       .eq('campaign_id', campaign.id);
-    const allPlayerIds = (allPlayers ?? []).map((p: { id: string }) => p.id);
+    const allPlayerRows = (allPlayers ?? []) as CampaignPlayer[];
+    const allPlayerIds = allPlayerRows.map((p) => p.id);
 
     // Fetch units for ALL players in the campaign
     const { data: unitRows, error: unitErr } = await supabase
@@ -208,6 +210,7 @@ export async function pullCampaignFromCloud(userId: string): Promise<{
     return {
       campaign,
       player,
+      players: allPlayerRows,
       units: (unitRows ?? []) as CrusadeUnit[],
       battles: (battleRows ?? []) as Battle[],
     };

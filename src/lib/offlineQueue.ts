@@ -102,6 +102,7 @@ export async function flushQueue(): Promise<{ succeeded: number; failed: number 
       succeeded++;
     } else {
       failed++;
+      break;  // Stop processing — preserve ordering
     }
   }
 

@@ -62,9 +62,9 @@ export default function PostBattleWizard() {
         .map(id => units.find(u => u.id === id))
         .filter(Boolean) as typeof units;
     }
-    // Fall back to all roster units
-    return units;
-  }, [latestBattle, units]);
+    // Fall back to current player's roster units only (not all units in the campaign)
+    return units.filter(u => u.player_id === currentPlayer?.id);
+  }, [latestBattle, units, currentPlayer]);
 
   const [currentStep, setCurrentStep] = useState(1);
 
