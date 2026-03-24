@@ -121,12 +121,19 @@ export default function PostBattleWizard() {
   // Track whether step 5 changes have been applied
   const [changesApplied, setChangesApplied] = useState(!!alreadyProcessed);
 
-  // If already processed, skip straight to summary
+  // If already processed, skip straight to summary and recalculate XP for display
   useEffect(() => {
     if (alreadyProcessed) {
       setCurrentStep(5);
     }
   }, [alreadyProcessed]);
+
+  useEffect(() => {
+    if (alreadyProcessed && latestBattle) {
+      calculateXP();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [alreadyProcessed, latestBattle]);
 
   // UI state for pickers
   const [scarPickerOpen, setScarPickerOpen] = useState<string | null>(null);

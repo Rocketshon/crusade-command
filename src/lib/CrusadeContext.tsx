@@ -351,8 +351,8 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
       if (u.id !== unitId) return u;
       const newXP = u.experience_points + xp;
       const newRank = getRankFromXP(newXP);
-      // Update crusade_points: increment by 1 per battle participated (each awardXP call = 1 battle)
-      return { ...u, experience_points: newXP, rank: newRank, crusade_points: u.crusade_points + 1 };
+      // Update crusade_points: increment by XP gained
+      return { ...u, experience_points: newXP, rank: newRank, crusade_points: u.crusade_points + xp };
     }));
   }, []);
 
@@ -448,6 +448,8 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
   const removePlayerFn = useCallback((playerId: string) => {
     // Remove player from local state
     setPlayers(prev => prev.filter(p => p.id !== playerId));
+    // Purge the removed player's units from local state
+    setUnits(prev => prev.filter(u => u.player_id !== playerId));
     // Remove from cloud
     if (isSupabaseConfigured()) {
       sync.leaveCampaignCloud(playerId).catch(console.warn);

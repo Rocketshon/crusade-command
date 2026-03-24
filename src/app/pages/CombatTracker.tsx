@@ -311,12 +311,18 @@ export default function CombatTracker() {
   const hitsForWoundRoll = useMemo(() => {
     if (!preview || hitRolls.length === 0) return 0;
     let hits = 0;
+    let crits = 0;
     for (const r of hitRolls) {
       if (r === 1) continue;
-      if (r === 6 || r >= preview.hitTarget) hits++;
+      if (r === 6) { hits++; crits++; }
+      else if (r >= preview.hitTarget) hits++;
     }
-    return hits;
-  }, [hitRolls, preview]);
+    // Check if weapon has LETHAL HITS - those crits auto-wound and shouldn't be rolled again
+    const hasLethalHits = selectedWeapon?.traits?.some(
+      (t: string) => t.toLowerCase().includes('lethal hits')
+    );
+    return hasLethalHits ? hits - crits : hits;
+  }, [hitRolls, preview, selectedWeapon]);
 
   // Count wounds for save roll count
   const woundsForSaveRoll = useMemo(() => {

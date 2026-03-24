@@ -171,12 +171,13 @@ export async function pullCampaignFromCloud(userId: string): Promise<{
       .from('cc_campaigns')
       .select('*')
       .eq('id', player.campaign_id)
-      .single();
+      .maybeSingle();
 
     if (campaignErr) {
       console.error('[Sync] pullCampaignFromCloud campaign error:', campaignErr.message);
       return null;
     }
+    if (!campaignRow) return null;
 
     const campaign = campaignRow as Campaign;
 

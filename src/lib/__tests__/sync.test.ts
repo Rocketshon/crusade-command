@@ -364,7 +364,7 @@ describe('pullCampaignFromCloud', () => {
         return {
           select: vi.fn().mockReturnValue({
             eq: vi.fn().mockReturnValue({
-              single: vi.fn().mockResolvedValue({ data: mockCampaign, error: null }),
+              maybeSingle: vi.fn().mockResolvedValue({ data: mockCampaign, error: null }),
             }),
           }),
         };
