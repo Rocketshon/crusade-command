@@ -231,41 +231,43 @@ export function CrusadeProvider({ children }: { children: ReactNode }) {
   }, [campaign, currentPlayer]);
 
   const addUnitFn = useCallback((datasheetName: string, customName: string, pointsCost: number, equipment: string, modelCount?: number) => {
-    setCurrentPlayer(cp => {
-      if (!cp) return cp;
-      const unit: CrusadeUnit = {
-        id: storage.generateId(),
-        player_id: cp.id,
-        datasheet_name: datasheetName,
-        custom_name: customName || datasheetName,
-        points_cost: pointsCost,
-        model_count: modelCount,
-        rank: 'Battle-ready',
-        experience_points: 0,
-        crusade_points: 0,
-        battles_played: 0,
-        battles_survived: 0,
-        equipment,
-        battle_honours: [],
-        battle_scars: [],
-        notes: '',
-        is_destroyed: false,
-        is_warlord: false,
-        status: 'ready',
-        faction_legacy: {},
-        created_at: new Date().toISOString(),
-      };
-      setUnits(prev => [...prev, unit]);
-      // Push unit to cloud
-      if (isSupabaseConfigured()) {
-        sync.pushUnitToCloud(unit).catch(err => {
-          console.warn('Cloud push failed, queuing:', err);
-          queueMutation({ type: 'unit', action: 'create', data: unit });
-        });
-      }
-      trackEvent('unit_added', { faction: cp.faction_id || '' });
-      return { ...cp, supply_used: (cp.supply_used || 0) + pointsCost };
+    const cp = currentPlayerRef.current;
+    if (!cp) return;
+    const unit: CrusadeUnit = {
+      id: storage.generateId(),
+      player_id: cp.id,
+      datasheet_name: datasheetName,
+      custom_name: customName || datasheetName,
+      points_cost: pointsCost,
+      model_count: modelCount,
+      rank: 'Battle-ready',
+      experience_points: 0,
+      crusade_points: 0,
+      battles_played: 0,
+      battles_survived: 0,
+      equipment,
+      battle_honours: [],
+      battle_scars: [],
+      notes: '',
+      is_destroyed: false,
+      is_warlord: false,
+      status: 'ready',
+      faction_legacy: {},
+      created_at: new Date().toISOString(),
+    };
+    setUnits(prev => [...prev, unit]);
+    setCurrentPlayer(prev => {
+      if (!prev) return prev;
+      return { ...prev, supply_used: (prev.supply_used || 0) + pointsCost };
     });
+    // Push unit to cloud
+    if (isSupabaseConfigured()) {
+      sync.pushUnitToCloud(unit).catch(err => {
+        console.warn('Cloud push failed, queuing:', err);
+        queueMutation({ type: 'unit', action: 'create', data: unit });
+      });
+    }
+    trackEvent('unit_added', { faction: cp.faction_id || '' });
   }, []);
 
   const updateUnitFn = useCallback((unitId: string, updates: Partial<CrusadeUnit>) => {

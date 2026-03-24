@@ -52,6 +52,7 @@ export default function DiceRoller({ count, target, label, onComplete, mode }: D
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
+  const rollingRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -71,9 +72,14 @@ export default function DiceRoller({ count, target, label, onComplete, mode }: D
   }, [count, label]);
 
   const rollDigital = useCallback(() => {
-    if (rolling || count === 0) return;
+    if (rollingRef.current || count === 0) return;
+    rollingRef.current = true;
     setRolling(true);
     setRolls([]);
+
+    // Clear existing timers before creating new ones
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
 
     // Animate random faces rapidly for 800ms
     intervalRef.current = setInterval(() => {
@@ -92,9 +98,10 @@ export default function DiceRoller({ count, target, label, onComplete, mode }: D
       setRolls(finalRolls);
       setAnimValues([]);
       setRolling(false);
+      rollingRef.current = false;
       onComplete(finalRolls);
     }, 800);
-  }, [count, rolling, onComplete]);
+  }, [count, onComplete]);
 
   const handleManualSubmit = useCallback(() => {
     const parsed = manualInputs.map((v) => {

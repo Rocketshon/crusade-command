@@ -261,7 +261,8 @@ export default function DatasheetView() {
       <div className="relative z-10 w-full max-w-2xl mx-auto mt-6">
           <button
             onClick={handleAddToRoster}
-            className={`w-full py-4 rounded-lg font-bold text-base transition-all ${
+            disabled={showAddSuccess || !campaign}
+            className={`w-full py-4 rounded-lg font-bold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
               showAddSuccess
                 ? "bg-emerald-600 text-black"
                 : "bg-gradient-to-r from-red-600 to-red-500 text-black hover:from-red-500 hover:to-red-400"

@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { ArrowLeft, Trophy } from "lucide-react";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFaction, getFactionIcon, getFactionName } from "../../lib/factions";
+import { isFeatureEnabled } from "../../lib/featureFlags";
 import type { CampaignPlayer, CrusadeUnit, FactionId } from "../../types";
 
 // ──────────────────────────────────────────────
@@ -148,6 +149,14 @@ export default function HallOfFame() {
 
     return result;
   }, [allUnits, displayPlayers, playerMap]);
+
+  useEffect(() => {
+    if (!isFeatureEnabled('HALL_OF_FAME')) {
+      navigate('/home', { replace: true });
+    }
+  }, [navigate]);
+
+  if (!isFeatureEnabled('HALL_OF_FAME')) return null;
 
   // ── Helpers ─────────────────────────────────
 

@@ -299,7 +299,7 @@ export default function CombatTracker() {
 
     // Save engagement to the specific battle (by ID) or fall back to most recent
     const targetBattle = battleId ? battles.find(b => b.id === battleId) : battles[0];
-    if (targetBattle) {
+    if (battleId && targetBattle) {
       const updatedLog = [...(targetBattle.combat_log || []), engagement];
       updateBattle(targetBattle.id, { combat_log: updatedLog });
     }

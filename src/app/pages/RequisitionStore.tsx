@@ -17,6 +17,7 @@ import {
 import { toast } from "sonner";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { safeGetItem, safeSetItem } from "../../lib/storage";
+import { isFeatureEnabled } from "../../lib/featureFlags";
 import type { CrusadeUnit } from "../../types";
 import {
   AlertDialog,
@@ -232,6 +233,12 @@ export default function RequisitionStore() {
     }
   }, [campaign, navigate]);
 
+  useEffect(() => {
+    if (!isFeatureEnabled('REQUISITION_STORE')) {
+      navigate('/home', { replace: true });
+    }
+  }, [navigate]);
+
   const handleSpendClick = useCallback((req: RequisitionDef) => {
     setSelectedReq(req);
     setConfirmOpen(true);
@@ -336,6 +343,7 @@ export default function RequisitionStore() {
   );
 
   if (!campaign || !currentPlayer) return null;
+  if (!isFeatureEnabled('REQUISITION_STORE')) return null;
 
   return (
     <div className="min-h-screen bg-black flex flex-col relative overflow-hidden pb-24">

@@ -22,6 +22,7 @@ export default function CreateCampaign() {
 
   // UI state
   const [showFactionPicker, setShowFactionPicker] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleFactionSelect = (factionId: string, factionName: string, factionIcon: string) => {
     setSelectedFaction({ id: factionId, name: factionName, icon: factionIcon });
@@ -30,6 +31,8 @@ export default function CreateCampaign() {
   const handleCreate = () => {
     if (!selectedFaction) return;
     if (supplyLimit < 1) return;
+    if (isSubmitting) return;
+    setIsSubmitting(true);
     createCampaign(
       campaignName.trim(),
       supplyLimit,
@@ -38,9 +41,10 @@ export default function CreateCampaign() {
       selectedFaction.id as FactionId
     );
     navigate("/campaign/active");
+    setIsSubmitting(false);
   };
 
-  const isFormValid = campaignName.trim() && playerName.trim() && selectedFaction;
+  const isFormValid = campaignName.trim() && playerName.trim() && selectedFaction && supplyLimit >= 1;
 
   return (
     <div className="min-h-screen bg-black flex flex-col p-6 pb-24 relative overflow-hidden">
@@ -92,7 +96,7 @@ export default function CreateCampaign() {
               type="number"
               inputMode="numeric"
               value={supplyLimit}
-              onChange={(e) => setSupplyLimit(parseInt(e.target.value) || 0)}
+              onChange={(e) => { const val = parseInt(e.target.value); setSupplyLimit(isNaN(val) ? 0 : Math.min(Math.max(0, val), 9999)); }}
               min={1}
               className="w-full bg-stone-900 border border-stone-600 rounded-lg px-4 py-3 text-stone-100 placeholder:text-stone-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
             />
@@ -163,7 +167,7 @@ export default function CreateCampaign() {
           {/* Create Button */}
           <button
             onClick={handleCreate}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isSubmitting}
             className={`w-full py-4 rounded-lg font-bold transition-all mt-8 ${
               isFormValid
                 ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-black hover:from-emerald-500 hover:to-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]"

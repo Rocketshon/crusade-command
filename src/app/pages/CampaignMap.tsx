@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { useAuth } from "../../lib/AuthContext";
 import { supabase, isSupabaseConfigured } from "../../lib/supabase";
+import { isFeatureEnabled } from "../../lib/featureFlags";
 import type { Territory } from "../../types";
 
 export default function CampaignMap() {
@@ -57,7 +58,14 @@ export default function CampaignMap() {
     }
   }, [campaign, navigate]);
 
+  useEffect(() => {
+    if (!isFeatureEnabled('CAMPAIGN_MAP')) {
+      navigate('/home', { replace: true });
+    }
+  }, [navigate]);
+
   if (!campaign) return null;
+  if (!isFeatureEnabled('CAMPAIGN_MAP')) return null;
 
   if (!isSupabaseConfigured()) {
     return (

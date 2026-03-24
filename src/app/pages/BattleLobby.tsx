@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Swords, ChevronDown, ChevronRight, ArrowLeft } from "lucide-react";
 import { useCrusade } from "../../lib/CrusadeContext";
 import { getFaction } from "../../lib/factions";
 import { getUnitsForFaction } from "../../data";
 import { getRankColor } from "../../lib/ranks";
+import { isFeatureEnabled } from "../../lib/featureFlags";
 import type { CampaignPlayer, Datasheet } from "../../types";
 
 export default function BattleLobby() {
@@ -18,12 +19,20 @@ export default function BattleLobby() {
       ? [currentPlayer]
       : [];
 
+  useEffect(() => {
+    if (!isFeatureEnabled('COMBAT_TRACKER')) {
+      navigate('/home', { replace: true });
+    }
+  }, [navigate]);
+
+  if (!isFeatureEnabled('COMBAT_TRACKER')) return null;
+
   const toggleExpand = (playerId: string) => {
     setExpandedPlayerId((prev) => (prev === playerId ? null : playerId));
   };
 
   const handleSelectOpponent = (opponentId: string) => {
-    const latestBattleId = battles[0]?.id;
+    const latestBattleId = battles[0]?.id ?? null;
     navigate(`/battle-live/${opponentId}`, { state: { battleId: latestBattleId } });
   };
 

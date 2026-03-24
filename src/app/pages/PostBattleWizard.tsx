@@ -120,6 +120,11 @@ export default function PostBattleWizard() {
 
   // Track whether step 5 changes have been applied
   const [changesApplied, setChangesApplied] = useState(!!alreadyProcessed);
+  const appliedRef = useRef(false);
+  // Sync ref with initial state
+  if (alreadyProcessed && !appliedRef.current) {
+    appliedRef.current = true;
+  }
 
   // If already processed, skip straight to summary and recalculate XP for display
   useEffect(() => {
@@ -202,7 +207,8 @@ export default function PostBattleWizard() {
   };
 
   const applyChanges = () => {
-    if (changesApplied) return;
+    if (appliedRef.current) return;
+    appliedRef.current = true;
 
     fieldedUnits.forEach((unit) => {
       const state = unitStates[unit.id];
@@ -752,7 +758,8 @@ export default function PostBattleWizard() {
             <div>
               <button
                 onClick={goToNextStep}
-                className="w-full py-4 rounded-lg font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 text-black hover:from-emerald-500 hover:to-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all"
+                disabled={currentStep === 4 && changesApplied}
+                className="w-full py-4 rounded-lg font-bold bg-gradient-to-r from-emerald-600 to-emerald-500 text-black hover:from-emerald-500 hover:to-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {currentStep === 4 ? "Confirm & Apply Changes" : "Next"}
               </button>

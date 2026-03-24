@@ -22,6 +22,7 @@ export default function JoinCampaign() {
   const [showFactionPicker, setShowFactionPicker] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [touched, setTouched] = useState(false);
+  const [isJoining, setIsJoining] = useState(false);
 
   const handleFactionSelect = (factionId: string, factionName: string, factionIcon: string) => {
     setSelectedFaction({ id: factionId, name: factionName, icon: factionIcon });
@@ -40,17 +41,23 @@ export default function JoinCampaign() {
     }
 
     if (!selectedFaction) return;
+    if (isJoining) return;
+    setIsJoining(true);
 
-    const result = await joinCampaign(
-      joinCode.trim(),
-      playerName.trim(),
-      selectedFaction.id as FactionId
-    );
+    try {
+      const result = await joinCampaign(
+        joinCode.trim(),
+        playerName.trim(),
+        selectedFaction.id as FactionId
+      );
 
-    if (result.success) {
-      navigate("/campaign/active");
-    } else {
-      setErrorMessage(result.error ?? "Failed to join campaign.");
+      if (result.success) {
+        navigate("/campaign/active");
+      } else {
+        setErrorMessage(result.error ?? "Failed to join campaign.");
+      }
+    } finally {
+      setIsJoining(false);
     }
   };
 
@@ -163,9 +170,9 @@ export default function JoinCampaign() {
           {/* Join Button */}
           <button
             onClick={handleJoin}
-            disabled={!isFormValid}
+            disabled={!isFormValid || isJoining}
             className={`w-full py-4 rounded-lg font-bold transition-all mt-8 ${
-              isFormValid
+              isFormValid && !isJoining
                 ? "bg-gradient-to-r from-emerald-600 to-emerald-500 text-black hover:from-emerald-500 hover:to-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.3)]"
                 : "bg-stone-800 text-stone-500 cursor-not-allowed"
             }`}

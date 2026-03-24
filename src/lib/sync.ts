@@ -442,6 +442,12 @@ export async function syncAll(userId: string): Promise<void> {
     const cloudData = await pullCampaignFromCloud(userId);
     if (!cloudData) return;
 
+    // Capture local state BEFORE cloud overwrite
+    const localCampaign = storage.loadCampaign();
+    const localPlayer = storage.loadPlayer();
+    const localUnits = storage.loadUnits();
+    const localBattles = storage.loadBattles();
+
     // If we have cloud data, write it to localStorage
     if (cloudData.campaign) {
       storage.saveCampaign(cloudData.campaign);
@@ -455,12 +461,6 @@ export async function syncAll(userId: string): Promise<void> {
     if (cloudData.battles.length > 0) {
       storage.saveBattles(cloudData.battles);
     }
-
-    // Push any local data that might be newer / local-only
-    const localCampaign = storage.loadCampaign();
-    const localPlayer = storage.loadPlayer();
-    const localUnits = storage.loadUnits();
-    const localBattles = storage.loadBattles();
 
     // Push local units not present in cloud
     const cloudUnitIds = new Set(cloudData.units.map(u => u.id));
