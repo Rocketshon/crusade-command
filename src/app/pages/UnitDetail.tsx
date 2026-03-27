@@ -1,43 +1,20 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router";
 import { ArrowLeft, Shield, Edit, Plus, Award, AlertTriangle, Skull, ChevronDown, ChevronUp, Star, Trash2, Sparkles, Zap } from "lucide-react";
 import { toast } from "sonner";
-// TODO: wire to ArmyContext
-// import { useArmy } from "../../lib/ArmyContext";
+import { useArmy } from "../../lib/ArmyContext";
 import { getFactionName, getDataFactionId } from "../../lib/factions";
 import { getUnitsForFaction, getRulesForFaction } from "../../data";
 import type { Datasheet, FactionId } from "../../types";
 import WeaponStatTable from "../components/WeaponStatTable";
 import { FormattedRuleText } from "../../lib/formatText";
 
-// TODO: These will come from ArmyContext
-// For now, define a minimal mock to keep the page compilable
-interface MockUnit {
-  id: string;
-  datasheet_name: string;
-  custom_name: string;
-  points_cost: number;
-  experience_points: number;
-  battles_played: number;
-  battles_survived: number;
-  battle_honours: { id: string; type: string; name: string; description: string }[];
-  battle_scars: { id: string; name: string; description: string }[];
-  notes: string;
-  equipment: string;
-  is_destroyed: boolean;
-  status: string;
-  faction_legacy?: Record<string, unknown>;
-}
-
 export default function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
   const navigate = useNavigate();
 
-  // TODO: wire to ArmyContext
-  // const { units, updateUnit, removeUnit, mode, factionId } = useArmy();
-  const units: MockUnit[] = []; // placeholder
-  const mode = 'standard' as 'standard' | 'crusade'; // placeholder - will come from ArmyContext
-  const factionId: FactionId | null = null; // placeholder
+  const { army, mode, factionId: armyFactionId, updateUnit, removeUnit, awardXP, addBattleHonour, addBattleScar, removeBattleScar } = useArmy();
+  const factionId: FactionId | null = (armyFactionId as FactionId) ?? null;
 
   const [isEditing, setIsEditing] = useState(false);
   const [showAbilities, setShowAbilities] = useState(false);
@@ -47,11 +24,11 @@ export default function UnitDetail() {
   const [xpAmount, setXpAmount] = useState(1);
   const [editName, setEditName] = useState("");
   const [editPoints, setEditPoints] = useState(0);
-  const [editNotes, setEditNotes] = useState("");
+  const [editNotes, setEditNotes] = useState(""); // kept for notes textarea UI
   const [showEnhancementPicker, setShowEnhancementPicker] = useState(false);
   const [showStratagems, setShowStratagems] = useState(false);
 
-  const unit = units.find((u) => u.id === unitId);
+  const unit = army.find((u) => u.id === unitId);
 
   // Load matching datasheet from faction data
   const datasheet: Datasheet | undefined = useMemo(() => {
@@ -173,24 +150,27 @@ export default function UnitDetail() {
   })() : [];
 
   const handleAddBattleHonor = () => {
-    // TODO: wire to ArmyContext
-    toast.success("Battle Honor added!");
+    if (!unitId) return;
+    addBattleHonour(unitId, { name: 'Battle Honour', type: 'Honour' });
+    toast.success("Battle Honour added!");
   };
 
   const handleAssignEnhancement = (enh: { detachment: string; name: string; cost: string; text: string }) => {
-    // TODO: wire to ArmyContext
+    if (!unitId) return;
+    addBattleHonour(unitId, { name: enh.name, type: 'Enhancement' });
     setShowEnhancementPicker(false);
     toast.success(`${enh.name} assigned!`);
   };
 
   const handleAddBattleScar = () => {
-    // TODO: wire to ArmyContext
+    if (!unitId) return;
+    addBattleScar(unitId, { name: 'Battle Scar', effect: 'No effect assigned' });
     toast.success("Battle Scar added!");
   };
 
   const handleSpendXP = () => {
-    if (xpAmount < 1) return;
-    // TODO: wire to ArmyContext
+    if (xpAmount < 1 || !unitId) return;
+    awardXP(unitId, xpAmount);
     toast.success(`+${xpAmount} XP awarded!`);
     setShowSpendXP(false);
     setXpAmount(1);
@@ -199,25 +179,28 @@ export default function UnitDetail() {
   const handleStartEdit = () => {
     setEditName(unit.custom_name);
     setEditPoints(unit.points_cost);
-    setEditNotes(unit.notes);
+    setEditNotes('');
     setIsEditing(true);
   };
 
   const handleSaveEdit = () => {
-    // TODO: wire to ArmyContext
+    if (!unitId) return;
+    updateUnit(unitId, { custom_name: editName, points_cost: editPoints });
     setIsEditing(false);
     toast.success("Unit updated!");
   };
 
   const handleMarkDestroyed = () => {
-    // TODO: wire to ArmyContext
+    if (!unitId) return;
+    updateUnit(unitId, { is_destroyed: true });
     toast.error("Unit marked as destroyed");
     setShowDestroyConfirm(false);
     setTimeout(() => navigate("/army"), 1500);
   };
 
   const handleRemove = () => {
-    // TODO: wire to ArmyContext
+    if (!unitId) return;
+    removeUnit(unitId);
     toast.success("Unit removed from army");
     setShowDeleteConfirm(false);
     setTimeout(() => navigate("/army"), 1500);
@@ -459,7 +442,7 @@ export default function UnitDetail() {
                     Rank
                   </div>
                   <div className="text-base font-bold text-[#b8860b]">
-                    Battle-ready
+                    {unit.rank}
                   </div>
                 </div>
               </div>
@@ -526,7 +509,7 @@ export default function UnitDetail() {
                       {honor.name}
                     </h4>
                     <p className="text-xs text-[#8b7355] leading-relaxed">
-                      {honor.description}
+                      {honor.type}
                     </p>
                   </div>
                 ))}
@@ -561,7 +544,7 @@ export default function UnitDetail() {
                       {scar.name}
                     </h4>
                     <p className="text-xs text-[#8b7355] leading-relaxed">
-                      {scar.description}
+                      {scar.effect}
                     </p>
                   </div>
                 ))}
@@ -585,36 +568,6 @@ export default function UnitDetail() {
                 </span>
               </div>
             </button>
-          </div>
-        )}
-
-        {/* Notes */}
-        {unit.notes && (
-          <div className="mb-4">
-            <h3 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider mb-3">
-              Notes
-            </h3>
-            <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
-              <p className="text-xs text-[#8b7355] leading-relaxed whitespace-pre-line">
-                {unit.notes}
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Equipment / Relics */}
-        {unit.equipment && (
-          <div className="mb-4">
-            <h3 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider mb-3">
-              Relics & Upgrades
-            </h3>
-            <div className="space-y-2">
-              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
-                <p className="text-sm font-semibold text-purple-600">
-                  {unit.equipment}
-                </p>
-              </div>
-            </div>
           </div>
         )}
 

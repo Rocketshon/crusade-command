@@ -1,9 +1,8 @@
-import { useState, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router";
 import { ArrowLeft, Search, Plus, X, Users } from "lucide-react";
 import { toast } from "sonner";
-// TODO: wire to ArmyContext
-// import { useArmy } from "../../lib/ArmyContext";
+import { useArmy } from "../../lib/ArmyContext";
 import { getFactionName, getDataFactionId } from "../../lib/factions";
 import { getUnitsForFaction } from "../../data";
 import { toTitleCase } from "../../lib/formatText";
@@ -12,8 +11,7 @@ import WeaponStatTable from "../components/WeaponStatTable";
 
 export default function AddUnit() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  // TODO: wire to ArmyContext - const { addUnit, factionId } = useArmy();
+  const { addUnit, factionId: armyFactionId } = useArmy();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUnit, setSelectedUnit] = useState<Datasheet | null>(null);
   const [customName, setCustomName] = useState("");
@@ -21,8 +19,14 @@ export default function AddUnit() {
   const [selectedModelTier, setSelectedModelTier] = useState(0);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
 
-  // Get factionId from URL params or ArmyContext (TODO)
-  const factionId: FactionId | null = (searchParams.get('faction') as FactionId) ?? null;
+  const factionId: FactionId | null = (armyFactionId as FactionId) ?? null;
+
+  // Redirect to /army if no faction is set
+  useEffect(() => {
+    if (!factionId) {
+      navigate('/army');
+    }
+  }, [factionId, navigate]);
 
   // Load real datasheets for this faction
   const allFactionUnits = useMemo(() => {
@@ -59,12 +63,6 @@ export default function AddUnit() {
     setCustomPoints(cost);
   };
 
-  /** Parse "5 models" -> 5 from the points tier string */
-  const parseModelCount = (modelsStr: string): number | undefined => {
-    const match = modelsStr.match(/(\d+)\s*model/i);
-    return match ? parseInt(match[1], 10) : undefined;
-  };
-
   const handleEquipmentToggle = (option: string) => {
     setSelectedEquipment((prev) =>
       prev.includes(option)
@@ -84,8 +82,8 @@ export default function AddUnit() {
       return;
     }
 
-    const modelCount = parseModelCount(selectedUnit.points[selectedModelTier]?.models ?? '');
-    // TODO: wire to ArmyContext - addUnit(selectedUnit.name, customName, customPoints, selectedEquipment.join(", "), modelCount);
+    const role = selectedUnit.keywords.length > 0 ? selectedUnit.keywords[0] : '';
+    addUnit(selectedUnit.name, customPoints, role);
 
     toast.success(`${customName} added to army!`, {
       duration: 3000,
