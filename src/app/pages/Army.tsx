@@ -47,6 +47,8 @@ function FactionGrid({ onSelect }: { onSelect: (id: string) => void }) {
 const POINTS_OPTIONS = [500, 1000, 1500, 2000, 2500, 3000];
 
 function PointsSelector({ mode, onSelect }: { mode: 'standard' | 'crusade'; onSelect: (pts: number) => void }) {
+  const [supplyValue, setSupplyValue] = useState(1000);
+
   if (mode === 'crusade') {
     return (
       <div className="space-y-4 text-center">
@@ -57,20 +59,18 @@ function PointsSelector({ mode, onSelect }: { mode: 'standard' | 'crusade'; onSe
           min={500}
           max={10000}
           step={250}
-          defaultValue={1000}
+          value={supplyValue}
+          onChange={e => setSupplyValue(Number(e.target.value) || 0)}
           className="w-32 mx-auto block px-4 py-2 bg-[#f5efe6] border border-[#d4c5a9] rounded-lg text-center
                      text-[#2c2416] focus:outline-none focus:ring-2 focus:ring-[#b8860b]"
           onKeyDown={e => {
             if (e.key === 'Enter') {
-              onSelect(Number((e.target as HTMLInputElement).value) || 1000);
+              onSelect(supplyValue || 1000);
             }
           }}
         />
         <button
-          onClick={() => {
-            const input = document.querySelector<HTMLInputElement>('input[type="number"]');
-            onSelect(Number(input?.value) || 1000);
-          }}
+          onClick={() => onSelect(supplyValue || 1000)}
           className="px-6 py-2 bg-[#b8860b] text-[#faf6f0] font-semibold rounded-lg hover:bg-[#9a7209] transition-colors"
         >
           Confirm
@@ -254,7 +254,12 @@ function DetachmentRuleCard({ factionId, detachmentName }: { factionId: string; 
     if (!factionId || !detachmentName) return null;
     const dataFactionId = getDataFactionId(factionId as FactionId);
     const rules = getRulesForFaction(dataFactionId);
-    return rules?.detachments?.find(d => d.name === detachmentName) ?? null;
+    let found = rules?.detachments?.find(d => d.name === detachmentName) ?? null;
+    if (!found && dataFactionId !== factionId) {
+      const chapterRules = getRulesForFaction(factionId as FactionId);
+      found = chapterRules?.detachments?.find(d => d.name === detachmentName) ?? null;
+    }
+    return found;
   }, [factionId, detachmentName]);
 
   if (!detachmentName) {
@@ -308,6 +313,24 @@ function DetachmentRuleCard({ factionId, detachmentName }: { factionId: string; 
 }
 
 // ---------------------------------------------------------------------------
+// Constants (static — no reason to be inside the component)
+// ---------------------------------------------------------------------------
+
+const ROLE_KEYWORDS = ['CHARACTER', 'EPIC HERO', 'BATTLELINE', 'DEDICATED TRANSPORT', 'FAST ATTACK', 'HEAVY SUPPORT', 'ELITES', 'LORD OF WAR', 'FORTIFICATION'] as const;
+const ROLE_COLORS: Record<string, string> = {
+  'CHARACTER': '#b8860b',
+  'EPIC HERO': '#b8860b',
+  'BATTLELINE': '#16a34a',
+  'DEDICATED TRANSPORT': '#2563eb',
+  'FAST ATTACK': '#9333ea',
+  'HEAVY SUPPORT': '#dc2626',
+  'ELITES': '#0891b2',
+  'LORD OF WAR': '#ea580c',
+  'FORTIFICATION': '#6b7280',
+  'Other': '#9ca3af',
+};
+
+// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
@@ -323,12 +346,40 @@ export default function Army() {
   const activeArmy = savedArmies.find(a => a.id === activeArmyId);
   const [nameInput, setNameInput] = useState(activeArmy?.name ?? '');
 
+  const [compositionOpen, setCompositionOpen] = useState(false);
+
   const handleSaveName = () => {
     if (activeArmyId && nameInput.trim()) {
       renameArmy(activeArmyId, nameInput.trim());
     }
     setEditingName(false);
   };
+
+  // Build datasheet lookup for keywords (must be before early returns to avoid hooks violation)
+  const datasheetLookup = useMemo(() => {
+    if (!factionId) return new Map<string, Datasheet>();
+    const units = getUnitsForFaction(getDataFactionId(factionId as FactionId));
+    const map = new Map<string, Datasheet>();
+    for (const u of units) map.set(u.name, u);
+    return map;
+  }, [factionId]);
+
+  // Compute role breakdown (must be before early returns to avoid hooks violation)
+  const roleBreakdown = useMemo(() => {
+    const breakdown = new Map<string, number>();
+    for (const unit of army) {
+      const ds = datasheetLookup.get(unit.datasheet_name);
+      let role = 'Other';
+      if (ds) {
+        const upperKw = ds.keywords.map(k => k.toUpperCase());
+        for (const r of ROLE_KEYWORDS) {
+          if (upperKw.includes(r)) { role = r; break; }
+        }
+      }
+      breakdown.set(role, (breakdown.get(role) ?? 0) + unit.points_cost);
+    }
+    return breakdown;
+  }, [army, datasheetLookup]);
 
   // If no mode selected, redirect to home
   if (!mode) {
@@ -385,49 +436,6 @@ export default function Army() {
   const isOverBudget = totalPoints > cap;
   const overBy = totalPoints - cap;
 
-  // Role classification for composition chart
-  const ROLE_KEYWORDS = ['CHARACTER', 'EPIC HERO', 'BATTLELINE', 'DEDICATED TRANSPORT', 'FAST ATTACK', 'HEAVY SUPPORT', 'ELITES', 'LORD OF WAR', 'FORTIFICATION'] as const;
-  const ROLE_COLORS: Record<string, string> = {
-    'CHARACTER': '#b8860b',
-    'EPIC HERO': '#b8860b',
-    'BATTLELINE': '#16a34a',
-    'DEDICATED TRANSPORT': '#2563eb',
-    'FAST ATTACK': '#9333ea',
-    'HEAVY SUPPORT': '#dc2626',
-    'ELITES': '#0891b2',
-    'LORD OF WAR': '#ea580c',
-    'FORTIFICATION': '#6b7280',
-    'Other': '#9ca3af',
-  };
-
-  // Build datasheet lookup for keywords
-  const datasheetLookup = useMemo(() => {
-    if (!factionId) return new Map<string, Datasheet>();
-    const units = getUnitsForFaction(getDataFactionId(factionId as FactionId));
-    const map = new Map<string, Datasheet>();
-    for (const u of units) map.set(u.name, u);
-    return map;
-  }, [factionId]);
-
-  // Compute role breakdown
-  const roleBreakdown = useMemo(() => {
-    const breakdown = new Map<string, number>();
-    for (const unit of army) {
-      const ds = datasheetLookup.get(unit.datasheet_name);
-      let role = 'Other';
-      if (ds) {
-        const upperKw = ds.keywords.map(k => k.toUpperCase());
-        for (const r of ROLE_KEYWORDS) {
-          if (upperKw.includes(r)) { role = r; break; }
-        }
-      }
-      breakdown.set(role, (breakdown.get(role) ?? 0) + unit.points_cost);
-    }
-    return breakdown;
-  }, [army, datasheetLookup]);
-
-  const [compositionOpen, setCompositionOpen] = useState(false);
-
   // Step 4: Army builder
   return (
     <div className="min-h-screen bg-[#faf6f0] px-4 pt-6 pb-24">
@@ -477,7 +485,7 @@ export default function Army() {
         </div>
         <div className="flex flex-col items-end gap-1">
           <button
-            onClick={() => setFaction('')}
+            onClick={() => setFaction(null)}
             className="text-xs text-[#8b7355] hover:text-[#5c4a32] underline"
           >
             Change Faction

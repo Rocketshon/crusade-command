@@ -57,7 +57,7 @@ interface ArmyState {
   savedArmies: SavedArmy[];
   activeArmyId: string | null;
   setMode: (mode: ArmyMode) => void;
-  setFaction: (factionId: string) => void;
+  setFaction: (factionId: string | null) => void;
   setDetachment: (name: string | null) => void;
   setPointsCap: (cap: number) => void;
   setSupplyLimit: (limit: number) => void;
@@ -71,7 +71,7 @@ interface ArmyState {
   addBattleScar: (unitId: string, scar: { name: string; effect: string }) => void;
   removeBattleScar: (unitId: string, scarId: string) => void;
   // Multi-army actions
-  createArmy: (name: string) => string;
+  createArmy: (name: string, armyMode?: ArmyMode) => string;
   deleteArmy: (armyId: string) => void;
   switchArmy: (armyId: string) => void;
   renameArmy: (armyId: string, name: string) => void;
@@ -207,7 +207,7 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
   }, [mode, factionId, detachmentName, pointsCap, supplyLimit, army, activeArmyId]);
 
   const setMode = useCallback((m: ArmyMode) => setModeState(m), []);
-  const setFaction = useCallback((id: string) => setFactionState(id), []);
+  const setFaction = useCallback((id: string | null) => setFactionState(id), []);
   const setDetachment = useCallback((name: string | null) => setDetachmentState(name), []);
   const setPointsCap = useCallback((cap: number) => setPointsCapState(cap), []);
   const setSupplyLimit = useCallback((limit: number) => setSupplyLimitState(limit), []);
@@ -247,14 +247,17 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearArmy = useCallback(() => {
-    setArmy([]);
+    if (activeArmyId) {
+      setSavedArmies(prev => prev.filter(a => a.id !== activeArmyId));
+    }
+    setActiveArmyId(null);
     setModeState(null);
     setFactionState(null);
     setDetachmentState(null);
     setPointsCapState(2000);
     setSupplyLimitState(1000);
-    setActiveArmyId(null);
-  }, []);
+    setArmy([]);
+  }, [activeArmyId]);
 
   const awardXP = useCallback((unitId: string, xp: number) => {
     setArmy(prev => prev.map(u => {
@@ -301,13 +304,13 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
   // Multi-army actions
   // -------------------------------------------------------------------------
 
-  const createArmy = useCallback((name: string): string => {
+  const createArmy = useCallback((name: string, armyMode?: ArmyMode): string => {
     const id = crypto.randomUUID();
     const now = new Date().toISOString();
     const newArmy: SavedArmy = {
       id,
       name,
-      mode,
+      mode: armyMode ?? null,
       factionId: null,
       detachmentName: null,
       pointsCap: 2000,
@@ -326,7 +329,7 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
     setSupplyLimitState(1000);
     setArmy([]);
     return id;
-  }, [mode]);
+  }, []);
 
   const deleteArmy = useCallback((armyId: string) => {
     setSavedArmies(prev => {

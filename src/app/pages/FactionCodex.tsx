@@ -34,6 +34,14 @@ export default function FactionCodex() {
   const rules = dataFaction ? getRulesForFaction(dataFaction) : undefined;
   const units = dataFaction ? getUnitsForFaction(dataFaction) : [];
 
+  // Expand first detachment by default (must be before early returns to avoid hooks violation)
+  useEffect(() => {
+    if (!factionMeta || !rules?.detachments?.length) return;
+    if (expandedDetachments.length === 0) {
+      setExpandedDetachments([rules.detachments[0].name]);
+    }
+  }, [rules?.detachments]);
+
   if (!factionMeta) {
     return (
       <div className="min-h-screen bg-[#faf6f0] flex flex-col p-6 relative overflow-hidden">
@@ -59,13 +67,6 @@ export default function FactionCodex() {
 
   const accentColor = getAccentColor(factionMeta.color);
   const enhColors = getEnhancementCardColors(factionMeta.color);
-
-  // Expand first detachment by default (in useEffect to avoid setState during render)
-  useEffect(() => {
-    if (expandedDetachments.length === 0 && rules?.detachments && rules.detachments.length > 0) {
-      setExpandedDetachments([rules.detachments[0].name]);
-    }
-  }, [rules?.detachments]);
 
   const toggleDetachment = (detachmentName: string) => {
     setExpandedDetachments((prev) =>

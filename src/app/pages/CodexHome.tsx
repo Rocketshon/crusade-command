@@ -62,6 +62,7 @@ export default function CodexHome() {
       const dataId = getDataFactionId(f.id);
       const units = getUnitsForFaction(dataId);
       for (const unit of units) {
+        if (results.length >= 30) break;
         if (
           unit.name.toLowerCase().includes(q) ||
           unit.keywords?.some((k: string) => k.toLowerCase().includes(q))
