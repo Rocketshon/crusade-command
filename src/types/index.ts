@@ -1,5 +1,5 @@
 // ============================================================
-// Crusade Command — Core Type Definitions
+// Warcaster — Core Type Definitions
 // ============================================================
 
 // --- Factions ---

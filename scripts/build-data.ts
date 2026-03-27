@@ -383,7 +383,7 @@ function generateIndexFile(): string {
 // ---------------------------------------------------------------------------
 
 function main() {
-  console.log('=== Crusade Command Data Build ===');
+  console.log('=== Warcaster Data Build ===');
   console.log(`Source: ${DATASHEETS_ROOT}`);
   console.log(`Output: ${OUTPUT_DIR}`);
   console.log('');

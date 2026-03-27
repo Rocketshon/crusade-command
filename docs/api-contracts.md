@@ -1,4 +1,4 @@
-# Crusade Command API Contracts
+# Warcaster API Contracts
 
 ## Database Schema
 

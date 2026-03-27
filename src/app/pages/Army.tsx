@@ -1,7 +1,9 @@
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { Plus, ChevronRight, Trash2 } from 'lucide-react';
+import { Plus, ChevronRight, Trash2, Pencil, Check } from 'lucide-react';
 import { useArmy, type ArmyUnit } from '../../lib/ArmyContext';
-import { FACTIONS } from '../../lib/factions';
+import { FACTIONS, getDataFactionId } from '../../lib/factions';
+import { getRulesForFaction } from '../../data';
 import type { FactionId } from '../../types';
 
 // ---------------------------------------------------------------------------
@@ -96,6 +98,58 @@ function PointsSelector({ mode, onSelect }: { mode: 'standard' | 'crusade'; onSe
   );
 }
 
+function DetachmentPicker({ factionId, onSelect }: { factionId: string; onSelect: (name: string) => void }) {
+  const detachments = useMemo(() => {
+    const dataFactionId = getDataFactionId(factionId as FactionId);
+    const rules = getRulesForFaction(dataFactionId);
+    return rules?.detachments ?? [];
+  }, [factionId]);
+
+  if (detachments.length === 0) {
+    return (
+      <div className="space-y-4 text-center">
+        <h2 className="font-serif text-xl font-bold text-[#b8860b]">No Detachments Available</h2>
+        <p className="text-sm text-[#8b7355]">This faction has no detachment data. You can continue without one.</p>
+        <button
+          onClick={() => onSelect('')}
+          className="px-6 py-2 bg-[#b8860b] text-[#faf6f0] font-semibold rounded-lg hover:bg-[#9a7209] transition-colors"
+        >
+          Continue
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <h2 className="font-serif text-xl font-bold text-[#b8860b] text-center">Select Detachment</h2>
+      <div className="grid grid-cols-1 gap-3">
+        {detachments.map((det) => {
+          const ruleText = det.rule?.text ?? '';
+          const truncated = ruleText.length > 100 ? ruleText.slice(0, 100) + '...' : ruleText;
+          return (
+            <button
+              key={det.name}
+              onClick={() => onSelect(det.name)}
+              className="text-left p-4 bg-[#f5efe6] border border-[#d4c5a9] rounded-lg
+                         hover:border-[#b8860b] transition-colors
+                         focus:outline-none focus:ring-2 focus:ring-[#b8860b]"
+            >
+              <h3 className="text-sm font-semibold text-[#2c2416] mb-1">{det.name}</h3>
+              {det.rule?.name && (
+                <p className="text-xs font-medium text-[#b8860b] mb-1">{det.rule.name}</p>
+              )}
+              {truncated && (
+                <p className="text-xs text-[#8b7355] leading-relaxed">{truncated}</p>
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function StandardUnitCard({ unit, onRemove }: { unit: ArmyUnit; onRemove: () => void }) {
   return (
     <div className="flex items-center justify-between p-3 bg-[#f5efe6] border border-[#d4c5a9] rounded-lg">
@@ -179,9 +233,21 @@ function CrusadeUnitCard({ unit, onRemove }: { unit: ArmyUnit; onRemove: () => v
 export default function Army() {
   const navigate = useNavigate();
   const {
-    mode, factionId, pointsCap, supplyLimit, army,
-    setFaction, setPointsCap, setSupplyLimit, removeUnit,
+    mode, factionId, detachmentName, pointsCap, supplyLimit, army,
+    savedArmies, activeArmyId,
+    setFaction, setDetachment, setPointsCap, setSupplyLimit, removeUnit, renameArmy,
   } = useArmy();
+
+  const [editingName, setEditingName] = useState(false);
+  const activeArmy = savedArmies.find(a => a.id === activeArmyId);
+  const [nameInput, setNameInput] = useState(activeArmy?.name ?? '');
+
+  const handleSaveName = () => {
+    if (activeArmyId && nameInput.trim()) {
+      renameArmy(activeArmyId, nameInput.trim());
+    }
+    setEditingName(false);
+  };
 
   // If no mode selected, redirect to home
   if (!mode) {
@@ -214,7 +280,16 @@ export default function Army() {
     );
   }
 
-  // Step 2: Points cap selection
+  // Step 2: Detachment selection
+  if (!detachmentName && detachmentName !== '') {
+    return (
+      <div className="min-h-screen bg-[#faf6f0] px-4 pt-8 pb-24">
+        <DetachmentPicker factionId={factionId} onSelect={(name) => setDetachment(name)} />
+      </div>
+    );
+  }
+
+  // Step 3: Points cap selection
   if (!hasCap || (mode === 'standard' && pointsCap === 0)) {
     return (
       <div className="min-h-screen bg-[#faf6f0] px-4 pt-16 pb-24 flex items-start justify-center">
@@ -226,24 +301,65 @@ export default function Army() {
     );
   }
 
-  // Step 3: Army builder
+  // Step 4: Army builder
   return (
     <div className="min-h-screen bg-[#faf6f0] px-4 pt-6 pb-24">
-      {/* Header */}
+      {/* Army name header */}
+      {activeArmy && (
+        <div className="flex items-center gap-2 mb-2">
+          {editingName ? (
+            <div className="flex items-center gap-2 flex-1">
+              <input
+                type="text"
+                value={nameInput}
+                onChange={(e) => setNameInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleSaveName(); }}
+                className="flex-1 px-2 py-1 text-lg font-bold font-serif bg-[#faf6f0] border border-[#d4c5a9] rounded text-[#2c2416] focus:outline-none focus:border-[#b8860b]"
+                autoFocus
+              />
+              <button onClick={handleSaveName} className="text-[#b8860b] hover:text-[#9a7209]">
+                <Check className="w-5 h-5" />
+              </button>
+            </div>
+          ) : (
+            <>
+              <h2 className="font-serif text-lg font-bold text-[#b8860b] tracking-wide">{activeArmy.name}</h2>
+              <button
+                onClick={() => { setEditingName(true); setNameInput(activeArmy.name); }}
+                className="text-[#8b7355] hover:text-[#b8860b] transition-colors"
+                aria-label="Rename army"
+              >
+                <Pencil className="w-4 h-4" />
+              </button>
+            </>
+          )}
+        </div>
+      )}
+
+      {/* Faction & mode header */}
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="font-serif text-xl font-bold text-[#2c2416] flex items-center gap-2">
             {factionMeta && <span>{factionMeta.icon}</span>}
             {factionMeta?.name ?? factionId}
           </h1>
-          <p className="text-sm text-[#8b7355]">{mode === 'crusade' ? 'Crusade' : 'Matched Play'}</p>
+          <p className="text-sm text-[#8b7355]">
+            {mode === 'crusade' ? 'Crusade' : 'Matched Play'}
+            {detachmentName ? ` \u2014 ${detachmentName}` : ''}
+          </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-end gap-1">
           <button
             onClick={() => setFaction('')}
             className="text-xs text-[#8b7355] hover:text-[#5c4a32] underline"
           >
             Change Faction
+          </button>
+          <button
+            onClick={() => setDetachment(null)}
+            className="text-xs text-[#8b7355] hover:text-[#5c4a32] underline"
+          >
+            Change Detachment
           </button>
         </div>
       </div>

@@ -8,7 +8,7 @@ export const CORE_RULES: GeneralRulesDocument | null = {
   "sections": [
     {
       "name": "Introduction",
-      "text": "Welcome to CrusadeCommand, your companion app for Warhammer 40,000 Crusade campaigns. This rules reference covers the core rules you need to play, from the basic concepts of the game through to the detailed mechanics of movement, shooting, and close combat. Use the sections below to quickly look up any rule during your games.",
+      "text": "Welcome to Warcaster, your companion app for Warhammer 40,000 Crusade campaigns. This rules reference covers the core rules you need to play, from the basic concepts of the game through to the detailed mechanics of movement, shooting, and close combat. Use the sections below to quickly look up any rule during your games.",
       "subsections": [],
       "accordion": []
     },

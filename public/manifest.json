@@ -1,7 +1,7 @@
 {
-  "name": "Army Builder",
-  "short_name": "ArmyBuilder",
-  "description": "Warhammer 40K Army Builder — Standard & Crusade modes",
+  "name": "Warcaster",
+  "short_name": "Warcaster",
+  "description": "Warhammer 40K Army Builder & Battle Aid",
   "start_url": "/crusade-command/",
   "scope": "/crusade-command/",
   "display": "standalone",

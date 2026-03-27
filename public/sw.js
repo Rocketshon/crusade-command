@@ -1,4 +1,4 @@
-const CACHE_NAME = 'crusade-command-v2';
+const CACHE_NAME = 'warcaster-v1';
 
 // Assets to precache on install
 const PRECACHE_URLS = [

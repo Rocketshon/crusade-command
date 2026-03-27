@@ -313,7 +313,7 @@ function calculateCost(): { haiku: number; sonnet: number; total: number } {
 
 async function main() {
   console.log('╔══════════════════════════════════════════════════════╗');
-  console.log('║     CrusadeCommand Data Quality Audit               ║');
+  console.log('║     Warcaster Data Quality Audit                    ║');
   console.log('║     Haiku 4.5 scan + Sonnet 4.6 deep review        ║');
   console.log('╚══════════════════════════════════════════════════════╝\n');
 

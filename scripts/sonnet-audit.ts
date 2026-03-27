@@ -330,7 +330,7 @@ async function runImplementation(findings: Finding[]) {
 
 async function main() {
   console.log('╔══════════════════════════════════════════════════════╗');
-  console.log('║  CrusadeCommand: Sonnet Analyze → Haiku Implement   ║');
+  console.log('║  Warcaster: Sonnet Analyze → Haiku Implement        ║');
   console.log('╚══════════════════════════════════════════════════════╝');
 
   let findings: Finding[];

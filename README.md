@@ -1,4 +1,4 @@
-# Crusade Command -- Army Builder
+# Warcaster
 
 A simple Warhammer 40,000 army builder with Standard and Crusade modes. Build your army list, browse faction datasheets, and track crusade progression -- all from your phone.
 

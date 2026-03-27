@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to CrusadeCommand are documented here.
+All notable changes to Warcaster are documented here.
 
 ---
 

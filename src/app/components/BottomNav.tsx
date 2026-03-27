@@ -1,8 +1,9 @@
 import { useLocation, useNavigate } from 'react-router';
-import { Swords, BookOpen, ScrollText } from 'lucide-react';
+import { Swords, Crosshair, BookOpen, ScrollText } from 'lucide-react';
 
 const tabs = [
   { path: '/army', label: 'Army', icon: Swords },
+  { path: '/battle-aid', label: 'Battle Aid', icon: Crosshair },
   { path: '/codex', label: 'Codex', icon: BookOpen },
   { path: '/rules', label: 'Rules', icon: ScrollText },
 ] as const;
@@ -10,6 +11,9 @@ const tabs = [
 function isActiveTab(pathname: string, tabPath: string): boolean {
   if (tabPath === '/army') {
     return pathname === '/army' || pathname.startsWith('/add-unit') || pathname.startsWith('/unit/') || pathname === '/';
+  }
+  if (tabPath === '/battle-aid') {
+    return pathname === '/battle-aid';
   }
   return pathname.startsWith(tabPath);
 }

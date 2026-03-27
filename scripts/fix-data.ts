@@ -749,7 +749,7 @@ function processRulesFile() {
 // ─── Run ───────────────────────────────────────────────────────────────────
 
 console.log('╔══════════════════════════════════════════════════════╗');
-console.log('║       CrusadeCommand Data Cleanup                   ║');
+console.log('║       Warcaster Data Cleanup                        ║');
 console.log('╚══════════════════════════════════════════════════════╝');
 
 processUnitsFile();

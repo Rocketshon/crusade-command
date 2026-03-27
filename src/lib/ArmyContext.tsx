@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, useEffect, useMemo, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef, type ReactNode } from 'react';
 // Inline rank calculation (was in ranks.ts)
 function getRankFromXP(xp: number): string {
   if (xp >= 51) return 'Legendary';
@@ -33,14 +33,32 @@ export interface ArmyUnit {
   is_destroyed: boolean;
 }
 
+export interface SavedArmy {
+  id: string;
+  name: string;
+  mode: ArmyMode;
+  factionId: string | null;
+  detachmentName: string | null;
+  pointsCap: number;
+  supplyLimit: number;
+  units: ArmyUnit[];
+  createdAt: string;
+  updatedAt: string;
+}
+
 interface ArmyState {
   mode: ArmyMode;
   factionId: string | null;
+  detachmentName: string | null;
   pointsCap: number;
   supplyLimit: number;
   army: ArmyUnit[];
+  // Multi-army
+  savedArmies: SavedArmy[];
+  activeArmyId: string | null;
   setMode: (mode: ArmyMode) => void;
   setFaction: (factionId: string) => void;
+  setDetachment: (name: string | null) => void;
   setPointsCap: (cap: number) => void;
   setSupplyLimit: (limit: number) => void;
   addUnit: (datasheetName: string, pointsCost: number, role?: string) => void;
@@ -52,6 +70,11 @@ interface ArmyState {
   addBattleHonour: (unitId: string, honour: { name: string; type: string }) => void;
   addBattleScar: (unitId: string, scar: { name: string; effect: string }) => void;
   removeBattleScar: (unitId: string, scarId: string) => void;
+  // Multi-army actions
+  createArmy: (name: string) => string;
+  deleteArmy: (armyId: string) => void;
+  switchArmy: (armyId: string) => void;
+  renameArmy: (armyId: string, name: string) => void;
 }
 
 // ---------------------------------------------------------------------------
@@ -61,9 +84,12 @@ interface ArmyState {
 const KEYS = {
   mode: 'army_mode',
   faction: 'army_faction',
+  detachment: 'army_detachment',
   pointsCap: 'army_points_cap',
   supplyLimit: 'army_supply_limit',
   units: 'army_units',
+  savedArmies: 'army_saved_lists',
+  activeArmyId: 'army_active_id',
 } as const;
 
 function loadJSON<T>(key: string, fallback: T): T {
@@ -85,27 +111,104 @@ function saveJSON(key: string, value: unknown): void {
 }
 
 // ---------------------------------------------------------------------------
+// Migration: convert old single-army localStorage to saved army
+// ---------------------------------------------------------------------------
+
+function migrateOldData(): { savedArmies: SavedArmy[]; activeArmyId: string | null } {
+  const existingSaved = loadJSON<SavedArmy[]>(KEYS.savedArmies, []);
+  const existingActiveId = loadJSON<string | null>(KEYS.activeArmyId, null);
+
+  // If saved armies already exist, no migration needed
+  if (existingSaved.length > 0) {
+    return { savedArmies: existingSaved, activeArmyId: existingActiveId };
+  }
+
+  // Check if old-format data exists
+  const oldMode = loadJSON<ArmyMode>(KEYS.mode, null);
+  const oldFaction = loadJSON<string | null>(KEYS.faction, null);
+  const oldDetachment = loadJSON<string | null>(KEYS.detachment, null);
+  const oldUnits = loadJSON<ArmyUnit[]>(KEYS.units, []);
+  const oldPointsCap = loadJSON<number>(KEYS.pointsCap, 2000);
+  const oldSupplyLimit = loadJSON<number>(KEYS.supplyLimit, 1000);
+
+  const hasOldData = oldMode !== null || oldUnits.length > 0;
+
+  if (!hasOldData) {
+    return { savedArmies: [], activeArmyId: null };
+  }
+
+  // Migrate old data into a saved army
+  const migratedId = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const migratedArmy: SavedArmy = {
+    id: migratedId,
+    name: 'My Army',
+    mode: oldMode,
+    factionId: oldFaction,
+    detachmentName: oldDetachment,
+    pointsCap: oldPointsCap,
+    supplyLimit: oldSupplyLimit,
+    units: oldUnits,
+    createdAt: now,
+    updatedAt: now,
+  };
+
+  const savedArmies = [migratedArmy];
+  saveJSON(KEYS.savedArmies, savedArmies);
+  saveJSON(KEYS.activeArmyId, migratedId);
+
+  return { savedArmies, activeArmyId: migratedId };
+}
+
+// ---------------------------------------------------------------------------
 // Context
 // ---------------------------------------------------------------------------
 
 const ArmyContext = createContext<ArmyState | null>(null);
 
 export function ArmyProvider({ children }: { children: ReactNode }) {
-  const [mode, setModeState] = useState<ArmyMode>(() => loadJSON<ArmyMode>(KEYS.mode, null));
-  const [factionId, setFactionState] = useState<string | null>(() => loadJSON<string | null>(KEYS.faction, null));
-  const [pointsCap, setPointsCapState] = useState<number>(() => loadJSON<number>(KEYS.pointsCap, 2000));
-  const [supplyLimit, setSupplyLimitState] = useState<number>(() => loadJSON<number>(KEYS.supplyLimit, 1000));
-  const [army, setArmy] = useState<ArmyUnit[]>(() => loadJSON<ArmyUnit[]>(KEYS.units, []));
+  // Run migration on first load
+  const migrated = useRef(migrateOldData()).current;
 
-  // Persist to localStorage on changes
+  const [savedArmies, setSavedArmies] = useState<SavedArmy[]>(migrated.savedArmies);
+  const [activeArmyId, setActiveArmyId] = useState<string | null>(migrated.activeArmyId);
+
+  // Derive initial active army values
+  const activeArmy = migrated.savedArmies.find(a => a.id === migrated.activeArmyId);
+
+  const [mode, setModeState] = useState<ArmyMode>(() => activeArmy?.mode ?? loadJSON<ArmyMode>(KEYS.mode, null));
+  const [factionId, setFactionState] = useState<string | null>(() => activeArmy?.factionId ?? loadJSON<string | null>(KEYS.faction, null));
+  const [detachmentName, setDetachmentState] = useState<string | null>(() => activeArmy?.detachmentName ?? loadJSON<string | null>(KEYS.detachment, null));
+  const [pointsCap, setPointsCapState] = useState<number>(() => activeArmy?.pointsCap ?? loadJSON<number>(KEYS.pointsCap, 2000));
+  const [supplyLimit, setSupplyLimitState] = useState<number>(() => activeArmy?.supplyLimit ?? loadJSON<number>(KEYS.supplyLimit, 1000));
+  const [army, setArmy] = useState<ArmyUnit[]>(() => activeArmy?.units ?? loadJSON<ArmyUnit[]>(KEYS.units, []));
+
+  // Persist individual fields to localStorage on changes (keeps backwards compat)
   useEffect(() => { saveJSON(KEYS.mode, mode); }, [mode]);
   useEffect(() => { saveJSON(KEYS.faction, factionId); }, [factionId]);
+  useEffect(() => { saveJSON(KEYS.detachment, detachmentName); }, [detachmentName]);
   useEffect(() => { saveJSON(KEYS.pointsCap, pointsCap); }, [pointsCap]);
   useEffect(() => { saveJSON(KEYS.supplyLimit, supplyLimit); }, [supplyLimit]);
   useEffect(() => { saveJSON(KEYS.units, army); }, [army]);
 
+  // Persist saved armies & active ID
+  useEffect(() => { saveJSON(KEYS.savedArmies, savedArmies); }, [savedArmies]);
+  useEffect(() => { saveJSON(KEYS.activeArmyId, activeArmyId); }, [activeArmyId]);
+
+  // Sync current state back to savedArmies whenever it changes
+  useEffect(() => {
+    if (!activeArmyId) return;
+    setSavedArmies(prev => prev.map(a =>
+      a.id === activeArmyId
+        ? { ...a, mode, factionId, detachmentName, pointsCap, supplyLimit, units: army, updatedAt: new Date().toISOString() }
+        : a
+    ));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, factionId, detachmentName, pointsCap, supplyLimit, army, activeArmyId]);
+
   const setMode = useCallback((m: ArmyMode) => setModeState(m), []);
   const setFaction = useCallback((id: string) => setFactionState(id), []);
+  const setDetachment = useCallback((name: string | null) => setDetachmentState(name), []);
   const setPointsCap = useCallback((cap: number) => setPointsCapState(cap), []);
   const setSupplyLimit = useCallback((limit: number) => setSupplyLimitState(limit), []);
 
@@ -141,8 +244,10 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
     setArmy([]);
     setModeState(null);
     setFactionState(null);
+    setDetachmentState(null);
     setPointsCapState(2000);
     setSupplyLimitState(1000);
+    setActiveArmyId(null);
   }, []);
 
   const awardXP = useCallback((unitId: string, xp: number) => {
@@ -186,16 +291,99 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
     }));
   }, []);
 
+  // -------------------------------------------------------------------------
+  // Multi-army actions
+  // -------------------------------------------------------------------------
+
+  const createArmy = useCallback((name: string): string => {
+    const id = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const newArmy: SavedArmy = {
+      id,
+      name,
+      mode,
+      factionId: null,
+      detachmentName: null,
+      pointsCap: 2000,
+      supplyLimit: 1000,
+      units: [],
+      createdAt: now,
+      updatedAt: now,
+    };
+    setSavedArmies(prev => [...prev, newArmy]);
+    // Switch to the new army
+    setActiveArmyId(id);
+    setModeState(newArmy.mode);
+    setFactionState(null);
+    setDetachmentState(null);
+    setPointsCapState(2000);
+    setSupplyLimitState(1000);
+    setArmy([]);
+    return id;
+  }, [mode]);
+
+  const deleteArmy = useCallback((armyId: string) => {
+    setSavedArmies(prev => {
+      const remaining = prev.filter(a => a.id !== armyId);
+      if (armyId === activeArmyId) {
+        if (remaining.length > 0) {
+          const next = remaining[0];
+          setActiveArmyId(next.id);
+          setModeState(next.mode);
+          setFactionState(next.factionId);
+          setDetachmentState(next.detachmentName);
+          setPointsCapState(next.pointsCap);
+          setSupplyLimitState(next.supplyLimit);
+          setArmy(next.units);
+        } else {
+          setActiveArmyId(null);
+          setModeState(null);
+          setFactionState(null);
+          setDetachmentState(null);
+          setPointsCapState(2000);
+          setSupplyLimitState(1000);
+          setArmy([]);
+        }
+      }
+      return remaining;
+    });
+  }, [activeArmyId]);
+
+  const switchArmy = useCallback((armyId: string) => {
+    setSavedArmies(prev => {
+      const target = prev.find(a => a.id === armyId);
+      if (!target) return prev;
+      setActiveArmyId(target.id);
+      setModeState(target.mode);
+      setFactionState(target.factionId);
+      setDetachmentState(target.detachmentName);
+      setPointsCapState(target.pointsCap);
+      setSupplyLimitState(target.supplyLimit);
+      setArmy(target.units);
+      return prev;
+    });
+  }, []);
+
+  const renameArmy = useCallback((armyId: string, name: string) => {
+    setSavedArmies(prev => prev.map(a =>
+      a.id === armyId ? { ...a, name, updatedAt: new Date().toISOString() } : a
+    ));
+  }, []);
+
   const value = useMemo<ArmyState>(() => ({
-    mode, factionId, pointsCap, supplyLimit, army,
-    setMode, setFaction, setPointsCap, setSupplyLimit,
+    mode, factionId, detachmentName, pointsCap, supplyLimit, army,
+    savedArmies, activeArmyId,
+    setMode, setFaction, setDetachment, setPointsCap, setSupplyLimit,
     addUnit, removeUnit, updateUnit, clearArmy,
     awardXP, addBattleHonour, addBattleScar, removeBattleScar,
+    createArmy, deleteArmy, switchArmy, renameArmy,
   }), [
-    mode, factionId, pointsCap, supplyLimit, army,
-    setMode, setFaction, setPointsCap, setSupplyLimit,
+    mode, factionId, detachmentName, pointsCap, supplyLimit, army,
+    savedArmies, activeArmyId,
+    setMode, setFaction, setDetachment, setPointsCap, setSupplyLimit,
     addUnit, removeUnit, updateUnit, clearArmy,
     awardXP, addBattleHonour, addBattleScar, removeBattleScar,
+    createArmy, deleteArmy, switchArmy, renameArmy,
   ]);
 
   return (
