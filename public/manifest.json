@@ -1,7 +1,7 @@
 {
-  "name": "Crusade Command",
-  "short_name": "Crusade",
-  "description": "Warhammer 40K Crusade Campaign Manager",
+  "name": "Army Builder",
+  "short_name": "ArmyBuilder",
+  "description": "Warhammer 40K Army Builder — Standard & Crusade modes",
   "start_url": "/crusade-command/",
   "scope": "/crusade-command/",
   "display": "standalone",

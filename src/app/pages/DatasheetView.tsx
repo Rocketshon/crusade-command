@@ -4,17 +4,17 @@ import { toast } from "sonner";
 import { ArrowLeft, Plus, Shield, Zap } from "lucide-react";
 import { getUnitsForFaction } from '../../data';
 import { getFaction, getDataFactionId } from '../../lib/factions';
-import { useCrusade } from '../../lib/CrusadeContext';
+// TODO: wire to ArmyContext
+// import { useArmy } from '../../lib/ArmyContext';
 import { toTitleCase, FormattedRuleText } from '../../lib/formatText';
 import type { FactionId, Datasheet } from '../../types';
 import WeaponStatTable from '../components/WeaponStatTable';
-import WargearOptionsPanel, { WargearAbilitiesPanel } from '../components/WargearOptionsPanel';
 
 export default function DatasheetView() {
   const { factionId, datasheetName } = useParams<{ factionId: string; datasheetName: string }>();
   const navigate = useNavigate();
   const [showAddSuccess, setShowAddSuccess] = useState(false);
-  const { campaign, addUnit } = useCrusade();
+  // TODO: wire to ArmyContext - const { addUnit } = useArmy();
 
   // Look up real datasheet
   const units = factionId ? getUnitsForFaction(getDataFactionId(factionId as FactionId)) : [];
@@ -25,18 +25,18 @@ export default function DatasheetView() {
 
   if (!datasheet) {
     return (
-      <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden">
+      <div className="min-h-screen bg-[#faf6f0] flex flex-col p-6 relative overflow-hidden">
         <div className="relative z-10 w-full max-w-md mx-auto">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-stone-400 hover:text-emerald-500 transition-colors mb-6"
+            className="flex items-center gap-2 text-[#8b7355] hover:text-[#b8860b] transition-colors mb-6"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="text-sm">Back</span>
           </button>
 
           <div className="text-center">
-            <h1 className="text-xl font-bold text-stone-400 mb-2">
+            <h1 className="text-xl font-bold text-[#8b7355] mb-2">
               Datasheet Not Found
             </h1>
           </div>
@@ -45,27 +45,26 @@ export default function DatasheetView() {
     );
   }
 
-  const handleAddToRoster = () => {
-    if (campaign && datasheet) {
+  const handleAddToArmy = () => {
+    if (datasheet) {
+      // TODO: wire to ArmyContext - addUnit(...)
       const pointsCost = datasheet.points.length > 0 ? parseInt(datasheet.points[0].cost, 10) || 0 : 0;
-      addUnit(datasheet.name, datasheet.name, pointsCost, '');
       setShowAddSuccess(true);
+      toast.success(`${datasheet.name} added to army (${pointsCost} pts)`);
       setTimeout(() => {
         setShowAddSuccess(false);
       }, 2000);
-    } else {
-      toast.error('Join a campaign first to add units to your roster.');
     }
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-24">
+    <div className="min-h-screen bg-[#faf6f0] flex flex-col p-6 relative overflow-hidden pb-24">
 
       <div className="relative z-10 w-full max-w-2xl mx-auto">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-stone-400 hover:text-emerald-500 transition-colors mb-6"
+          className="flex items-center gap-2 text-[#8b7355] hover:text-[#b8860b] transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm">Back to Codex</span>
@@ -73,10 +72,10 @@ export default function DatasheetView() {
 
         {/* Unit Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-stone-100 tracking-wider mb-2 drop-shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+          <h1 className="text-3xl font-bold text-[#2c2416] tracking-wider mb-2">
             {datasheet.name}
           </h1>
-          <p className="text-red-400 text-sm mb-3">{datasheet.faction}</p>
+          <p className="text-[#b8860b] text-sm mb-3">{datasheet.faction}</p>
 
           {/* Points Costs */}
           {datasheet.points.length > 0 && (
@@ -84,10 +83,10 @@ export default function DatasheetView() {
               {datasheet.points.map((tier, idx) => (
                 <div
                   key={idx}
-                  className="px-3 py-1.5 rounded-sm border border-stone-700/60 bg-stone-900"
+                  className="px-3 py-1.5 rounded-sm border border-[#d4c5a9] bg-[#f5efe6]"
                 >
-                  <span className="text-stone-400 text-xs">{tier.models} models:</span>
-                  <span className="text-emerald-400 text-sm font-bold ml-2 font-mono">{tier.cost} pts</span>
+                  <span className="text-[#8b7355] text-xs">{tier.models} models:</span>
+                  <span className="text-[#b8860b] text-sm font-bold ml-2 font-mono">{tier.cost} pts</span>
                 </div>
               ))}
             </div>
@@ -99,10 +98,10 @@ export default function DatasheetView() {
               {Object.entries(datasheet.stats).map(([stat, value]) => (
                 <div
                   key={stat}
-                  className="flex-1 min-w-[70px] px-3 py-2 rounded-sm border border-stone-700/60 bg-stone-900"
+                  className="flex-1 min-w-[70px] px-3 py-2 rounded-sm border border-[#d4c5a9] bg-[#f5efe6]"
                 >
-                  <div className="text-xs text-stone-400 font-semibold">{stat}</div>
-                  <div className="text-lg font-bold text-stone-100">{value}</div>
+                  <div className="text-xs text-[#8b7355] font-semibold">{stat}</div>
+                  <div className="text-lg font-bold text-[#2c2416]">{value}</div>
                 </div>
               ))}
             </div>
@@ -112,7 +111,7 @@ export default function DatasheetView() {
           {datasheet.invuln && (
             <div className="flex items-center gap-2 mt-2">
               <Shield className="w-4 h-4 text-blue-400" />
-              <span className="text-sm text-stone-400">Invulnerable Save:</span>
+              <span className="text-sm text-[#8b7355]">Invulnerable Save:</span>
               <span className="text-base font-bold text-blue-400">{datasheet.invuln}</span>
             </div>
           )}
@@ -134,7 +133,7 @@ export default function DatasheetView() {
 
         {/* Abilities */}
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-stone-200 mb-3 flex items-center gap-2">
+          <h2 className="text-lg font-bold text-[#2c2416] mb-3 flex items-center gap-2">
             <Zap className="w-5 h-5 text-amber-500" />
             Abilities
           </h2>
@@ -142,12 +141,12 @@ export default function DatasheetView() {
           {/* Core Abilities */}
           {datasheet.abilities.core.length > 0 && (
             <div className="mb-4">
-              <h3 className="text-sm font-semibold text-stone-400 mb-2 uppercase tracking-wider">Core</h3>
+              <h3 className="text-sm font-semibold text-[#8b7355] mb-2 uppercase tracking-wider">Core</h3>
               <div className="flex flex-wrap gap-2">
                 {datasheet.abilities.core.map((ability: string, idx: number) => (
                   <span
                     key={idx}
-                    className="px-3 py-1 rounded-full border border-stone-700/60 bg-stone-900 text-amber-400 text-xs font-semibold"
+                    className="px-3 py-1 rounded-full border border-[#d4c5a9] bg-[#f5efe6] text-amber-600 text-xs font-semibold"
                   >
                     {ability}
                   </span>
@@ -159,12 +158,12 @@ export default function DatasheetView() {
           {/* Faction Abilities */}
           {datasheet.abilities.faction.length > 0 && (
             <div className="mb-4">
-              <h3 className="text-sm font-semibold text-stone-400 mb-2 uppercase tracking-wider">Faction</h3>
+              <h3 className="text-sm font-semibold text-[#8b7355] mb-2 uppercase tracking-wider">Faction</h3>
               <div className="flex flex-wrap gap-2">
                 {datasheet.abilities.faction.map((factionAbility: string, idx: number) => (
                   <span
                     key={idx}
-                    className="px-3 py-1 rounded-full border border-stone-700/60 bg-stone-900 text-red-400 text-xs font-semibold"
+                    className="px-3 py-1 rounded-full border border-[#d4c5a9] bg-[#f5efe6] text-[#b8860b] text-xs font-semibold"
                   >
                     {factionAbility}
                   </span>
@@ -177,9 +176,9 @@ export default function DatasheetView() {
           {datasheet.abilities.other.map((ability: [string, string], idx: number) => (
             <div
               key={idx}
-              className="mb-3 rounded-sm border border-stone-700/60 bg-stone-900 p-4"
+              className="mb-3 rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-4"
             >
-              <h3 className="text-sm font-bold text-emerald-400 mb-2">{ability[0]}</h3>
+              <h3 className="text-sm font-bold text-[#b8860b] mb-2">{ability[0]}</h3>
               <FormattedRuleText text={ability[1]} className="text-xs" />
             </div>
           ))}
@@ -188,9 +187,9 @@ export default function DatasheetView() {
         {/* Unit Composition */}
         {datasheet.unit_composition && (
           <div className="mb-6">
-            <h2 className="text-lg font-bold text-stone-200 mb-3">Unit Composition</h2>
-            <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-4">
-              <p className="text-sm text-stone-300 whitespace-pre-line">{datasheet.unit_composition}</p>
+            <h2 className="text-lg font-bold text-[#2c2416] mb-3">Unit Composition</h2>
+            <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-4">
+              <p className="text-sm text-[#5c4a32] whitespace-pre-line">{datasheet.unit_composition}</p>
             </div>
           </div>
         )}
@@ -198,35 +197,53 @@ export default function DatasheetView() {
         {/* Wargear Options */}
         {datasheet.wargear_options.length > 0 && (
           <div className="mb-6">
-            <WargearOptionsPanel options={datasheet.wargear_options} />
+            <h2 className="text-lg font-bold text-[#2c2416] mb-3">Wargear Options</h2>
+            <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-4">
+              <ul className="list-disc list-inside space-y-1 text-sm text-[#5c4a32]">
+                {datasheet.wargear_options.map((opt: string, idx: number) => (
+                  <li key={idx}>{opt}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 
         {/* Wargear Abilities */}
         {datasheet.wargear_abilities.length > 0 && (
           <div className="mb-6">
-            <WargearAbilitiesPanel abilities={datasheet.wargear_abilities} />
+            <h2 className="text-lg font-bold text-[#2c2416] mb-3">Wargear Abilities</h2>
+            <div className="space-y-2">
+              {datasheet.wargear_abilities.map((ability, idx: number) => {
+                if (typeof ability === 'string') return <p key={idx} className="text-xs text-[#5c4a32]">{ability}</p>;
+                return (
+                  <div key={idx} className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                    <h3 className="text-sm font-bold text-[#b8860b] mb-1">{ability[0]}</h3>
+                    <p className="text-xs text-[#5c4a32]">{ability[1]}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
         {/* Damaged */}
         {datasheet.damaged && (
           <div className="mb-6">
-            <h2 className="text-lg font-bold text-stone-200 mb-3">Damaged Profile</h2>
-            <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-4">
-              <FormattedRuleText text={datasheet.damaged} className="text-sm text-amber-300" />
+            <h2 className="text-lg font-bold text-[#2c2416] mb-3">Damaged Profile</h2>
+            <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-4">
+              <FormattedRuleText text={datasheet.damaged} className="text-sm text-amber-700" />
             </div>
           </div>
         )}
 
         {/* Keywords */}
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-stone-200 mb-3">Keywords</h2>
+          <h2 className="text-lg font-bold text-[#2c2416] mb-3">Keywords</h2>
           <div className="flex flex-wrap gap-2">
             {datasheet.keywords.map((keyword: string, idx: number) => (
               <span
                 key={idx}
-                className="px-3 py-1.5 rounded-sm border border-stone-700/60 bg-stone-900 text-stone-300 text-xs font-semibold"
+                className="px-3 py-1.5 rounded-sm border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] text-xs font-semibold"
               >
                 {toTitleCase(keyword)}
               </span>
@@ -237,7 +254,7 @@ export default function DatasheetView() {
               {datasheet.faction_keywords.map((keyword: string, idx: number) => (
                 <span
                   key={idx}
-                  className="px-3 py-1.5 rounded-sm border border-stone-700/60 bg-stone-900 text-red-400 text-xs font-semibold"
+                  className="px-3 py-1.5 rounded-sm border border-[#d4c5a9] bg-[#f5efe6] text-[#b8860b] text-xs font-semibold"
                 >
                   {toTitleCase(keyword)}
                 </span>
@@ -249,33 +266,33 @@ export default function DatasheetView() {
         {/* Leader Info */}
         {datasheet.leader && (
           <div className="mb-6">
-            <h2 className="text-lg font-bold text-stone-200 mb-3">Leader</h2>
-            <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-4">
-              <FormattedRuleText text={datasheet.leader} className="text-sm text-purple-300" />
+            <h2 className="text-lg font-bold text-[#2c2416] mb-3">Leader</h2>
+            <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-4">
+              <FormattedRuleText text={datasheet.leader} className="text-sm text-purple-700" />
             </div>
           </div>
         )}
       </div>
 
-      {/* Add to Roster Button — flows with content, above footer */}
+      {/* Add to Army Button — flows with content, above footer */}
       <div className="relative z-10 w-full max-w-2xl mx-auto mt-6">
           <button
-            onClick={handleAddToRoster}
-            disabled={showAddSuccess || !campaign}
+            onClick={handleAddToArmy}
+            disabled={showAddSuccess}
             className={`w-full py-4 rounded-lg font-bold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
               showAddSuccess
-                ? "bg-emerald-600 text-black"
-                : "bg-gradient-to-r from-red-600 to-red-500 text-black hover:from-red-500 hover:to-red-400"
+                ? "bg-[#b8860b] text-white"
+                : "bg-gradient-to-r from-[#b8860b] to-[#d4a017] text-white hover:from-[#d4a017] hover:to-[#b8860b]"
             }`}
           >
             {showAddSuccess ? (
               <span className="flex items-center justify-center gap-2">
-                ✓ Added to Roster
+                ✓ Added to Army
               </span>
             ) : (
               <span className="flex items-center justify-center gap-2">
                 <Plus className="w-5 h-5" />
-                {campaign ? 'Add to Roster' : 'Add to Roster (No Active Campaign)'}
+                Add to Army
               </span>
             )}
           </button>

@@ -1,20 +1,19 @@
 import { useState, useMemo } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { ArrowLeft, Search, Plus, X, Users } from "lucide-react";
 import { toast } from "sonner";
-import { useCrusade } from "../../lib/CrusadeContext";
-import { useCampaignGuard } from "../../lib/hooks/useCampaignGuard";
+// TODO: wire to ArmyContext
+// import { useArmy } from "../../lib/ArmyContext";
 import { getFactionName, getDataFactionId } from "../../lib/factions";
 import { getUnitsForFaction } from "../../data";
 import { toTitleCase } from "../../lib/formatText";
 import type { Datasheet, FactionId } from "../../types";
 import WeaponStatTable from "../components/WeaponStatTable";
-import WargearOptionsPanel, { WargearAbilitiesPanel } from "../components/WargearOptionsPanel";
 
 export default function AddUnit() {
-  const guard = useCampaignGuard();
   const navigate = useNavigate();
-  const { addUnit } = useCrusade();
+  const [searchParams] = useSearchParams();
+  // TODO: wire to ArmyContext - const { addUnit, factionId } = useArmy();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUnit, setSelectedUnit] = useState<Datasheet | null>(null);
   const [customName, setCustomName] = useState("");
@@ -22,8 +21,8 @@ export default function AddUnit() {
   const [selectedModelTier, setSelectedModelTier] = useState(0);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
 
-  // Extract factionId safely before useMemo
-  const factionId: FactionId | null = guard.ready ? guard.currentPlayer.faction_id : null;
+  // Get factionId from URL params or ArmyContext (TODO)
+  const factionId: FactionId | null = (searchParams.get('faction') as FactionId) ?? null;
 
   // Load real datasheets for this faction
   const allFactionUnits = useMemo(() => {
@@ -42,10 +41,7 @@ export default function AddUnit() {
     );
   }, [allFactionUnits, searchQuery]);
 
-  if (!guard.ready) return null;
-
-  const { campaign, currentPlayer } = guard;
-  const factionName = getFactionName(currentPlayer.faction_id);
+  const factionName = factionId ? getFactionName(factionId) : 'Select a faction';
 
   const handleUnitSelect = (unit: Datasheet) => {
     setSelectedUnit(unit);
@@ -63,7 +59,7 @@ export default function AddUnit() {
     setCustomPoints(cost);
   };
 
-  /** Parse "5 models" → 5 from the points tier string */
+  /** Parse "5 models" -> 5 from the points tier string */
   const parseModelCount = (modelsStr: string): number | undefined => {
     const match = modelsStr.match(/(\d+)\s*model/i);
     return match ? parseInt(match[1], 10) : undefined;
@@ -89,13 +85,13 @@ export default function AddUnit() {
     }
 
     const modelCount = parseModelCount(selectedUnit.points[selectedModelTier]?.models ?? '');
-    addUnit(selectedUnit.name, customName, customPoints, selectedEquipment.join(", "), modelCount);
+    // TODO: wire to ArmyContext - addUnit(selectedUnit.name, customName, customPoints, selectedEquipment.join(", "), modelCount);
 
-    toast.success(`${customName} added to roster!`, {
+    toast.success(`${customName} added to army!`, {
       duration: 3000,
     });
 
-    navigate("/roster");
+    navigate("/army");
   };
 
   const handleCancel = () => {
@@ -109,23 +105,23 @@ export default function AddUnit() {
   const wargearOptions = selectedUnit?.wargear_options ?? [];
 
   return (
-    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-24">
+    <div className="min-h-screen bg-[#faf6f0] flex flex-col p-6 relative overflow-hidden pb-24">
       <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-stone-400 hover:text-emerald-500 transition-colors mb-6"
+          className="flex items-center gap-2 text-[#8b7355] hover:text-[#b8860b] transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back to Roster</span>
+          <span className="text-sm">Back to Army</span>
         </button>
 
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-stone-100 tracking-wider drop-shadow-[0_0_10px_rgba(16,185,129,0.3)] mb-1">
+          <h1 className="text-2xl font-bold text-[#2c2416] tracking-wider mb-1">
             Add Unit
           </h1>
-          <p className="text-stone-400 text-sm">{factionName}</p>
+          <p className="text-[#8b7355] text-sm">{factionName}</p>
         </div>
 
         {!selectedUnit ? (
@@ -133,13 +129,13 @@ export default function AddUnit() {
             {/* Search Bar */}
             <div className="mb-5">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500/50" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#b8860b]/50" />
                 <input
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search units or keywords..."
-                  className="w-full bg-stone-900 border border-stone-600 rounded-lg pl-11 pr-4 py-3 text-stone-100 placeholder:text-stone-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  className="w-full bg-[#f5efe6] border border-[#d4c5a9] rounded-lg pl-11 pr-4 py-3 text-[#2c2416] placeholder:text-[#8b7355] focus:border-[#b8860b]/40 focus:outline-none focus:ring-2 focus:ring-[#b8860b]/20 transition-all"
                 />
               </div>
             </div>
@@ -157,38 +153,38 @@ export default function AddUnit() {
                   <button
                     key={`${unit.name}-${idx}`}
                     onClick={() => handleUnitSelect(unit)}
-                    className="w-full text-left relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 hover:border-emerald-500/50 transition-all group"
+                    className="w-full text-left relative overflow-hidden rounded-sm border border-[#d4c5a9] bg-[#f5efe6] hover:border-[#b8860b] transition-all group"
                   >
                     <div className="p-4">
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex-1">
-                          <h3 className="text-sm font-semibold text-stone-100 mb-1 group-hover:text-emerald-400 transition-colors">
+                          <h3 className="text-sm font-semibold text-[#2c2416] mb-1 group-hover:text-[#b8860b] transition-colors">
                             {unit.name}
                           </h3>
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {displayKeywords.map((kw, kidx) => (
                               <span
                                 key={kidx}
-                                className="text-xs text-stone-500 bg-stone-950 px-2 py-0.5 rounded"
+                                className="text-xs text-[#8b7355] bg-[#e8dcc8] px-2 py-0.5 rounded"
                               >
                                 {toTitleCase(kw)}
                               </span>
                             ))}
                           </div>
                         </div>
-                        <div className="text-sm font-bold text-emerald-500 font-mono">
+                        <div className="text-sm font-bold text-[#b8860b] font-mono">
                           {baseCost} pts
                         </div>
                       </div>
                     </div>
-                    <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#b8860b]/20 to-transparent" />
                   </button>
                 );
               })}
 
               {filteredUnits.length === 0 && (
                 <div className="text-center py-12">
-                  <p className="text-stone-400 text-sm">No units found</p>
+                  <p className="text-[#8b7355] text-sm">No units found</p>
                 </div>
               )}
             </div>
@@ -198,11 +194,11 @@ export default function AddUnit() {
             {/* Unit Configuration Form */}
             <div className="space-y-5">
               {/* Selected Unit Info */}
-              <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4">
+              <div className="relative overflow-hidden rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-4">
                 <div className="relative">
                   <div className="flex items-start justify-between gap-3 mb-2">
                     <div>
-                      <h3 className="text-base font-semibold text-stone-100 mb-1">
+                      <h3 className="text-base font-semibold text-[#2c2416] mb-1">
                         {selectedUnit.name}
                       </h3>
                       <div className="flex items-center gap-1.5 flex-wrap">
@@ -212,7 +208,7 @@ export default function AddUnit() {
                           .map((kw, idx) => (
                             <span
                               key={idx}
-                              className="text-xs text-stone-500 bg-stone-950 px-2 py-0.5 rounded"
+                              className="text-xs text-[#8b7355] bg-[#e8dcc8] px-2 py-0.5 rounded"
                             >
                               {toTitleCase(kw)}
                             </span>
@@ -222,7 +218,7 @@ export default function AddUnit() {
                     <button
                       onClick={handleCancel}
                       aria-label="Deselect unit"
-                      className="text-stone-500 hover:text-stone-300 transition-colors"
+                      className="text-[#8b7355] hover:text-[#5c4a32] transition-colors"
                     >
                       <X className="w-5 h-5" />
                     </button>
@@ -236,13 +232,13 @@ export default function AddUnit() {
 
               {/* Unit Composition */}
               {selectedUnit.unit_composition && (
-                <div className="relative overflow-hidden rounded-sm border border-stone-700/40 bg-stone-900 p-3">
+                <div className="relative overflow-hidden rounded-sm border border-[#d4c5a9]/40 bg-[#f5efe6] p-3">
                   <div className="relative">
-                    <h4 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-stone-500" />
+                    <h4 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                      <Users className="w-3.5 h-3.5 text-[#8b7355]" />
                       Unit Composition
                     </h4>
-                    <p className="text-xs text-stone-300 leading-relaxed">
+                    <p className="text-xs text-[#5c4a32] leading-relaxed">
                       {selectedUnit.unit_composition}
                     </p>
                   </div>
@@ -252,8 +248,8 @@ export default function AddUnit() {
               {/* Model Count / Points Tier Selector */}
               {selectedUnit.points.length > 1 && (
                 <div>
-                  <label className="block text-sm font-medium text-stone-300 mb-2 tracking-wide flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-emerald-500/70" />
+                  <label className="block text-sm font-medium text-[#5c4a32] mb-2 tracking-wide flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-[#b8860b]/70" />
                     Unit Size
                   </label>
                   <div className="grid gap-2" style={{ gridTemplateColumns: `repeat(${Math.min(selectedUnit.points.length, 3)}, 1fr)` }}>
@@ -264,18 +260,18 @@ export default function AddUnit() {
                         onClick={() => handleModelTierChange(idx)}
                         className={`relative overflow-hidden rounded-sm border p-3 text-center transition-all ${
                           selectedModelTier === idx
-                            ? "border-emerald-500/50 bg-emerald-500/10"
-                            : "border-stone-700/60 bg-stone-900 hover:border-emerald-500/50"
+                            ? "border-[#b8860b]/50 bg-[#b8860b]/10"
+                            : "border-[#d4c5a9] bg-[#f5efe6] hover:border-[#b8860b]"
                         }`}
                       >
-                        <div className="text-sm font-bold text-stone-100 font-mono mb-0.5">
+                        <div className="text-sm font-bold text-[#2c2416] font-mono mb-0.5">
                           {tier.models}
                         </div>
-                        <div className={`text-xs font-mono ${selectedModelTier === idx ? "text-emerald-400" : "text-stone-500"}`}>
+                        <div className={`text-xs font-mono ${selectedModelTier === idx ? "text-[#b8860b]" : "text-[#8b7355]"}`}>
                           {tier.cost} pts
                         </div>
                         {selectedModelTier === idx && (
-                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-emerald-500" />
+                          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#b8860b]" />
                         )}
                       </button>
                     ))}
@@ -285,7 +281,7 @@ export default function AddUnit() {
 
               {/* Custom Name */}
               <div>
-                <label className="block text-sm font-medium text-stone-300 mb-2 tracking-wide">
+                <label className="block text-sm font-medium text-[#5c4a32] mb-2 tracking-wide">
                   Custom Name
                 </label>
                 <input
@@ -293,13 +289,13 @@ export default function AddUnit() {
                   value={customName}
                   onChange={(e) => setCustomName(e.target.value)}
                   placeholder="Enter custom unit name"
-                  className="w-full bg-stone-900 border border-stone-600 rounded-lg px-4 py-3 text-stone-100 placeholder:text-stone-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  className="w-full bg-[#f5efe6] border border-[#d4c5a9] rounded-lg px-4 py-3 text-[#2c2416] placeholder:text-[#8b7355] focus:border-[#b8860b]/40 focus:outline-none focus:ring-2 focus:ring-[#b8860b]/20 transition-all"
                 />
               </div>
 
               {/* Base Points */}
               <div>
-                <label className="block text-sm font-medium text-stone-300 mb-2 tracking-wide">
+                <label className="block text-sm font-medium text-[#5c4a32] mb-2 tracking-wide">
                   Base Points
                 </label>
                 <input
@@ -308,32 +304,55 @@ export default function AddUnit() {
                   value={customPoints}
                   onChange={(e) => setCustomPoints(Number(e.target.value))}
                   min="0"
-                  className="w-full bg-stone-900 border border-stone-600 rounded-lg px-4 py-3 text-stone-100 placeholder:text-stone-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                  className="w-full bg-[#f5efe6] border border-[#d4c5a9] rounded-lg px-4 py-3 text-[#2c2416] placeholder:text-[#8b7355] focus:border-[#b8860b]/40 focus:outline-none focus:ring-2 focus:ring-[#b8860b]/20 transition-all"
                 />
               </div>
 
-              {/* Wargear Options (structured panel) */}
+              {/* Wargear Options */}
               {wargearOptions.length > 0 && (
-                <WargearOptionsPanel
-                  options={wargearOptions}
-                  selectable
-                  selectedOptions={selectedEquipment}
-                  onToggleOption={handleEquipmentToggle}
-                />
+                <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                  <h4 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider mb-2">Wargear Options</h4>
+                  <ul className="space-y-1">
+                    {wargearOptions.map((opt: string, idx: number) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <input
+                          type="checkbox"
+                          checked={selectedEquipment.includes(opt)}
+                          onChange={() => handleEquipmentToggle(opt)}
+                          className="mt-1"
+                        />
+                        <span className="text-xs text-[#5c4a32]">{opt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               )}
 
               {/* Wargear Abilities */}
               {selectedUnit.wargear_abilities.length > 0 && (
-                <WargearAbilitiesPanel abilities={selectedUnit.wargear_abilities} />
+                <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                  <h4 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider mb-2">Wargear Abilities</h4>
+                  <div className="space-y-2">
+                    {selectedUnit.wargear_abilities.map((ability, idx: number) => {
+                      if (typeof ability === 'string') return <p key={idx} className="text-xs text-[#5c4a32]">{ability}</p>;
+                      return (
+                        <div key={idx}>
+                          <span className="text-xs font-bold text-[#b8860b]">{ability[0]}: </span>
+                          <span className="text-xs text-[#5c4a32]">{ability[1]}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
               )}
 
               {/* Total Points Display */}
-              <div className="relative overflow-hidden rounded-sm border border-stone-700/60 bg-stone-900 p-4">
+              <div className="relative overflow-hidden rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-4">
                 <div className="relative flex items-center justify-between">
-                  <span className="text-sm font-medium text-stone-300 uppercase tracking-wider">
+                  <span className="text-sm font-medium text-[#5c4a32] uppercase tracking-wider">
                     Total Points
                   </span>
-                  <span className="text-2xl font-bold text-amber-400 font-mono">
+                  <span className="text-2xl font-bold text-amber-600 font-mono">
                     {customPoints}
                   </span>
                 </div>
@@ -341,14 +360,14 @@ export default function AddUnit() {
 
               {/* Divider */}
               <div className="flex items-center gap-2 py-2">
-                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#b8860b]/20 to-transparent" />
               </div>
 
               {/* Action Buttons */}
               <div className="flex gap-3">
                 <button
                   onClick={handleCancel}
-                  className="flex-1 px-6 py-3 rounded-lg border border-stone-700/60 bg-stone-900 text-stone-300 font-semibold hover:border-emerald-500/50 transition-all"
+                  className="flex-1 px-6 py-3 rounded-lg border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] font-semibold hover:border-[#b8860b] transition-all"
                 >
                   Cancel
                 </button>
@@ -356,13 +375,12 @@ export default function AddUnit() {
                   onClick={handleSubmit}
                   className="flex-1 relative overflow-hidden group"
                 >
-                  <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-emerald-700/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#b8860b] to-[#d4a017] rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(184,134,11,0.4)]" />
 
                   <div className="relative px-6 py-3 flex items-center justify-center gap-2">
-                    <Plus className="w-5 h-5 text-black" strokeWidth={2.5} />
-                    <span className="text-base font-bold text-black tracking-wide">
-                      Add to Roster
+                    <Plus className="w-5 h-5 text-white" strokeWidth={2.5} />
+                    <span className="text-base font-bold text-white tracking-wide">
+                      Add to Army
                     </span>
                   </div>
                 </button>
@@ -378,15 +396,15 @@ export default function AddUnit() {
           width: 4px;
         }
         .scrollbar-thin::-webkit-scrollbar-track {
-          background: rgba(28, 25, 23, 0.5);
+          background: rgba(212, 197, 169, 0.3);
           border-radius: 2px;
         }
         .scrollbar-thin::-webkit-scrollbar-thumb {
-          background: rgba(16, 185, 129, 0.3);
+          background: rgba(184, 134, 11, 0.3);
           border-radius: 2px;
         }
         .scrollbar-thin::-webkit-scrollbar-thumb:hover {
-          background: rgba(16, 185, 129, 0.5);
+          background: rgba(184, 134, 11, 0.5);
         }
       `}</style>
     </div>

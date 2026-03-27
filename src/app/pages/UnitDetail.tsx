@@ -2,32 +2,42 @@ import { useState, useMemo, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import { ArrowLeft, Shield, Edit, Plus, Award, AlertTriangle, Skull, ChevronDown, ChevronUp, Star, Trash2, Sparkles, Zap } from "lucide-react";
 import { toast } from "sonner";
-import { useCrusade } from "../../lib/CrusadeContext";
-import { useCampaignGuard } from "../../lib/hooks/useCampaignGuard";
+// TODO: wire to ArmyContext
+// import { useArmy } from "../../lib/ArmyContext";
 import { getFactionName, getDataFactionId } from "../../lib/factions";
-import { getRankFromXP, getRankColor } from "../../lib/ranks";
 import { getUnitsForFaction, getRulesForFaction } from "../../data";
-import type { Datasheet, UnitStatus } from "../../types";
+import type { Datasheet, FactionId } from "../../types";
 import WeaponStatTable from "../components/WeaponStatTable";
-import WargearOptionsPanel, { WargearAbilitiesPanel } from "../components/WargearOptionsPanel";
 import { FormattedRuleText } from "../../lib/formatText";
-import FactionLegacy from "../components/FactionLegacy";
-import { getFactionLegacyConfig } from "../../lib/factionLegacy";
-import { isFeatureEnabled } from "../../lib/featureFlags";
+
+// TODO: These will come from ArmyContext
+// For now, define a minimal mock to keep the page compilable
+interface MockUnit {
+  id: string;
+  datasheet_name: string;
+  custom_name: string;
+  points_cost: number;
+  experience_points: number;
+  battles_played: number;
+  battles_survived: number;
+  battle_honours: { id: string; type: string; name: string; description: string }[];
+  battle_scars: { id: string; name: string; description: string }[];
+  notes: string;
+  equipment: string;
+  is_destroyed: boolean;
+  status: string;
+  faction_legacy?: Record<string, unknown>;
+}
 
 export default function UnitDetail() {
   const { unitId } = useParams<{ unitId: string }>();
-  const guard = useCampaignGuard();
   const navigate = useNavigate();
-  const {
-    units,
-    updateUnit,
-    awardXP,
-    addBattleHonour,
-    addBattleScar,
-    markDestroyed,
-    removeUnit,
-  } = useCrusade();
+
+  // TODO: wire to ArmyContext
+  // const { units, updateUnit, removeUnit, mode, factionId } = useArmy();
+  const units: MockUnit[] = []; // placeholder
+  const mode = 'standard' as 'standard' | 'crusade'; // placeholder - will come from ArmyContext
+  const factionId: FactionId | null = null; // placeholder
 
   const [isEditing, setIsEditing] = useState(false);
   const [showAbilities, setShowAbilities] = useState(false);
@@ -39,21 +49,21 @@ export default function UnitDetail() {
   const [editPoints, setEditPoints] = useState(0);
   const [editNotes, setEditNotes] = useState("");
   const [showEnhancementPicker, setShowEnhancementPicker] = useState(false);
-  const [showStatusDropdown, setShowStatusDropdown] = useState(false);
+  const [showStratagems, setShowStratagems] = useState(false);
 
   const unit = units.find((u) => u.id === unitId);
 
   // Load matching datasheet from faction data
   const datasheet: Datasheet | undefined = useMemo(() => {
-    if (!guard.currentPlayer || !unit) return undefined;
-    const factionUnits = getUnitsForFaction(getDataFactionId(guard.currentPlayer.faction_id));
+    if (!factionId || !unit) return undefined;
+    const factionUnits = getUnitsForFaction(getDataFactionId(factionId));
     return factionUnits.find((ds) => ds.name === unit.datasheet_name);
-  }, [guard.currentPlayer, unit]);
+  }, [factionId, unit]);
 
   // Load faction enhancements from all detachments
   const factionEnhancements = useMemo(() => {
-    if (!guard.currentPlayer) return [];
-    const rules = getRulesForFaction(getDataFactionId(guard.currentPlayer.faction_id));
+    if (!factionId) return [];
+    const rules = getRulesForFaction(getDataFactionId(factionId));
     if (!rules) return [];
     const enhancements: { detachment: string; name: string; cost: string; text: string }[] = [];
     for (const det of rules.detachments) {
@@ -62,7 +72,7 @@ export default function UnitDetail() {
       }
     }
     return enhancements;
-  }, [guard.currentPlayer]);
+  }, [factionId]);
 
   // Filter enhancements by unit keyword eligibility
   const filteredEnhancements = useMemo(() => {
@@ -70,46 +80,34 @@ export default function UnitDetail() {
     const unitKeywords = [...(datasheet.keywords || []), ...(datasheet.faction_keywords || [])].map(k => k.toUpperCase());
 
     return factionEnhancements.filter(enh => {
-      // Match "KEYWORD model only" or "KEYWORD1 or KEYWORD2 model only" at start of text
       const match = enh.text.match(/^(.+?)\s+model only\b/i);
-      if (!match) return true; // No restriction = available to all
-
-      // Split on " or " and ", " to get individual required keywords
+      if (!match) return true;
       const restrictions = match[1]
         .split(/\s*(?:,\s*|\bor\b)\s*/i)
         .map(s => s.trim().toUpperCase())
         .filter(Boolean);
-
-      // Check if any restriction keyword matches any unit keyword
       return restrictions.some(restriction => {
-        // Direct match
         if (unitKeywords.includes(restriction)) return true;
-        // Compound keyword: check if all parts exist across unit keywords
         const parts = restriction.split(/\s+/);
         if (parts.length > 1) {
           return parts.every(part => unitKeywords.some(kw => kw.includes(part)));
         }
-        // Check if any unit keyword contains the restriction
         return unitKeywords.some(kw => kw === restriction);
       });
     });
   }, [factionEnhancements, datasheet]);
 
-  const [showStratagems, setShowStratagems] = useState(false);
-
   // Match stratagems whose target field references this unit's keywords
   const matchingStratagems = useMemo(() => {
-    if (!guard.currentPlayer || !datasheet) return [];
-    const rules = getRulesForFaction(getDataFactionId(guard.currentPlayer.faction_id));
+    if (!factionId || !datasheet) return [];
+    const rules = getRulesForFaction(getDataFactionId(factionId));
     if (!rules) return [];
 
-    // Collect unit keywords (uppercase)
     const unitKeywords = [
       ...datasheet.keywords,
-      datasheet.name, // also match on datasheet name itself
+      datasheet.name,
     ].map(k => k.toUpperCase());
 
-    // Skip overly generic keywords that would match every stratagem
     const genericKeywords = new Set([
       'IMPERIUM', 'CHAOS', 'XENOS', 'TYRANIDS', 'ORKS', 'AELDARI',
       'DRUKHARI', 'NECRONS', 'T\'AU EMPIRE', 'LEAGUES OF VOTANN',
@@ -120,13 +118,11 @@ export default function UnitDetail() {
     for (const det of rules.detachments) {
       for (const strat of det.stratagems) {
         const targetUpper = strat.target.toUpperCase();
-
         const matched = unitKeywords.some(kw => {
           if (genericKeywords.has(kw)) return false;
-          if (kw.length < 3) return false; // skip trivially short keywords
+          if (kw.length < 3) return false;
           return targetUpper.includes(kw);
         });
-
         if (matched) {
           results.push({ detachment: det.name, ...strat });
         }
@@ -134,69 +130,26 @@ export default function UnitDetail() {
     }
 
     return results;
-  }, [guard.currentPlayer, datasheet]);
-
-  if (!guard.ready) return null;
-  const { campaign, currentPlayer } = guard;
+  }, [factionId, datasheet]);
 
   if (!unit) {
     return (
-      <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden">
+      <div className="min-h-screen bg-[#faf6f0] flex flex-col p-6 relative overflow-hidden">
         <div className="relative z-10 w-full max-w-md mx-auto">
           <button
-            onClick={() => navigate("/roster")}
-            className="flex items-center gap-2 text-stone-400 hover:text-emerald-500 transition-colors mb-6"
+            onClick={() => navigate("/army")}
+            className="flex items-center gap-2 text-[#8b7355] hover:text-[#b8860b] transition-colors mb-6"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span className="text-sm">Back to Roster</span>
+            <span className="text-sm">Back to Army</span>
           </button>
-          <p className="text-stone-400 text-center mt-12">Unit not found.</p>
+          <p className="text-[#8b7355] text-center mt-12">Unit not found.</p>
         </div>
       </div>
     );
   }
 
-  // Compute effective status (auto-set for destroyed / scarred)
-  const effectiveStatus: UnitStatus = unit.is_destroyed
-    ? 'destroyed'
-    : unit.battle_scars.length > 0
-      ? 'battle_scarred'
-      : unit.status;
-
-  // Auto-sync status if it diverges (in a useEffect to avoid side effects during render)
-  useEffect(() => {
-    if (effectiveStatus !== unit.status) {
-      updateUnit(unit.id, { status: effectiveStatus });
-    }
-  }, [effectiveStatus, unit.status, unit.id, updateUnit]);
-
-  const statusLabel = (s: UnitStatus) => {
-    switch (s) {
-      case 'ready': return 'Ready';
-      case 'battle_scarred': return 'Battle Scarred';
-      case 'recovering': return 'Recovering';
-      case 'destroyed': return 'Destroyed';
-    }
-  };
-
-  const statusBadgeColor = (s: UnitStatus) => {
-    switch (s) {
-      case 'ready': return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40';
-      case 'battle_scarred': return 'bg-amber-500/20 text-amber-400 border-amber-500/40';
-      case 'recovering': return 'bg-stone-500/20 text-stone-400 border-stone-500/40';
-      case 'destroyed': return 'bg-red-500/20 text-red-400 border-red-500/40';
-    }
-  };
-
-  const handleSetStatus = (newStatus: UnitStatus) => {
-    updateUnit(unit.id, { status: newStatus });
-    setShowStatusDropdown(false);
-    toast.success(`Status set to ${statusLabel(newStatus)}`);
-  };
-
-  const factionName = getFactionName(currentPlayer.faction_id);
-  const rank = getRankFromXP(unit.experience_points);
-  const rankColor = getRankColor(rank);
+  const factionName = factionId ? getFactionName(factionId) : '';
 
   // Stats from datasheet or fallback
   const stats = datasheet?.stats ?? {};
@@ -205,8 +158,7 @@ export default function UnitDetail() {
   const meleeWeapons = datasheet?.melee_weapons ?? [];
 
   // Abilities: flatten core, faction, and other abilities into a unified list
-  const abilities = useMemo(() => {
-    if (!datasheet) return [];
+  const abilities = datasheet ? (() => {
     const list: { name: string; description: string }[] = [];
     for (const core of datasheet.abilities.core) {
       list.push({ name: core, description: "Core ability" });
@@ -218,41 +170,27 @@ export default function UnitDetail() {
       list.push({ name, description: desc });
     }
     return list;
-  }, [datasheet]);
+  })() : [];
 
   const handleAddBattleHonor = () => {
-    addBattleHonour(unit.id, {
-      id: crypto.randomUUID(),
-      type: "battle_trait",
-      name: "New Battle Honour",
-      description: "Earned through valorous deeds in battle.",
-    });
+    // TODO: wire to ArmyContext
     toast.success("Battle Honor added!");
   };
 
   const handleAssignEnhancement = (enh: { detachment: string; name: string; cost: string; text: string }) => {
-    addBattleHonour(unit.id, {
-      id: crypto.randomUUID(),
-      type: "weapon_enhancement",
-      name: enh.name,
-      description: `${enh.text} (${enh.detachment} — ${enh.cost} pts)`,
-    });
+    // TODO: wire to ArmyContext
     setShowEnhancementPicker(false);
     toast.success(`${enh.name} assigned!`);
   };
 
   const handleAddBattleScar = () => {
-    addBattleScar(unit.id, {
-      id: crypto.randomUUID(),
-      name: "New Battle Scar",
-      description: "Sustained during a harrowing engagement.",
-    });
+    // TODO: wire to ArmyContext
     toast.success("Battle Scar added!");
   };
 
   const handleSpendXP = () => {
     if (xpAmount < 1) return;
-    awardXP(unit.id, xpAmount);
+    // TODO: wire to ArmyContext
     toast.success(`+${xpAmount} XP awarded!`);
     setShowSpendXP(false);
     setXpAmount(1);
@@ -266,39 +204,35 @@ export default function UnitDetail() {
   };
 
   const handleSaveEdit = () => {
-    updateUnit(unit.id, {
-      custom_name: editName || unit.datasheet_name,
-      points_cost: editPoints,
-      notes: editNotes,
-    });
+    // TODO: wire to ArmyContext
     setIsEditing(false);
     toast.success("Unit updated!");
   };
 
   const handleMarkDestroyed = () => {
-    markDestroyed(unit.id);
+    // TODO: wire to ArmyContext
     toast.error("Unit marked as destroyed");
     setShowDestroyConfirm(false);
-    setTimeout(() => navigate("/roster"), 1500);
+    setTimeout(() => navigate("/army"), 1500);
   };
 
   const handleRemove = () => {
-    removeUnit(unit.id);
-    toast.success("Unit removed from roster");
+    // TODO: wire to ArmyContext
+    toast.success("Unit removed from army");
     setShowDeleteConfirm(false);
-    setTimeout(() => navigate("/roster"), 1500);
+    setTimeout(() => navigate("/army"), 1500);
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-24">
+    <div className="min-h-screen bg-[#faf6f0] flex flex-col p-6 relative overflow-hidden pb-24">
       <div className="relative z-10 w-full max-w-md mx-auto">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-stone-400 hover:text-emerald-500 transition-colors mb-6"
+          className="flex items-center gap-2 text-[#8b7355] hover:text-[#b8860b] transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-sm">Back to Roster</span>
+          <span className="text-sm">Back to Army</span>
         </button>
 
         {/* Unit Header */}
@@ -307,50 +241,22 @@ export default function UnitDetail() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-1">
                 <Shield className="w-5 h-5 text-blue-500" strokeWidth={2} />
-                <span className="text-xs text-stone-500 uppercase tracking-wider">
+                <span className="text-xs text-[#8b7355] uppercase tracking-wider">
                   {factionName}
                 </span>
               </div>
-              <h1 className="text-2xl font-bold text-stone-100 tracking-wider drop-shadow-[0_0_10px_rgba(16,185,129,0.3)] mb-1">
+              <h1 className="text-2xl font-bold text-[#2c2416] tracking-wider mb-1">
                 {unit.custom_name}
               </h1>
-              <p className="text-stone-400 text-sm italic mb-2">{unit.datasheet_name}</p>
-              {/* Status Badge + Dropdown */}
-              <div className="relative">
-                <button
-                  onClick={() => setShowStatusDropdown(!showStatusDropdown)}
-                  className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-xs font-medium border ${statusBadgeColor(effectiveStatus)}`}
-                >
-                  {statusLabel(effectiveStatus)}
-                  <ChevronDown className="w-3 h-3" />
-                </button>
-                {showStatusDropdown && (
-                  <div className="absolute top-full left-0 mt-1 z-20 rounded-sm border border-stone-700/60 bg-stone-950/98 backdrop-blur-sm shadow-xl min-w-[140px]">
-                    {(['ready', 'recovering'] as UnitStatus[]).map((s) => (
-                      <button
-                        key={s}
-                        onClick={() => handleSetStatus(s)}
-                        className={`w-full text-left px-3 py-2 text-xs hover:bg-emerald-500/10 transition-colors border-b border-stone-800/50 last:border-b-0 ${
-                          effectiveStatus === s ? 'text-emerald-400' : 'text-stone-300'
-                        }`}
-                      >
-                        {statusLabel(s)}
-                      </button>
-                    ))}
-                    <div className="px-3 py-1.5 text-[10px] text-stone-600 border-t border-stone-800/50">
-                      Scarred &amp; Destroyed are auto-set
-                    </div>
-                  </div>
-                )}
-              </div>
+              <p className="text-[#8b7355] text-sm italic mb-2">{unit.datasheet_name}</p>
             </div>
             <div className="text-right">
-              <div className="text-xl font-bold text-emerald-500 font-mono">
+              <div className="text-xl font-bold text-[#b8860b] font-mono">
                 {unit.points_cost} pts
               </div>
               <button
                 onClick={handleStartEdit}
-                className="text-xs text-emerald-500/70 hover:text-emerald-500 transition-colors flex items-center gap-1 mt-1"
+                className="text-xs text-[#b8860b]/70 hover:text-[#b8860b] transition-colors flex items-center gap-1 mt-1"
               >
                 <Edit className="w-3 h-3" />
                 Edit
@@ -362,20 +268,20 @@ export default function UnitDetail() {
         {/* Stats Line */}
         {Object.keys(stats).length > 0 && (
           <div className="mb-6">
-            <h2 className="text-sm font-semibold text-stone-300 uppercase tracking-wider mb-3">
+            <h2 className="text-sm font-semibold text-[#5c4a32] uppercase tracking-wider mb-3">
               Unit Statistics
             </h2>
             <div className="grid grid-cols-3 gap-2 mb-2">
               {Object.entries(stats).map(([key, value]) => (
                 <div
                   key={key}
-                  className="rounded-sm border border-stone-700/60 bg-stone-900 p-3"
+                  className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3"
                 >
                   <div className="text-center">
-                    <div className="text-xs text-stone-500 uppercase tracking-wider mb-1">
+                    <div className="text-xs text-[#8b7355] uppercase tracking-wider mb-1">
                       {key}
                     </div>
-                    <div className="text-lg font-bold text-stone-100 font-mono">
+                    <div className="text-lg font-bold text-[#2c2416] font-mono">
                       {value}
                     </div>
                   </div>
@@ -383,12 +289,12 @@ export default function UnitDetail() {
               ))}
             </div>
             {invulnSave && (
-              <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-3">
+              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
                 <div className="text-center">
-                  <div className="text-xs text-purple-400 uppercase tracking-wider mb-1">
+                  <div className="text-xs text-purple-500 uppercase tracking-wider mb-1">
                     Invulnerable Save
                   </div>
-                  <div className="text-lg font-bold text-purple-300 font-mono">
+                  <div className="text-lg font-bold text-purple-600 font-mono">
                     {invulnSave}
                   </div>
                 </div>
@@ -414,25 +320,32 @@ export default function UnitDetail() {
         {/* Wargear Options */}
         {datasheet?.wargear_options && datasheet.wargear_options.length > 0 && (
           <div className="mb-6">
-            <WargearOptionsPanel
-              options={datasheet.wargear_options}
-              selectable
-              selectedOptions={unit.equipment ? unit.equipment.split(", ").filter(Boolean) : []}
-              onToggleOption={(option) => {
-                const current = unit.equipment ? unit.equipment.split(", ").filter(Boolean) : [];
-                const updated = current.includes(option)
-                  ? current.filter((o) => o !== option)
-                  : [...current, option];
-                updateUnit(unit.id, { equipment: updated.join(", ") });
-              }}
-            />
+            <h2 className="text-sm font-semibold text-[#5c4a32] uppercase tracking-wider mb-3">Wargear Options</h2>
+            <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+              <ul className="list-disc list-inside space-y-1 text-xs text-[#5c4a32]">
+                {datasheet.wargear_options.map((opt: string, idx: number) => (
+                  <li key={idx}>{opt}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         )}
 
         {/* Wargear Abilities */}
         {datasheet?.wargear_abilities && datasheet.wargear_abilities.length > 0 && (
           <div className="mb-6">
-            <WargearAbilitiesPanel abilities={datasheet.wargear_abilities} />
+            <h2 className="text-sm font-semibold text-[#5c4a32] uppercase tracking-wider mb-3">Wargear Abilities</h2>
+            <div className="space-y-2">
+              {datasheet.wargear_abilities.map((ability, idx: number) => {
+                if (typeof ability === 'string') return <p key={idx} className="text-xs text-[#5c4a32]">{ability}</p>;
+                return (
+                  <div key={idx} className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                    <h3 className="text-xs font-bold text-[#b8860b] mb-1">{ability[0]}</h3>
+                    <p className="text-xs text-[#5c4a32]">{ability[1]}</p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 
@@ -441,13 +354,13 @@ export default function UnitDetail() {
           <div className="mb-6">
             <button
               onClick={() => setShowAbilities(!showAbilities)}
-              className="w-full flex items-center justify-between text-sm font-semibold text-stone-300 uppercase tracking-wider mb-3 hover:text-emerald-400 transition-colors"
+              className="w-full flex items-center justify-between text-sm font-semibold text-[#5c4a32] uppercase tracking-wider mb-3 hover:text-[#b8860b] transition-colors"
             >
               <span>Abilities ({abilities.length})</span>
               {showAbilities ? (
-                <ChevronUp className="w-5 h-5 text-emerald-500" />
+                <ChevronUp className="w-5 h-5 text-[#b8860b]" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-emerald-500" />
+                <ChevronDown className="w-5 h-5 text-[#b8860b]" />
               )}
             </button>
             {showAbilities && (
@@ -455,12 +368,12 @@ export default function UnitDetail() {
                 {abilities.map((ability, idx) => (
                   <div
                     key={idx}
-                    className="rounded-sm border border-stone-700/60 bg-stone-900 p-3"
+                    className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3"
                   >
-                    <h3 className="text-sm font-semibold text-emerald-400 mb-1">
+                    <h3 className="text-sm font-semibold text-[#b8860b] mb-1">
                       {ability.name}
                     </h3>
-                    <p className="text-xs text-stone-400 leading-relaxed">
+                    <p className="text-xs text-[#8b7355] leading-relaxed">
                       {ability.description}
                     </p>
                   </div>
@@ -475,16 +388,16 @@ export default function UnitDetail() {
           <div className="mb-6">
             <button
               onClick={() => setShowStratagems(!showStratagems)}
-              className="w-full flex items-center justify-between text-sm font-semibold text-stone-300 uppercase tracking-wider mb-3 hover:text-emerald-400 transition-colors"
+              className="w-full flex items-center justify-between text-sm font-semibold text-[#5c4a32] uppercase tracking-wider mb-3 hover:text-[#b8860b] transition-colors"
             >
               <span className="flex items-center gap-2">
                 <Zap className="w-4 h-4 text-amber-500" />
                 Stratagems ({matchingStratagems.length})
               </span>
               {showStratagems ? (
-                <ChevronUp className="w-5 h-5 text-emerald-500" />
+                <ChevronUp className="w-5 h-5 text-[#b8860b]" />
               ) : (
-                <ChevronDown className="w-5 h-5 text-emerald-500" />
+                <ChevronDown className="w-5 h-5 text-[#b8860b]" />
               )}
             </button>
             {showStratagems && (
@@ -492,26 +405,26 @@ export default function UnitDetail() {
                 {matchingStratagems.map((strat, idx) => (
                   <div
                     key={idx}
-                    className="rounded-sm border border-stone-700/60 bg-stone-900 p-3"
+                    className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3"
                   >
                     <div className="flex items-start justify-between gap-2 mb-1.5">
-                      <h4 className="text-sm font-semibold text-amber-400">
+                      <h4 className="text-sm font-semibold text-amber-600">
                         {strat.name}
                       </h4>
                       <div className="flex items-center gap-2 flex-shrink-0">
-                        <span className="text-[10px] text-stone-400 uppercase">{strat.type}</span>
-                        <span className="text-xs font-bold text-amber-500 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded">
+                        <span className="text-[10px] text-[#8b7355] uppercase">{strat.type}</span>
+                        <span className="text-xs font-bold text-amber-600 font-mono bg-amber-500/10 px-1.5 py-0.5 rounded">
                           {strat.cp}
                         </span>
                       </div>
                     </div>
-                    <p className="text-[10px] text-stone-400 mb-1">{strat.detachment}</p>
-                    <div className="space-y-1 text-xs text-stone-400 leading-relaxed">
-                      <p><span className="text-stone-400 font-medium">When:</span> {strat.when}</p>
-                      <p><span className="text-stone-400 font-medium">Target:</span> {strat.target}</p>
-                      <p><span className="text-stone-400 font-medium">Effect:</span> {strat.effect}</p>
+                    <p className="text-[10px] text-[#8b7355] mb-1">{strat.detachment}</p>
+                    <div className="space-y-1 text-xs text-[#8b7355] leading-relaxed">
+                      <p><span className="text-[#5c4a32] font-medium">When:</span> {strat.when}</p>
+                      <p><span className="text-[#5c4a32] font-medium">Target:</span> {strat.target}</p>
+                      <p><span className="text-[#5c4a32] font-medium">Effect:</span> {strat.effect}</p>
                       {strat.restrictions && (
-                        <p><span className="text-red-400/70 font-medium">Restrictions:</span> {strat.restrictions}</p>
+                        <p><span className="text-red-500/70 font-medium">Restrictions:</span> {strat.restrictions}</p>
                       )}
                     </div>
                   </div>
@@ -521,271 +434,255 @@ export default function UnitDetail() {
           </div>
         )}
 
-        {/* Crusade Progression */}
-        <div className="mb-6">
-          <h2 className="text-sm font-semibold text-stone-300 uppercase tracking-wider mb-3">
-            Crusade Progression
-          </h2>
+        {/* Crusade Progression - only shown in crusade mode */}
+        {mode === 'crusade' && (
+          <div className="mb-6">
+            <h2 className="text-sm font-semibold text-[#5c4a32] uppercase tracking-wider mb-3">
+              Crusade Progression
+            </h2>
 
-          {/* XP and Rank */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-3">
-              <div>
-                <div className="text-xs text-stone-500 uppercase tracking-wider mb-1">
-                  Crusade Points
+            {/* XP and Rank */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                <div>
+                  <div className="text-xs text-[#8b7355] uppercase tracking-wider mb-1">
+                    Crusade Points
+                  </div>
+                  <div className="text-xl font-bold text-[#b8860b] font-mono">
+                    {unit.experience_points}
+                  </div>
                 </div>
-                <div className="text-xl font-bold text-emerald-400 font-mono">
-                  {unit.experience_points}
+              </div>
+              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                <div>
+                  <div className="text-xs text-[#8b7355] uppercase tracking-wider mb-1">
+                    Rank
+                  </div>
+                  <div className="text-base font-bold text-[#b8860b]">
+                    Battle-ready
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-3">
-              <div>
-                <div className="text-xs text-stone-500 uppercase tracking-wider mb-1">
-                  Rank
-                </div>
-                <div className={`text-base font-bold ${rankColor}`}>
-                  {rank}
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Battles */}
-          <div className="grid grid-cols-2 gap-3 mb-4">
-            <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-3">
-              <div>
-                <div className="text-xs text-stone-500 uppercase tracking-wider mb-1">
-                  Battles Fought
+            {/* Battles */}
+            <div className="grid grid-cols-2 gap-3 mb-4">
+              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                <div>
+                  <div className="text-xs text-[#8b7355] uppercase tracking-wider mb-1">
+                    Battles Fought
+                  </div>
+                  <div className="text-xl font-bold text-[#2c2416] font-mono">
+                    {unit.battles_played}
+                  </div>
                 </div>
-                <div className="text-xl font-bold text-stone-100 font-mono">
-                  {unit.battles_played}
+              </div>
+              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                <div>
+                  <div className="text-xs text-[#8b7355] uppercase tracking-wider mb-1">
+                    Battles Survived
+                  </div>
+                  <div className="text-xl font-bold text-[#2c2416] font-mono">
+                    {unit.battles_survived}
+                  </div>
                 </div>
               </div>
             </div>
-            <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-3">
-              <div>
-                <div className="text-xs text-stone-500 uppercase tracking-wider mb-1">
-                  Battles Survived
-                </div>
-                <div className="text-xl font-bold text-stone-100 font-mono">
-                  {unit.battles_survived}
-                </div>
-              </div>
-            </div>
-          </div>
 
-          {/* Battle Honors */}
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider flex items-center gap-2">
-                <Award className="w-4 h-4 text-amber-400" />
-                Battle Honors
-              </h3>
-              <div className="flex items-center gap-3">
-                {filteredEnhancements.length > 0 && (
+            {/* Battle Honors */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider flex items-center gap-2">
+                  <Award className="w-4 h-4 text-amber-500" />
+                  Battle Honors
+                </h3>
+                <div className="flex items-center gap-3">
+                  {filteredEnhancements.length > 0 && (
+                    <button
+                      onClick={() => setShowEnhancementPicker(true)}
+                      className="text-xs text-purple-500/70 hover:text-purple-500 transition-colors flex items-center gap-1"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      Enhancement
+                    </button>
+                  )}
                   <button
-                    onClick={() => setShowEnhancementPicker(true)}
-                    className="text-xs text-purple-400/70 hover:text-purple-400 transition-colors flex items-center gap-1"
+                    onClick={handleAddBattleHonor}
+                    className="text-xs text-[#b8860b]/70 hover:text-[#b8860b] transition-colors flex items-center gap-1"
                   >
-                    <Sparkles className="w-3 h-3" />
-                    Enhancement
+                    <Plus className="w-3 h-3" />
+                    Add
                   </button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {unit.battle_honours.map((honor, idx) => (
+                  <div
+                    key={honor.id || idx}
+                    className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3"
+                  >
+                    <h4 className="text-sm font-semibold text-amber-600 mb-1 flex items-center gap-1.5">
+                      <Star className="w-3 h-3" />
+                      {honor.name}
+                    </h4>
+                    <p className="text-xs text-[#8b7355] leading-relaxed">
+                      {honor.description}
+                    </p>
+                  </div>
+                ))}
+                {unit.battle_honours.length === 0 && (
+                  <p className="text-xs text-[#8b7355] italic">No battle honours yet.</p>
                 )}
+              </div>
+            </div>
+
+            {/* Battle Scars */}
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4 text-red-400" />
+                  Battle Scars
+                </h3>
                 <button
-                  onClick={handleAddBattleHonor}
-                  className="text-xs text-emerald-500/70 hover:text-emerald-500 transition-colors flex items-center gap-1"
+                  onClick={handleAddBattleScar}
+                  className="text-xs text-[#b8860b]/70 hover:text-[#b8860b] transition-colors flex items-center gap-1"
                 >
                   <Plus className="w-3 h-3" />
                   Add
                 </button>
               </div>
+              <div className="space-y-2">
+                {unit.battle_scars.map((scar, idx) => (
+                  <div
+                    key={scar.id || idx}
+                    className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3"
+                  >
+                    <h4 className="text-sm font-semibold text-red-500 mb-1">
+                      {scar.name}
+                    </h4>
+                    <p className="text-xs text-[#8b7355] leading-relaxed">
+                      {scar.description}
+                    </p>
+                  </div>
+                ))}
+                {unit.battle_scars.length === 0 && (
+                  <p className="text-xs text-[#8b7355] italic">No battle scars yet.</p>
+                )}
+              </div>
             </div>
-            <div className="space-y-2">
-              {unit.battle_honours.map((honor, idx) => (
-                <div
-                  key={honor.id || idx}
-                  className="rounded-sm border border-stone-700/60 bg-stone-900 p-3"
-                >
-                  <h4 className="text-sm font-semibold text-amber-400 mb-1 flex items-center gap-1.5">
-                    <Star className="w-3 h-3" />
-                    {honor.name}
-                  </h4>
-                  <p className="text-xs text-stone-400 leading-relaxed">
-                    {honor.description}
-                  </p>
-                </div>
-              ))}
-              {unit.battle_honours.length === 0 && (
-                <p className="text-xs text-stone-500 italic">No battle honours yet.</p>
-              )}
-            </div>
-          </div>
 
-          {/* Battle Scars */}
+            {/* Award XP Button */}
+            <button
+              onClick={() => setShowSpendXP(true)}
+              className="w-full relative overflow-hidden group mb-3"
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-[#b8860b] to-[#d4a017] rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(184,134,11,0.4)]" />
+
+              <div className="relative px-6 py-3 flex items-center justify-center gap-2">
+                <Star className="w-5 h-5 text-white" strokeWidth={2} />
+                <span className="text-base font-bold text-white tracking-wide">
+                  Award XP
+                </span>
+              </div>
+            </button>
+          </div>
+        )}
+
+        {/* Notes */}
+        {unit.notes && (
           <div className="mb-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-red-400" />
-                Battle Scars
-              </h3>
-              <button
-                onClick={handleAddBattleScar}
-                className="text-xs text-emerald-500/70 hover:text-emerald-500 transition-colors flex items-center gap-1"
-              >
-                <Plus className="w-3 h-3" />
-                Add
-              </button>
-            </div>
-            <div className="space-y-2">
-              {unit.battle_scars.map((scar, idx) => (
-                <div
-                  key={scar.id || idx}
-                  className="rounded-sm border border-stone-700/60 bg-stone-900 p-3"
-                >
-                  <h4 className="text-sm font-semibold text-red-400 mb-1">
-                    {scar.name}
-                  </h4>
-                  <p className="text-xs text-stone-400 leading-relaxed">
-                    {scar.description}
-                  </p>
-                </div>
-              ))}
-              {unit.battle_scars.length === 0 && (
-                <p className="text-xs text-stone-500 italic">No battle scars yet.</p>
-              )}
+            <h3 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider mb-3">
+              Notes
+            </h3>
+            <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+              <p className="text-xs text-[#8b7355] leading-relaxed whitespace-pre-line">
+                {unit.notes}
+              </p>
             </div>
           </div>
+        )}
 
-          {/* Faction Legacy */}
-          {isFeatureEnabled('FACTION_LEGACY') && currentPlayer && getFactionLegacyConfig(currentPlayer.faction_id) && (
-            <div className="mb-4">
-              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider flex items-center gap-2 mb-3">
-                <Sparkles className="w-4 h-4 text-purple-400" />
-                Faction Legacy
-              </h3>
-              <FactionLegacy
-                factionId={currentPlayer.faction_id}
-                legacy={unit.faction_legacy ?? {}}
-                onUpdate={(key, value) => {
-                  updateUnit(unit.id, {
-                    faction_legacy: { ...(unit.faction_legacy ?? {}), [key]: value },
-                  });
-                }}
-              />
-            </div>
-          )}
-
-          {/* Notes */}
-          {unit.notes && (
-            <div className="mb-4">
-              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
-                Notes
-              </h3>
-              <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-3">
-                <p className="text-xs text-stone-400 leading-relaxed whitespace-pre-line">
-                  {unit.notes}
+        {/* Equipment / Relics */}
+        {unit.equipment && (
+          <div className="mb-4">
+            <h3 className="text-xs font-semibold text-[#8b7355] uppercase tracking-wider mb-3">
+              Relics & Upgrades
+            </h3>
+            <div className="space-y-2">
+              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3">
+                <p className="text-sm font-semibold text-purple-600">
+                  {unit.equipment}
                 </p>
               </div>
             </div>
-          )}
-
-          {/* Equipment / Relics */}
-          {unit.equipment && (
-            <div className="mb-4">
-              <h3 className="text-xs font-semibold text-stone-400 uppercase tracking-wider mb-3">
-                Relics & Upgrades
-              </h3>
-              <div className="space-y-2">
-                <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-3">
-                  <p className="text-sm font-semibold text-purple-300">
-                    {unit.equipment}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Action Button */}
-          <button
-            onClick={() => setShowSpendXP(true)}
-            className="w-full relative overflow-hidden group mb-3"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-emerald-500 rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(16,185,129,0.4)]" />
-            <div className="absolute inset-0 bg-gradient-to-t from-emerald-700/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg" />
-
-            <div className="relative px-6 py-3 flex items-center justify-center gap-2">
-              <Star className="w-5 h-5 text-black" strokeWidth={2} />
-              <span className="text-base font-bold text-black tracking-wide">
-                Award XP
-              </span>
-            </div>
-          </button>
-        </div>
+          </div>
+        )}
 
         {/* Divider */}
         <div className="flex items-center gap-2 py-2 mb-6">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-emerald-500/20 to-transparent" />
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#b8860b]/20 to-transparent" />
         </div>
 
         {/* Destructive Actions */}
         <div className="space-y-3">
-          <button
-            onClick={() => setShowDestroyConfirm(true)}
-            className="w-full px-6 py-3 rounded-lg border border-red-500/30 bg-gradient-to-br from-red-950/20 to-stone-950 text-red-400 font-semibold hover:border-red-500/50 hover:bg-red-950/30 transition-all flex items-center justify-center gap-2"
-          >
-            <Skull className="w-5 h-5" />
-            Mark as Destroyed
-          </button>
+          {mode === 'crusade' && (
+            <button
+              onClick={() => setShowDestroyConfirm(true)}
+              className="w-full px-6 py-3 rounded-lg border border-red-500/30 bg-red-50 text-red-500 font-semibold hover:border-red-500/50 hover:bg-red-100 transition-all flex items-center justify-center gap-2"
+            >
+              <Skull className="w-5 h-5" />
+              Mark as Destroyed
+            </button>
+          )}
 
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="w-full px-6 py-3 rounded-lg border border-red-500/30 bg-gradient-to-br from-red-950/20 to-stone-950 text-red-400 font-semibold hover:border-red-500/50 hover:bg-red-950/30 transition-all flex items-center justify-center gap-2"
+            className="w-full px-6 py-3 rounded-lg border border-red-500/30 bg-red-50 text-red-500 font-semibold hover:border-red-500/50 hover:bg-red-100 transition-all flex items-center justify-center gap-2"
           >
             <Trash2 className="w-5 h-5" />
-            Remove from Roster
+            Remove from Army
           </button>
         </div>
       </div>
 
       {/* Edit Unit Modal */}
       {isEditing && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
-          <div className="w-full max-w-sm rounded-sm border border-stone-700/60 bg-stone-900 p-6">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
+          <div className="w-full max-w-sm rounded-sm border border-[#d4c5a9] bg-[#faf6f0] p-6">
             <div>
-              <h3 className="text-lg font-bold text-stone-100 mb-4">Edit Unit</h3>
+              <h3 className="text-lg font-bold text-[#2c2416] mb-4">Edit Unit</h3>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-xs text-stone-400 uppercase tracking-wider mb-1">Custom Name</label>
+                  <label className="block text-xs text-[#8b7355] uppercase tracking-wider mb-1">Custom Name</label>
                   <input
                     type="text"
                     value={editName}
                     onChange={(e) => setEditName(e.target.value)}
-                    className="w-full bg-stone-950 border border-stone-600 rounded-lg px-3 py-2 text-stone-100 text-sm focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full bg-[#f5efe6] border border-[#d4c5a9] rounded-lg px-3 py-2 text-[#2c2416] text-sm focus:border-[#b8860b]/40 focus:outline-none focus:ring-2 focus:ring-[#b8860b]/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-stone-400 uppercase tracking-wider mb-1">Points Cost</label>
+                  <label className="block text-xs text-[#8b7355] uppercase tracking-wider mb-1">Points Cost</label>
                   <input
                     type="number"
                     inputMode="numeric"
                     value={editPoints}
                     onChange={(e) => setEditPoints(Number(e.target.value))}
                     min="0"
-                    className="w-full bg-stone-950 border border-stone-600 rounded-lg px-3 py-2 text-stone-100 text-sm focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                    className="w-full bg-[#f5efe6] border border-[#d4c5a9] rounded-lg px-3 py-2 text-[#2c2416] text-sm focus:border-[#b8860b]/40 focus:outline-none focus:ring-2 focus:ring-[#b8860b]/20"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs text-stone-400 uppercase tracking-wider mb-1">Notes</label>
+                  <label className="block text-xs text-[#8b7355] uppercase tracking-wider mb-1">Notes</label>
                   <textarea
                     value={editNotes}
                     onChange={(e) => setEditNotes(e.target.value)}
                     rows={3}
                     placeholder="Battle notes, lore, etc."
-                    className="w-full bg-stone-950 border border-stone-600 rounded-lg px-3 py-2 text-stone-100 text-sm focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 resize-none"
+                    className="w-full bg-[#f5efe6] border border-[#d4c5a9] rounded-lg px-3 py-2 text-[#2c2416] text-sm focus:border-[#b8860b]/40 focus:outline-none focus:ring-2 focus:ring-[#b8860b]/20 resize-none"
                   />
                 </div>
               </div>
@@ -793,13 +690,13 @@ export default function UnitDetail() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => setIsEditing(false)}
-                  className="flex-1 px-4 py-2 rounded-lg border border-stone-700/60 bg-stone-900 text-stone-300 font-semibold hover:border-emerald-500/50 transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] font-semibold hover:border-[#b8860b] transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg bg-[#b8860b] hover:bg-[#d4a017] text-white font-semibold transition-all"
                 >
                   Save
                 </button>
@@ -811,16 +708,16 @@ export default function UnitDetail() {
 
       {/* Enhancement Picker Modal */}
       {showEnhancementPicker && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
-          <div className="w-full max-w-sm rounded-sm border border-stone-700/60 bg-stone-900 p-6 max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
+          <div className="w-full max-w-sm rounded-sm border border-[#d4c5a9] bg-[#faf6f0] p-6 max-h-[80vh] overflow-y-auto">
             <div>
               <div className="flex justify-center mb-4">
                 <Sparkles className="w-12 h-12 text-purple-400" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-bold text-stone-100 text-center mb-2">
+              <h3 className="text-lg font-bold text-[#2c2416] text-center mb-2">
                 Assign Enhancement
               </h3>
-              <p className="text-sm text-stone-400 text-center mb-4">
+              <p className="text-sm text-[#8b7355] text-center mb-4">
                 Select an enhancement from your detachment
               </p>
 
@@ -829,13 +726,13 @@ export default function UnitDetail() {
                   <button
                     key={idx}
                     onClick={() => handleAssignEnhancement(enh)}
-                    className="w-full text-left rounded-sm border border-stone-700/60 bg-stone-900 p-3 hover:border-emerald-500/50 transition-all"
+                    className="w-full text-left rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3 hover:border-[#b8860b] transition-all"
                   >
                     <div className="flex items-start justify-between gap-2 mb-1">
-                      <h4 className="text-sm font-semibold text-purple-300">{enh.name}</h4>
-                      <span className="text-xs font-bold text-purple-400 font-mono flex-shrink-0">{enh.cost} pts</span>
+                      <h4 className="text-sm font-semibold text-purple-600">{enh.name}</h4>
+                      <span className="text-xs font-bold text-purple-500 font-mono flex-shrink-0">{enh.cost} pts</span>
                     </div>
-                    <p className="text-[10px] text-stone-400 mb-1">{enh.detachment}</p>
+                    <p className="text-[10px] text-[#8b7355] mb-1">{enh.detachment}</p>
                     <FormattedRuleText text={enh.text} className="text-xs" />
                   </button>
                 ))}
@@ -843,7 +740,7 @@ export default function UnitDetail() {
 
               <button
                 onClick={() => setShowEnhancementPicker(false)}
-                className="w-full mt-4 px-4 py-2 rounded-lg border border-stone-700/60 bg-stone-900 text-stone-300 font-semibold hover:border-emerald-500/50 transition-all"
+                className="w-full mt-4 px-4 py-2 rounded-lg border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] font-semibold hover:border-[#b8860b] transition-all"
               >
                 Cancel
               </button>
@@ -854,32 +751,32 @@ export default function UnitDetail() {
 
       {/* Award XP Modal */}
       {showSpendXP && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
-          <div className="w-full max-w-sm rounded-sm border border-stone-700/60 bg-stone-900 p-6">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
+          <div className="w-full max-w-sm rounded-sm border border-[#d4c5a9] bg-[#faf6f0] p-6">
             <div>
               <div className="flex justify-center mb-4">
-                <Star className="w-12 h-12 text-emerald-500" strokeWidth={1.5} />
+                <Star className="w-12 h-12 text-[#b8860b]" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-bold text-stone-100 text-center mb-2">
+              <h3 className="text-lg font-bold text-[#2c2416] text-center mb-2">
                 Award Experience
               </h3>
-              <p className="text-sm text-stone-400 text-center mb-4">
-                Current XP: <span className="text-emerald-400 font-mono">{unit.experience_points}</span> &middot; Rank: <span className={rankColor}>{rank}</span>
+              <p className="text-sm text-[#8b7355] text-center mb-4">
+                Current XP: <span className="text-[#b8860b] font-mono">{unit.experience_points}</span>
               </p>
 
               <div className="flex items-center justify-center gap-4 mb-6">
                 <button
                   onClick={() => setXpAmount(Math.max(1, xpAmount - 1))}
-                  className="w-11 h-11 rounded-lg border border-emerald-500/30 bg-stone-950 text-emerald-400 font-bold text-lg hover:bg-stone-900 transition-colors"
+                  className="w-11 h-11 rounded-lg border border-[#b8860b]/30 bg-[#f5efe6] text-[#b8860b] font-bold text-lg hover:bg-[#e8dcc8] transition-colors"
                 >
                   -
                 </button>
-                <div className="text-3xl font-bold text-emerald-400 font-mono w-16 text-center">
+                <div className="text-3xl font-bold text-[#b8860b] font-mono w-16 text-center">
                   {xpAmount}
                 </div>
                 <button
                   onClick={() => setXpAmount(xpAmount + 1)}
-                  className="w-11 h-11 rounded-lg border border-emerald-500/30 bg-stone-950 text-emerald-400 font-bold text-lg hover:bg-stone-900 transition-colors"
+                  className="w-11 h-11 rounded-lg border border-[#b8860b]/30 bg-[#f5efe6] text-[#b8860b] font-bold text-lg hover:bg-[#e8dcc8] transition-colors"
                 >
                   +
                 </button>
@@ -888,13 +785,13 @@ export default function UnitDetail() {
               <div className="flex gap-3">
                 <button
                   onClick={() => { setShowSpendXP(false); setXpAmount(1); }}
-                  className="flex-1 px-4 py-2 rounded-lg border border-stone-700/60 bg-stone-900 text-stone-300 font-semibold hover:border-emerald-500/50 transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] font-semibold hover:border-[#b8860b] transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSpendXP}
-                  className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-black font-semibold transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg bg-[#b8860b] hover:bg-[#d4a017] text-white font-semibold transition-all"
                 >
                   Award +{xpAmount} XP
                 </button>
@@ -906,22 +803,22 @@ export default function UnitDetail() {
 
       {/* Destroy Confirmation Modal */}
       {showDestroyConfirm && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
-          <div className="w-full max-w-sm rounded-sm border border-stone-700/60 bg-stone-900 p-6">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
+          <div className="w-full max-w-sm rounded-sm border border-[#d4c5a9] bg-[#faf6f0] p-6">
             <div>
               <div className="flex justify-center mb-4">
                 <Skull className="w-12 h-12 text-red-500" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-bold text-stone-100 text-center mb-2">
+              <h3 className="text-lg font-bold text-[#2c2416] text-center mb-2">
                 Mark as Destroyed?
               </h3>
-              <p className="text-sm text-stone-400 text-center mb-6">
-                This unit will be marked as destroyed but remain in your roster for record keeping.
+              <p className="text-sm text-[#8b7355] text-center mb-6">
+                This unit will be marked as destroyed but remain in your army for record keeping.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDestroyConfirm(false)}
-                  className="flex-1 px-4 py-2 rounded-lg border border-stone-700/60 bg-stone-900 text-stone-300 font-semibold hover:border-emerald-500/50 transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] font-semibold hover:border-[#b8860b] transition-all"
                 >
                   Cancel
                 </button>
@@ -939,22 +836,22 @@ export default function UnitDetail() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
-          <div className="w-full max-w-sm rounded-sm border border-stone-700/60 bg-stone-900 p-6">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-6" role="dialog" aria-modal="true">
+          <div className="w-full max-w-sm rounded-sm border border-[#d4c5a9] bg-[#faf6f0] p-6">
             <div>
               <div className="flex justify-center mb-4">
                 <Trash2 className="w-12 h-12 text-red-500" strokeWidth={1.5} />
               </div>
-              <h3 className="text-lg font-bold text-stone-100 text-center mb-2">
-                Remove from Roster?
+              <h3 className="text-lg font-bold text-[#2c2416] text-center mb-2">
+                Remove from Army?
               </h3>
-              <p className="text-sm text-stone-400 text-center mb-6">
-                This will permanently remove this unit from your roster. This action cannot be undone.
+              <p className="text-sm text-[#8b7355] text-center mb-6">
+                This will permanently remove this unit from your army. This action cannot be undone.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 px-4 py-2 rounded-lg border border-stone-700/60 bg-stone-900 text-stone-300 font-semibold hover:border-emerald-500/50 transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] font-semibold hover:border-[#b8860b] transition-all"
                 >
                   Cancel
                 </button>

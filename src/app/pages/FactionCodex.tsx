@@ -6,15 +6,6 @@ import { getFaction, getDataFactionId } from '../../lib/factions';
 import { FormattedRuleText, toTitleCase, getStratagemTypeColor, getEnhancementCardColors } from '../../lib/formatText';
 import type { FactionId, DetachmentData, Datasheet } from '../../types';
 
-// Determine animation type based on faction id
-function getAnimationType(factionId: string): string | null {
-  if (factionId.includes('blood') || factionId === 'world_eaters') return 'blood';
-  if (factionId === 'death_guard') return 'plague';
-  if (factionId === 'thousand_sons' || factionId === 'grey_knights' || factionId === 'space_wolves') return 'frost';
-  if (factionId === 'necrons') return 'dust';
-  return null;
-}
-
 // Determine accent color class based on faction color
 function getAccentColor(color: string): string {
   const map: Record<string, string> = {
@@ -25,166 +16,8 @@ function getAccentColor(color: string): string {
     stone: 'bg-stone-400', emerald: 'bg-emerald-400', violet: 'bg-violet-400',
     sky: 'bg-sky-500', indigo: 'bg-indigo-400',
   };
-  return map[color] ?? 'bg-emerald-500';
+  return map[color] ?? 'bg-[#b8860b]';
 }
-
-// Helper to generate an array of random numbers once
-function generateRandomValues(count: number, fieldsPerItem: number): number[][] {
-  return Array.from({ length: count }, () =>
-    Array.from({ length: fieldsPerItem }, () => Math.random())
-  );
-}
-
-// Animation component for particle effects
-const AnimatedBackground = React.memo(function AnimatedBackground({ type }: { type: string }) {
-  const randoms = useMemo(() => {
-    if (type === "blood") return { particles: generateRandomValues(12, 4) };
-    if (type === "plague") return { particles: generateRandomValues(8, 5) };
-    if (type === "frost") return { crystals: generateRandomValues(20, 5), lines: generateRandomValues(6, 5) };
-    if (type === "dust") return { particles: generateRandomValues(30, 5), clouds: generateRandomValues(5, 5) };
-    return {};
-  }, [type]);
-
-  if (type === "blood") {
-    return (
-      <>
-        {randoms.particles!.map((r, i) => (
-          <div
-            key={i}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${r[0] * 100}%`,
-              top: `${-20 + r[1] * 20}%`,
-              animation: `bloodDrip ${8 + r[2] * 8}s linear infinite`,
-              animationDelay: `${r[3] * 8}s`,
-            }}
-          >
-            <div className="w-1 h-3 bg-red-500/30 rounded-full blur-sm" />
-          </div>
-        ))}
-      </>
-    );
-  }
-
-  if (type === "plague") {
-    return (
-      <>
-        {randoms.particles!.map((r, i) => (
-          <div
-            key={i}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${r[0] * 100}%`,
-              bottom: `${-10 + r[1] * 20}%`,
-              animation: `plagueFog ${15 + r[2] * 10}s ease-in-out infinite`,
-              animationDelay: `${r[3] * 10}s`,
-            }}
-          >
-            <div
-              className="bg-gradient-to-t from-green-500/20 via-green-400/10 to-transparent rounded-full blur-2xl"
-              style={{
-                width: `${150 + r[4] * 150}px`,
-                height: `${200 + r[0] * 200}px`,
-              }}
-            />
-          </div>
-        ))}
-      </>
-    );
-  }
-
-  if (type === "frost") {
-    return (
-      <>
-        {randoms.crystals!.map((r, i) => (
-          <div
-            key={i}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${r[0] * 100}%`,
-              top: `${r[1] * 100}%`,
-              animation: `frostPulse ${3 + r[2] * 4}s ease-in-out infinite`,
-              animationDelay: `${r[3] * 4}s`,
-            }}
-          >
-            <div
-              className="bg-blue-400/20 rounded-full blur-md"
-              style={{
-                width: `${10 + r[4] * 20}px`,
-                height: `${10 + r[4] * 20}px`,
-              }}
-            />
-          </div>
-        ))}
-        {randoms.lines!.map((r, i) => (
-          <div
-            key={`line-${i}`}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${r[0] * 100}%`,
-              top: `${r[1] * 100}%`,
-              width: "2px",
-              height: `${30 + r[2] * 50}px`,
-              background: "linear-gradient(180deg, rgba(96,165,250,0.3) 0%, transparent 100%)",
-              animation: `frostLine ${2 + r[3] * 3}s ease-in-out infinite`,
-              animationDelay: `${r[4] * 3}s`,
-              transform: `rotate(${r[0] * 360}deg)`,
-            }}
-          />
-        ))}
-      </>
-    );
-  }
-
-  if (type === "dust") {
-    return (
-      <>
-        {randoms.particles!.map((r, i) => (
-          <div
-            key={i}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${-10 + r[0] * 120}%`,
-              top: `${r[1] * 100}%`,
-              animation: `dustStorm ${10 + r[2] * 15}s linear infinite`,
-              animationDelay: `${r[3] * 10}s`,
-            }}
-          >
-            <div
-              className="bg-yellow-700/20 rounded-full blur-sm"
-              style={{
-                width: `${3 + r[4] * 8}px`,
-                height: `${3 + r[4] * 8}px`,
-              }}
-            />
-          </div>
-        ))}
-        {randoms.clouds!.map((r, i) => (
-          <div
-            key={`cloud-${i}`}
-            className="absolute pointer-events-none"
-            style={{
-              left: `${r[0] * 100}%`,
-              top: `${r[1] * 100}%`,
-              animation: `dustCloud ${20 + r[2] * 15}s ease-in-out infinite`,
-              animationDelay: `${r[3] * 15}s`,
-            }}
-          >
-            <div
-              className="bg-gradient-to-r from-transparent via-amber-700/10 to-transparent rounded-full blur-2xl"
-              style={{
-                width: `${200 + r[4] * 200}px`,
-                height: `${100 + r[0] * 100}px`,
-              }}
-            />
-          </div>
-        ))}
-      </>
-    );
-  }
-
-  return null;
-});
 
 export default function FactionCodex() {
   const { factionId } = useParams();
@@ -203,19 +36,19 @@ export default function FactionCodex() {
 
   if (!factionMeta) {
     return (
-      <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden">
+      <div className="min-h-screen bg-[#faf6f0] flex flex-col p-6 relative overflow-hidden">
         <div className="relative z-10 w-full max-w-md mx-auto">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-stone-400 hover:text-emerald-500 transition-colors mb-6"
+            className="flex items-center gap-2 text-[#8b7355] hover:text-[#b8860b] transition-colors mb-6"
           >
             <ArrowLeft className="w-5 h-5" />
             <span className="text-sm">Back</span>
           </button>
 
           <div className="text-center">
-            <BookOpen className="w-16 h-16 text-stone-500 mx-auto mb-4" strokeWidth={1.5} />
-            <h1 className="text-xl font-bold text-stone-400 mb-2">
+            <BookOpen className="w-16 h-16 text-[#8b7355] mx-auto mb-4" strokeWidth={1.5} />
+            <h1 className="text-xl font-bold text-[#8b7355] mb-2">
               Codex Not Found
             </h1>
           </div>
@@ -224,7 +57,6 @@ export default function FactionCodex() {
     );
   }
 
-  const animationType = getAnimationType(factionId!);
   const accentColor = getAccentColor(factionMeta.color);
   const enhColors = getEnhancementCardColors(factionMeta.color);
 
@@ -272,16 +104,13 @@ export default function FactionCodex() {
   }, [units, datasheetSearch]);
 
   return (
-    <div className="min-h-screen bg-black flex flex-col p-6 relative overflow-hidden pb-24">
-      {/* Animated Background Effects */}
-      {animationType && <AnimatedBackground type={animationType} />}
-
+    <div className="min-h-screen bg-[#faf6f0] flex flex-col p-6 relative overflow-hidden pb-24">
 
       <div className="relative z-10 w-full max-w-2xl mx-auto">
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-stone-400 hover:text-emerald-500 transition-colors mb-6"
+          className="flex items-center gap-2 text-[#8b7355] hover:text-[#b8860b] transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm">Back</span>
@@ -292,13 +121,13 @@ export default function FactionCodex() {
           <div className="flex items-center gap-3 mb-3">
             <div className="text-4xl">{factionMeta.icon}</div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-stone-100 tracking-wider drop-shadow-[0_0_10px_rgba(239,68,68,0.3)]">
+              <h1 className="text-3xl font-bold text-[#2c2416] tracking-wider">
                 {factionMeta.name}
               </h1>
-              <p className="text-stone-400 text-sm">Codex: {rules?.faction ?? factionMeta.name}</p>
+              <p className="text-[#8b7355] text-sm">Codex: {rules?.faction ?? factionMeta.name}</p>
             </div>
           </div>
-          <div className={`h-1 w-full ${accentColor} rounded-full shadow-[0_0_10px_rgba(239,68,68,0.4)]`} />
+          <div className={`h-1 w-full ${accentColor} rounded-full`} />
         </div>
 
         {/* Tabs */}
@@ -307,8 +136,8 @@ export default function FactionCodex() {
             onClick={() => setActiveTab("army")}
             className={`px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
               activeTab === "army"
-                ? "bg-gradient-to-r from-red-600 to-red-500 text-black"
-                : "border border-stone-700/60 bg-stone-900 text-stone-300 hover:border-emerald-500/50"
+                ? "bg-gradient-to-r from-[#b8860b] to-[#d4a017] text-white"
+                : "border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] hover:border-[#b8860b]"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -320,8 +149,8 @@ export default function FactionCodex() {
             onClick={() => setActiveTab("detachments")}
             className={`px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
               activeTab === "detachments"
-                ? "bg-gradient-to-r from-red-600 to-red-500 text-black"
-                : "border border-stone-700/60 bg-stone-900 text-stone-300 hover:border-emerald-500/50"
+                ? "bg-gradient-to-r from-[#b8860b] to-[#d4a017] text-white"
+                : "border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] hover:border-[#b8860b]"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -333,8 +162,8 @@ export default function FactionCodex() {
             onClick={() => setActiveTab("datasheets")}
             className={`px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
               activeTab === "datasheets"
-                ? "bg-gradient-to-r from-red-600 to-red-500 text-black"
-                : "border border-stone-700/60 bg-stone-900 text-stone-300 hover:border-emerald-500/50"
+                ? "bg-gradient-to-r from-[#b8860b] to-[#d4a017] text-white"
+                : "border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] hover:border-[#b8860b]"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -346,8 +175,8 @@ export default function FactionCodex() {
             onClick={() => setActiveTab("crusade")}
             className={`px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
               activeTab === "crusade"
-                ? "bg-gradient-to-r from-red-600 to-red-500 text-black"
-                : "border border-stone-700/60 bg-stone-900 text-stone-300 hover:border-emerald-500/50"
+                ? "bg-gradient-to-r from-[#b8860b] to-[#d4a017] text-white"
+                : "border border-[#d4c5a9] bg-[#f5efe6] text-[#5c4a32] hover:border-[#b8860b]"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -360,8 +189,8 @@ export default function FactionCodex() {
         {/* Army Rule Tab */}
         {activeTab === "army" && (
           <div className="space-y-4">
-            <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-6">
-                <h2 className="text-xl font-bold text-red-400 mb-4">Army Rules</h2>
+            <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-6">
+                <h2 className="text-xl font-bold text-[#b8860b] mb-4">Army Rules</h2>
                 {rules?.army_rules && rules.army_rules.length > 0 ? (
                   rules.army_rules.map((rule, idx) => (
                     <div key={idx} className="mb-4 last:mb-0">
@@ -369,7 +198,7 @@ export default function FactionCodex() {
                     </div>
                   ))
                 ) : (
-                  <p className="text-stone-400 italic">No army rules available for this faction.</p>
+                  <p className="text-[#8b7355] italic">No army rules available for this faction.</p>
                 )}
             </div>
           </div>
@@ -382,26 +211,26 @@ export default function FactionCodex() {
               rules.detachments.map((detachment: DetachmentData) => (
                 <div
                   key={detachment.name}
-                  className="rounded-sm border border-stone-700/60 bg-stone-900"
+                  className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6]"
                 >
                   {/* Detachment Header */}
                   <button
                     onClick={() => toggleDetachment(detachment.name)}
-                    className="w-full p-4 flex items-center justify-between hover:bg-red-500/5 transition-all"
+                    className="w-full p-4 flex items-center justify-between hover:bg-[#b8860b]/5 transition-all"
                   >
-                    <h2 className="text-lg font-bold text-stone-100">{detachment.name}</h2>
+                    <h2 className="text-lg font-bold text-[#2c2416]">{detachment.name}</h2>
                     {expandedDetachments.includes(detachment.name) ? (
-                      <ChevronDown className="w-5 h-5 text-red-500" />
+                      <ChevronDown className="w-5 h-5 text-[#b8860b]" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-red-500" />
+                      <ChevronRight className="w-5 h-5 text-[#b8860b]" />
                     )}
                   </button>
 
                   {expandedDetachments.includes(detachment.name) && (
-                    <div className="border-t border-red-500/10 p-4 space-y-4">
+                    <div className="border-t border-[#b8860b]/10 p-4 space-y-4">
                       {/* Detachment Rule */}
                       <div>
-                        <h3 className="text-sm font-semibold text-red-400 mb-2">{detachment.rule.name}</h3>
+                        <h3 className="text-sm font-semibold text-[#b8860b] mb-2">{detachment.rule.name}</h3>
                         <FormattedRuleText text={detachment.rule.text} />
                       </div>
 
@@ -412,13 +241,13 @@ export default function FactionCodex() {
                             onClick={() => toggleEnhancements(detachment.name)}
                             className="flex items-center justify-between w-full mb-2"
                           >
-                            <h3 className="text-sm font-semibold text-stone-300 uppercase tracking-wider">
+                            <h3 className="text-sm font-semibold text-[#5c4a32] uppercase tracking-wider">
                               Enhancements ({detachment.enhancements.length})
                             </h3>
                             {expandedEnhancements.includes(detachment.name) ? (
-                              <ChevronDown className="w-4 h-4 text-emerald-500" />
+                              <ChevronDown className="w-4 h-4 text-[#b8860b]" />
                             ) : (
-                              <ChevronRight className="w-4 h-4 text-emerald-500" />
+                              <ChevronRight className="w-4 h-4 text-[#b8860b]" />
                             )}
                           </button>
                           {expandedEnhancements.includes(detachment.name) && (
@@ -449,13 +278,13 @@ export default function FactionCodex() {
                             onClick={() => toggleStratagems(detachment.name)}
                             className="flex items-center justify-between w-full mb-2"
                           >
-                            <h3 className="text-sm font-semibold text-stone-300 uppercase tracking-wider">
+                            <h3 className="text-sm font-semibold text-[#5c4a32] uppercase tracking-wider">
                               Stratagems ({detachment.stratagems.length})
                             </h3>
                             {expandedStratagems.includes(detachment.name) ? (
-                              <ChevronDown className="w-4 h-4 text-emerald-500" />
+                              <ChevronDown className="w-4 h-4 text-[#b8860b]" />
                             ) : (
-                              <ChevronRight className="w-4 h-4 text-emerald-500" />
+                              <ChevronRight className="w-4 h-4 text-[#b8860b]" />
                             )}
                           </button>
                           {expandedStratagems.includes(detachment.name) && (
@@ -463,7 +292,7 @@ export default function FactionCodex() {
                               {detachment.stratagems.map((strat, idx) => (
                                 <div
                                   key={idx}
-                                  className="rounded-sm border border-stone-700/60 bg-stone-900 p-3"
+                                  className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-3"
                                 >
                                   <div className="flex items-start justify-between gap-3 mb-1">
                                     <div className="flex items-center gap-2">
@@ -476,18 +305,18 @@ export default function FactionCodex() {
                                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getStratagemTypeColor(strat.type)}`}>{strat.type}</span>
                                   </div>
                                   {strat.when && (
-                                    <div className="text-xs text-stone-400 leading-relaxed mb-1">
-                                      <span className="font-semibold text-stone-300">When: </span>{strat.when}
+                                    <div className="text-xs text-[#8b7355] leading-relaxed mb-1">
+                                      <span className="font-semibold text-[#5c4a32]">When: </span>{strat.when}
                                     </div>
                                   )}
                                   {strat.target && (
-                                    <div className="text-xs text-stone-400 leading-relaxed mb-1">
-                                      <span className="font-semibold text-stone-300">Target: </span>{strat.target}
+                                    <div className="text-xs text-[#8b7355] leading-relaxed mb-1">
+                                      <span className="font-semibold text-[#5c4a32]">Target: </span>{strat.target}
                                     </div>
                                   )}
                                   {strat.effect && (
-                                    <div className="text-xs text-stone-400 leading-relaxed">
-                                      <span className="font-semibold text-stone-300">Effect: </span>{strat.effect}
+                                    <div className="text-xs text-[#8b7355] leading-relaxed">
+                                      <span className="font-semibold text-[#5c4a32]">Effect: </span>{strat.effect}
                                     </div>
                                   )}
                                   {strat.restrictions && (
@@ -506,7 +335,7 @@ export default function FactionCodex() {
                 </div>
               ))
             ) : (
-              <div className="text-center py-8 text-stone-400 text-sm">
+              <div className="text-center py-8 text-[#8b7355] text-sm">
                 No detachments available for this faction.
               </div>
             )}
@@ -518,13 +347,13 @@ export default function FactionCodex() {
           <div className="space-y-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-emerald-500/50" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-[#b8860b]/50" />
               <input
                 type="text"
                 value={datasheetSearch}
                 onChange={(e) => setDatasheetSearch(e.target.value)}
                 placeholder="Search datasheets..."
-                className="w-full bg-stone-900 border border-stone-600 rounded-lg pl-11 pr-4 py-3 text-stone-100 placeholder:text-stone-500 focus:border-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 transition-all"
+                className="w-full bg-[#f5efe6] border border-[#d4c5a9] rounded-lg pl-11 pr-4 py-3 text-[#2c2416] placeholder:text-[#8b7355] focus:border-[#b8860b]/40 focus:outline-none focus:ring-2 focus:ring-[#b8860b]/20 transition-all"
               />
             </div>
 
@@ -534,12 +363,12 @@ export default function FactionCodex() {
                 <button
                   key={unit.name}
                   onClick={() => handleDatasheetClick(unit)}
-                  className="w-full rounded-sm border border-stone-700/60 bg-stone-900 hover:border-emerald-500/50 hover:bg-emerald-500/5 transition-all group"
+                  className="w-full rounded-sm border border-[#d4c5a9] bg-[#f5efe6] hover:border-[#b8860b] transition-all group"
                 >
                   <div className="p-3 flex items-center justify-between gap-3">
                     <div className="flex-1 text-left">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-sm font-semibold text-stone-100">
+                        <h3 className="text-sm font-semibold text-[#2c2416]">
                           {unit.name}
                         </h3>
                         {unit.legends && (
@@ -552,7 +381,7 @@ export default function FactionCodex() {
                         {unit.keywords.slice(0, 4).map((kw, kwIdx) => (
                           <span
                             key={kwIdx}
-                            className="px-1.5 py-0.5 rounded bg-stone-800/80 text-[10px] text-stone-400 border border-stone-700/50"
+                            className="px-1.5 py-0.5 rounded bg-[#e8dcc8] text-[10px] text-[#8b7355] border border-[#d4c5a9]/50"
                           >
                             {toTitleCase(kw)}
                           </span>
@@ -561,11 +390,11 @@ export default function FactionCodex() {
                     </div>
                     <div className="flex items-center gap-3">
                       {unit.points.length > 0 && (
-                        <span className="text-sm font-bold text-emerald-500 font-mono">
+                        <span className="text-sm font-bold text-[#b8860b] font-mono">
                           {unit.points[0].cost} pts
                         </span>
                       )}
-                      <ChevronRight className="w-4 h-4 text-stone-500 group-hover:text-emerald-500 transition-colors" />
+                      <ChevronRight className="w-4 h-4 text-[#8b7355] group-hover:text-[#b8860b] transition-colors" />
                     </div>
                   </div>
                 </button>
@@ -573,7 +402,7 @@ export default function FactionCodex() {
             </div>
 
             {filteredDatasheets.length === 0 && (
-              <div className="text-center py-8 text-stone-400 text-sm">
+              <div className="text-center py-8 text-[#8b7355] text-sm">
                 No datasheets found
               </div>
             )}
@@ -584,12 +413,12 @@ export default function FactionCodex() {
         {activeTab === "crusade" && (
           <div className="space-y-4">
             {rules?.crusade_rules && rules.crusade_rules.length > 0 ? (
-              <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-6">
-                <h2 className="text-xl font-bold text-amber-400 mb-4">Crusade Rules</h2>
+              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-6">
+                <h2 className="text-xl font-bold text-amber-600 mb-4">Crusade Rules</h2>
                 {rules.crusade_rules.map((cr, idx) => (
                   <div key={idx} className="mb-4 last:mb-0">
                     {cr.name && (
-                      <h3 className="text-base font-semibold text-stone-200 mb-2">{cr.name}</h3>
+                      <h3 className="text-base font-semibold text-[#2c2416] mb-2">{cr.name}</h3>
                     )}
                     {cr.text && (
                       <FormattedRuleText text={cr.text} />
@@ -598,9 +427,9 @@ export default function FactionCodex() {
                 ))}
               </div>
             ) : (
-              <div className="rounded-sm border border-stone-700/60 bg-stone-900 p-6">
+              <div className="rounded-sm border border-[#d4c5a9] bg-[#f5efe6] p-6">
                 <div className="text-center py-4">
-                  <p className="text-stone-400 italic">No crusade rules available for this faction.</p>
+                  <p className="text-[#8b7355] italic">No crusade rules available for this faction.</p>
                 </div>
               </div>
             )}
