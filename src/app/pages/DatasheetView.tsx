@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Shield, Zap } from "lucide-react";
+import { ArrowLeft, Plus, Shield, Zap, ScrollText } from "lucide-react";
 import { getUnitsForFaction } from '../../data';
 import { getFaction, getDataFactionId } from '../../lib/factions';
 import { useArmy } from '../../lib/ArmyContext';
+import { useCrusade } from '../../lib/CrusadeContext';
 import { toTitleCase, FormattedRuleText } from '../../lib/formatText';
 import type { FactionId, Datasheet } from '../../types';
 import WeaponStatTable from '../components/WeaponStatTable';
@@ -13,7 +14,9 @@ export default function DatasheetView() {
   const { factionId, datasheetName } = useParams<{ factionId: string; datasheetName: string }>();
   const navigate = useNavigate();
   const [showAddSuccess, setShowAddSuccess] = useState(false);
+  const [showAddCrusadeSuccess, setShowAddCrusadeSuccess] = useState(false);
   const { addUnit, mode } = useArmy();
+  const { campaign, addUnit: addCrusadeUnit } = useCrusade();
 
   const units = factionId ? getUnitsForFaction(getDataFactionId(factionId as FactionId)) : [];
   const datasheet: Datasheet | undefined = datasheetName
@@ -210,8 +213,8 @@ export default function DatasheetView() {
         )}
       </div>
 
-      {/* Add to Army Button */}
-      <div className="relative z-10 w-full max-w-2xl mx-auto mt-6">
+      {/* Add buttons */}
+      <div className="relative z-10 w-full max-w-2xl mx-auto mt-6 space-y-3">
         <button
           onClick={handleAddToArmy}
           disabled={showAddSuccess || !mode}
@@ -227,6 +230,35 @@ export default function DatasheetView() {
             <span className="flex items-center justify-center gap-2"><Plus className="w-5 h-5" />Add to Army</span>
           )}
         </button>
+
+        {campaign && (
+          <button
+            onClick={() => {
+              if (!datasheet) return;
+              const pointsCost = datasheet.points.length > 0 ? parseInt(datasheet.points[0].cost, 10) || 0 : 0;
+              const isCharacter = datasheet.keywords.includes('CHARACTER');
+              const isBattleline = datasheet.keywords.includes('BATTLELINE');
+              addCrusadeUnit({
+                datasheetName: datasheet.name,
+                customName: datasheet.name,
+                keywords: datasheet.keywords,
+                isCharacter,
+                isBattleline,
+                pointsCost,
+              });
+              setShowAddCrusadeSuccess(true);
+              toast.success(`${datasheet.name} added to Order of Battle`);
+              setTimeout(() => setShowAddCrusadeSuccess(false), 2000);
+            }}
+            disabled={showAddCrusadeSuccess}
+            className="w-full py-4 rounded-lg font-bold text-base border border-[var(--accent-gold)]/50 bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/20 transition-all disabled:opacity-50"
+          >
+            <span className="flex items-center justify-center gap-2">
+              <ScrollText className="w-5 h-5" />
+              {showAddCrusadeSuccess ? 'Added to Order of Battle' : `Add to Order of Battle (${campaign.name})`}
+            </span>
+          </button>
+        )}
       </div>
     </div>
   );
