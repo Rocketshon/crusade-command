@@ -4,7 +4,7 @@ import { ArrowLeft, Search, Plus, X, Users } from "lucide-react";
 import { toast } from "sonner";
 import { useArmy } from "../../lib/ArmyContext";
 import { getFactionName, getDataFactionId } from "../../lib/factions";
-import { getUnitsForFaction } from "../../data";
+import { getUnitsForFaction, searchUnits } from "../../data";
 import { toTitleCase } from "../../lib/formatText";
 import type { Datasheet, FactionId } from "../../types";
 import WeaponStatTable from "../components/WeaponStatTable";
@@ -33,7 +33,8 @@ export default function AddUnit() {
   const filteredUnits = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
     if (!q) return allFactionUnits;
-    return allFactionUnits.filter(unit => unit.name.toLowerCase().includes(q) || unit.keywords.some(kw => kw.toLowerCase().includes(q)));
+    // Search all factions when querying — supports adding allied units
+    return searchUnits(q);
   }, [allFactionUnits, searchQuery]);
 
   const factionName = factionId ? getFactionName(factionId) : 'Select a faction';
@@ -123,7 +124,12 @@ export default function AddUnit() {
                     <div className="p-4">
                       <div className="flex items-start justify-between gap-3 mb-2">
                         <div className="flex-1">
-                          <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-1 group-hover:text-[var(--accent-gold)] transition-colors">{unit.name}</h3>
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="text-sm font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent-gold)] transition-colors">{unit.name}</h3>
+                            {unit.faction_id !== getDataFactionId(factionId as FactionId) && (
+                              <span className="text-[10px] px-1.5 py-0.5 rounded border border-amber-400/40 text-amber-400 flex-shrink-0">Allied</span>
+                            )}
+                          </div>
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {displayKeywords.map((kw, kidx) => (
                               <span key={kidx} className="text-xs text-[var(--text-secondary)] bg-[#12121a] px-2 py-0.5 rounded">{toTitleCase(kw)}</span>

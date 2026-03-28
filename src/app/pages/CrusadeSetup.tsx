@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, ChevronRight, ChevronLeft, Shield, Swords, Skull } from 'lucide-react';
+import { ArrowLeft, ChevronRight, ChevronLeft, Shield, Swords, Skull, Search, X } from 'lucide-react';
 import { useCrusade } from '../../lib/CrusadeContext';
 import {
   CRUSADE_FACTIONS,
   SW_OATHSWORN_CAMPAIGNS,
   type CrusadeFaction,
 } from '../../data/crusadeRules';
+import { getRulesForFaction } from '../../data';
+import type { FactionId } from '../../types';
 
 // ============================================================
 // Step types
@@ -45,6 +47,77 @@ function mechanicColor(factionId: string): string {
     case 'astra_militarum':   return 'border-yellow-600/40 bg-yellow-600/10 text-yellow-400';
     default:                  return 'border-[var(--border-color)] text-[var(--text-secondary)]';
   }
+}
+
+// ============================================================
+// Detachment Step — extracted to avoid hooks-in-IIFE violation
+// ============================================================
+
+function DetachmentStep({
+  faction,
+  selectedDetachment,
+  onSelect,
+}: {
+  faction: CrusadeFaction;
+  selectedDetachment: string;
+  onSelect: (det: string) => void;
+}) {
+  const [detSearch, setDetSearch] = useState('');
+  const rulesData = getRulesForFaction(faction.id as FactionId);
+  const detachmentNames: string[] = rulesData?.detachments.map(d => d.name) ?? faction.detachments;
+  const filtered = detSearch.length >= 1
+    ? detachmentNames.filter(d => d.toLowerCase().includes(detSearch.toLowerCase()))
+    : detachmentNames;
+
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1 tracking-wider">Detachment</h1>
+      <p className="text-sm text-[var(--text-secondary)] mb-4">{faction.name} — choose your detachment</p>
+
+      {/* Search bar */}
+      <div className="relative mb-4">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+        <input
+          type="text"
+          value={detSearch}
+          onChange={e => setDetSearch(e.target.value)}
+          placeholder="Search detachments…"
+          className="w-full pl-9 pr-9 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-sm text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
+        />
+        {detSearch && (
+          <button onClick={() => setDetSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]">
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+
+      <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+        {filtered.map(det => (
+          <button
+            key={det}
+            onClick={() => onSelect(det)}
+            className={`w-full flex items-center gap-3 p-4 rounded-sm border transition-colors text-left ${
+              selectedDetachment === det
+                ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)]/10'
+                : 'border-[var(--border-color)] bg-[var(--bg-card)]'
+            }`}
+          >
+            <div className="flex-1">
+              <p className={`text-sm font-medium ${det.startsWith('⚠️') ? 'text-amber-400' : 'text-[var(--text-primary)]'}`}>
+                {det}
+              </p>
+            </div>
+            {selectedDetachment === det && (
+              <div className="w-4 h-4 rounded-full bg-[var(--accent-gold)] flex-shrink-0" />
+            )}
+          </button>
+        ))}
+        {filtered.length === 0 && (
+          <p className="text-sm text-[var(--text-secondary)] text-center py-4">No detachments match "{detSearch}"</p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 // ============================================================
@@ -159,32 +232,11 @@ export default function CrusadeSetup() {
 
         {/* Step: Detachment */}
         {step === 'detachment' && selectedFaction && (
-          <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1 tracking-wider">Detachment</h1>
-            <p className="text-sm text-[var(--text-secondary)] mb-6">{selectedFaction.name} — choose your detachment</p>
-            <div className="space-y-2">
-              {selectedFaction.detachments.map(det => (
-                <button
-                  key={det}
-                  onClick={() => setSelectedDetachment(det)}
-                  className={`w-full flex items-center gap-3 p-4 rounded-sm border transition-colors text-left ${
-                    selectedDetachment === det
-                      ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)]/10'
-                      : 'border-[var(--border-color)] bg-[var(--bg-card)]'
-                  }`}
-                >
-                  <div className="flex-1">
-                    <p className={`text-sm font-medium ${det.startsWith('⚠️') ? 'text-amber-400' : 'text-[var(--text-primary)]'}`}>
-                      {det}
-                    </p>
-                  </div>
-                  {selectedDetachment === det && (
-                    <div className="w-4 h-4 rounded-full bg-[var(--accent-gold)] flex-shrink-0" />
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
+          <DetachmentStep
+            faction={selectedFaction}
+            selectedDetachment={selectedDetachment}
+            onSelect={setSelectedDetachment}
+          />
         )}
 
         {/* Step: Supply & RP */}

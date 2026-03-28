@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import {
   ArrowLeft,
@@ -10,10 +10,13 @@ import {
   Star,
   AlertTriangle,
   X,
+  Check,
 } from 'lucide-react';
 import { useCrusade } from '../../lib/CrusadeContext';
 import { type CrusadeUnit } from '../../lib/CrusadeContext';
 import { getRank, getHonourSlots, getXPProgress } from '../../data/crusadeRules';
+import { searchUnits } from '../../data';
+import type { Datasheet } from '../../types';
 
 // ============================================================
 // XP Progress bar
@@ -104,129 +107,190 @@ function UnitCard({ unit, onClick }: { unit: CrusadeUnit; onClick: () => void })
 }
 
 // ============================================================
-// Add Unit Modal
+// Add Unit Modal — searchable codex with pre-filled data
 // ============================================================
 
-function AddUnitModal({ onClose }: { onClose: () => void }) {
+function AddUnitModal({ onClose, factionId }: { onClose: () => void; factionId: string }) {
   const { addUnit } = useCrusade();
-  const navigate = useNavigate();
+  const searchRef = useRef<HTMLInputElement>(null);
 
-  const [name, setName] = useState('');
+  const [query, setQuery] = useState('');
+  const [selected, setSelected] = useState<Datasheet | null>(null);
   const [customName, setCustomName] = useState('');
-  const [pts, setPts] = useState('');
-  const [isChar, setIsChar] = useState(false);
-  const [isBattleline, setIsBattleline] = useState(false);
-  const [keywordsRaw, setKeywordsRaw] = useState('');
+  const [pointsOverride, setPointsOverride] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
 
-  const canSubmit = name.trim().length > 0 && Number(pts) >= 0;
+  useEffect(() => { searchRef.current?.focus(); }, []);
+
+  // Search all factions (supports allied units); "Allied" badge shown for non-primary faction
+  const results = query.length >= 2
+    ? searchUnits(query).slice(0, 8)
+    : [];
+
+  const handleSelect = (unit: Datasheet) => {
+    setSelected(unit);
+    setQuery(unit.name);
+    setCustomName('');
+    const pts = unit.points.length > 0 ? unit.points[0].cost : '0';
+    setPointsOverride(pts);
+    setShowDropdown(false);
+  };
+
+  const handleClear = () => {
+    setSelected(null);
+    setQuery('');
+    setCustomName('');
+    setPointsOverride('');
+    setShowDropdown(false);
+    searchRef.current?.focus();
+  };
 
   const handleAdd = () => {
+    if (!selected) return;
     addUnit({
-      datasheetName: name.trim(),
-      customName: customName.trim() || name.trim(),
-      keywords: keywordsRaw
-        .split(',')
-        .map(k => k.trim().toUpperCase())
-        .filter(Boolean),
-      isCharacter: isChar,
-      isBattleline,
-      pointsCost: Number(pts) || 0,
+      datasheetName: selected.name,
+      customName: customName.trim() || selected.name,
+      keywords: selected.keywords,
+      isCharacter: selected.keywords.includes('CHARACTER'),
+      isBattleline: selected.keywords.includes('BATTLELINE'),
+      pointsCost: parseInt(pointsOverride, 10) || 0,
     });
     onClose();
   };
 
-  const handleAddFromCodex = () => {
-    onClose();
-    navigate('/codex');
-  };
-
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-end">
-      <div className="w-full bg-[var(--bg-primary)] rounded-t-xl border-t border-[var(--border-color)] p-5 max-h-[80vh] overflow-y-auto">
+      <div className="w-full bg-[var(--bg-primary)] rounded-t-xl border-t border-[var(--border-color)] p-5 max-h-[85vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-bold text-[var(--text-primary)]">Add Unit to Order of Battle</h2>
+          <h2 className="text-base font-bold text-[var(--text-primary)]">Add Unit</h2>
           <button onClick={onClose} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="space-y-3">
-          <div>
-            <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Datasheet Name *</label>
-            <input
-              type="text"
-              value={name}
-              onChange={e => setName(e.target.value)}
-              placeholder="e.g. Wolf Guard Battle Leader"
-              className="mt-1 w-full px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Custom Name</label>
-            <input
-              type="text"
-              value={customName}
-              onChange={e => setCustomName(e.target.value)}
-              placeholder="Optional — name your warrior"
-              className="mt-1 w-full px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Points Cost</label>
-            <input
-              type="number"
-              value={pts}
-              onChange={e => setPts(e.target.value)}
-              placeholder="0"
-              min={0}
-              className="mt-1 w-full px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
-            />
-          </div>
-          <div>
-            <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Keywords (comma-separated)</label>
-            <input
-              type="text"
-              value={keywordsRaw}
-              onChange={e => setKeywordsRaw(e.target.value)}
-              placeholder="INFANTRY, SPACE WOLVES, CORE"
-              className="mt-1 w-full px-3 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
-            />
-          </div>
+        {/* Search */}
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+          <input
+            ref={searchRef}
+            type="text"
+            value={query}
+            onChange={e => { setQuery(e.target.value); setSelected(null); setShowDropdown(true); }}
+            onFocus={() => setShowDropdown(true)}
+            placeholder="Search any unit (e.g. Grey Hunters, Rhino…)"
+            className="w-full pl-9 pr-9 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
+          />
+          {query.length > 0 && (
+            <button onClick={handleClear} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+              <X className="w-4 h-4" />
+            </button>
+          )}
 
-          {/* Toggles */}
-          <div className="flex gap-3">
-            {[
-              { label: 'Character', val: isChar, set: setIsChar },
-              { label: 'Battleline', val: isBattleline, set: setIsBattleline },
-            ].map(({ label, val, set }) => (
-              <button
-                key={label}
-                onClick={() => set(!val)}
-                className={`flex-1 py-2 text-sm rounded border transition-colors ${
-                  val
-                    ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-[var(--accent-gold)]'
-                    : 'border-[var(--border-color)] text-[var(--text-secondary)]'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          {/* Dropdown results */}
+          {showDropdown && results.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded shadow-xl z-10 max-h-52 overflow-y-auto">
+              {results.map(u => (
+                <button
+                  key={`${u.faction_id}-${u.name}`}
+                  onMouseDown={() => handleSelect(u)}
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[var(--accent-gold)]/10 transition-colors border-b border-[var(--border-color)] last:border-0"
+                >
+                  <div>
+                    <p className="text-sm text-[var(--text-primary)]">{u.name}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">
+                      {u.faction}
+                      {u.keywords.includes('CHARACTER') && ' · Character'}
+                      {u.keywords.includes('BATTLELINE') && ' · Battleline'}
+                      {u.points.length > 0 && ` · ${u.points[0].cost} pts`}
+                    </p>
+                  </div>
+                  {u.faction_id !== factionId && (
+                    <span className="text-xs text-amber-400 flex-shrink-0 ml-2">Allied</span>
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+          {showDropdown && query.length >= 2 && results.length === 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded px-3 py-2.5 text-sm text-[var(--text-secondary)] z-10">
+              No units found — try a different name
+            </div>
+          )}
         </div>
 
-        <div className="flex gap-3 mt-5">
-          <button
-            onClick={handleAddFromCodex}
-            className="flex-1 py-2.5 text-sm border border-[var(--border-color)] text-[var(--text-secondary)] rounded hover:text-[var(--text-primary)] transition-colors"
-          >
-            Browse Codex
+        {/* Selected unit details */}
+        {selected && (
+          <div className="rounded border border-[var(--accent-gold)]/30 bg-[var(--accent-gold)]/5 p-3 mb-4">
+            <div className="flex items-start justify-between gap-2 mb-2">
+              <div>
+                <p className="text-sm font-semibold text-[var(--text-primary)]">{selected.name}</p>
+                <p className="text-xs text-[var(--text-secondary)]">{selected.faction}</p>
+              </div>
+              <Check className="w-4 h-4 text-[var(--accent-gold)] flex-shrink-0 mt-0.5" />
+            </div>
+            <div className="flex flex-wrap gap-1">
+              {selected.keywords.slice(0, 5).map(k => (
+                <span key={k} className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--border-color)] text-[var(--text-secondary)]">{k}</span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Points + custom name (shown after selection) */}
+        {selected && (
+          <div className="space-y-3 mb-4">
+            <div>
+              <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Points Cost</label>
+              <div className="flex gap-2 mt-1">
+                <input
+                  type="number"
+                  value={pointsOverride}
+                  onChange={e => setPointsOverride(e.target.value)}
+                  min={0}
+                  className="flex-1 px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
+                />
+                {selected.points.length > 1 && (
+                  <div className="flex gap-1">
+                    {selected.points.map(p => (
+                      <button
+                        key={p.models}
+                        onClick={() => setPointsOverride(p.cost)}
+                        className={`px-2 py-1 text-xs rounded border transition-colors ${
+                          pointsOverride === p.cost
+                            ? 'border-[var(--accent-gold)] text-[var(--accent-gold)]'
+                            : 'border-[var(--border-color)] text-[var(--text-secondary)]'
+                        }`}
+                      >
+                        {p.models}m
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div>
+              <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Custom Name <span className="normal-case text-[var(--text-secondary)]">(optional)</span></label>
+              <input
+                type="text"
+                value={customName}
+                onChange={e => setCustomName(e.target.value)}
+                placeholder={selected.name}
+                className="mt-1 w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
+              />
+            </div>
+          </div>
+        )}
+
+        <div className="flex gap-3">
+          <button onClick={onClose} className="flex-1 py-2.5 text-sm border border-[var(--border-color)] text-[var(--text-secondary)] rounded">
+            Cancel
           </button>
           <button
             onClick={handleAdd}
-            disabled={!canSubmit}
+            disabled={!selected}
             className="flex-1 py-2.5 text-sm border border-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] font-semibold rounded hover:bg-[var(--accent-gold)]/20 transition-colors disabled:opacity-40"
           >
-            Add Unit
+            Add to Order of Battle
           </button>
         </div>
       </div>
@@ -370,7 +434,7 @@ export default function OrderOfBattle() {
         <Plus className="w-6 h-6" />
       </button>
 
-      {showAdd && <AddUnitModal onClose={() => setShowAdd(false)} />}
+      {showAdd && <AddUnitModal onClose={() => setShowAdd(false)} factionId={campaign.factionId} />}
     </div>
   );
 }
