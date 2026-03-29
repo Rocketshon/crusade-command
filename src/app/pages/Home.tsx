@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { Sword, ScrollText, Plus, X, Pencil, Check, Users, Settings } from 'lucide-react';
 import { toast } from 'sonner';
@@ -23,6 +23,11 @@ function ArmyListCard({
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(army.name);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const confirmDeleteTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (confirmDeleteTimer.current) clearTimeout(confirmDeleteTimer.current); };
+  }, []);
   const totalPoints = army.units.reduce((sum, u) => sum + u.points_cost, 0);
   const factionMeta = army.factionId ? FACTIONS.find(f => f.id === army.factionId) : null;
   const artSrc = army.factionId ? getFactionArt(army.factionId) : getArtPath('battle-scene.jpg');
@@ -55,7 +60,7 @@ function ArmyListCard({
               onDelete();
             } else {
               setConfirmDelete(true);
-              setTimeout(() => setConfirmDelete(false), 3000);
+              confirmDeleteTimer.current = setTimeout(() => setConfirmDelete(false), 3000);
             }
           }}
           className="absolute top-2 right-2 p-1 text-[var(--text-secondary)] hover:text-red-500 transition-colors"

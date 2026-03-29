@@ -179,7 +179,14 @@ export default function GameTracker() {
   const handleEndBattle = () => {
     const result = yourTotal > opponentTotal ? 'Victory' : yourTotal < opponentTotal ? 'Defeat' : 'Draw';
     // Save completed game to history
-    const history = JSON.parse(localStorage.getItem('warcaster_battle_history') ?? '[]');
+    let history: unknown[] = [];
+    try {
+      const raw = localStorage.getItem('warcaster_battle_history');
+      history = raw ? JSON.parse(raw) : [];
+      if (!Array.isArray(history)) history = [];
+    } catch {
+      history = [];
+    }
     history.push({
       id: crypto.randomUUID(),
       missionName: game.missionName || 'Unknown Mission',

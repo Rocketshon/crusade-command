@@ -311,7 +311,7 @@ function ItemCard({ item }: { item: CollectionItem }) {
                   onClick={() => updateStage(item.id, s)}
                   className={`px-2.5 py-1 rounded-full text-[11px] font-medium transition-all ${
                     item.stage === s
-                      ? 'ring-2 ring-offset-1 ring-offset-[#1a1a24]'
+                      ? 'ring-2 ring-offset-1 ring-offset-[var(--bg-card)]'
                       : idx <= stageIndex ? 'opacity-60' : 'opacity-40'
                   }`}
                   style={{
