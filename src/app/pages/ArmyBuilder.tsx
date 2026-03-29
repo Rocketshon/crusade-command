@@ -286,7 +286,7 @@ function AddUnitModal({ onClose, mode }: { onClose: () => void; mode: 'standard'
           <button onClick={onClose} className="text-[var(--text-secondary)]"><X className="w-5 h-5" /></button>
         </div>
 
-        <div className="relative mb-4">
+        <div className="relative mb-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
           <input
             type="text"
@@ -301,25 +301,24 @@ function AddUnitModal({ onClose, mode }: { onClose: () => void; mode: 'standard'
               <X className="w-4 h-4" />
             </button>
           )}
-
-          {showDropdown && results.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-[var(--bg-card)] border border-[var(--border-color)] rounded shadow-xl z-10 max-h-52 overflow-y-auto">
-              {results.map(u => (
-                <button key={`${u.faction_id}-${u.name}`} onMouseDown={() => handleSelect(u)}
-                  className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[var(--accent-gold)]/10 border-b border-[var(--border-color)] last:border-0">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm text-[var(--text-primary)]">{u.name}</p>
-                      {u.inCollection && <span className="text-[9px] px-1 py-0.5 rounded bg-[var(--accent-gold)]/20 text-[var(--accent-gold)]">Owned</span>}
-                    </div>
-                    <p className="text-xs text-[var(--text-secondary)]">{u.faction}</p>
-                  </div>
-                  {u.points[0] && <span className="text-xs text-[var(--accent-gold)]">{u.points[0].cost} pts</span>}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
+        {showDropdown && results.length > 0 && (
+          <div className="mb-3 bg-[var(--bg-card)] border border-[var(--border-color)] rounded shadow-xl max-h-52 overflow-y-auto">
+            {results.map(u => (
+              <button key={`${u.faction_id}-${u.name}`} onClick={() => handleSelect(u)}
+                className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[var(--accent-gold)]/10 border-b border-[var(--border-color)] last:border-0">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm text-[var(--text-primary)]">{u.name}</p>
+                    {u.inCollection && <span className="text-[9px] px-1 py-0.5 rounded bg-[var(--accent-gold)]/20 text-[var(--accent-gold)]">Owned</span>}
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)]">{u.faction}</p>
+                </div>
+                {u.points[0] && <span className="text-xs text-[var(--accent-gold)]">{u.points[0].cost} pts</span>}
+              </button>
+            ))}
+          </div>
+        )}
 
         {selected && (
           <div className="rounded border border-[var(--accent-gold)]/30 bg-[var(--accent-gold)]/5 p-3 mb-4">
