@@ -243,6 +243,7 @@ function AddUnitModal({ onClose, mode }: { onClose: () => void; mode: 'standard'
   const [customName, setCustomName] = useState('');
   const [pointsOverride, setPointsOverride] = useState('');
   const [wargearNotes, setWargearNotes] = useState('');
+  const [selectedWargear, setSelectedWargear] = useState<string[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
 
   // Search My Models first, fall back to all units
@@ -262,18 +263,27 @@ function AddUnitModal({ onClose, mode }: { onClose: () => void; mode: 'standard'
     setQuery(unit.name);
     setCustomName('');
     setPointsOverride(unit.points[0]?.cost ?? '0');
+    setSelectedWargear([]);
+    setWargearNotes('');
     setShowDropdown(false);
+  };
+
+  const toggleWargear = (opt: string) => {
+    setSelectedWargear(prev =>
+      prev.includes(opt) ? prev.filter(o => o !== opt) : [...prev, opt]
+    );
   };
 
   const handleAdd = () => {
     if (!selected) return;
+    const parts = [...selectedWargear, ...(wargearNotes.trim() ? [wargearNotes.trim()] : [])];
     addUnit({
       datasheetName: selected.name,
       customName: customName.trim(),
       pointsCost: parseInt(pointsOverride, 10) || 0,
       factionId: selected.faction_id,
       isCharacter: selected.keywords.includes('CHARACTER'),
-      wargearNotes: wargearNotes.trim(),
+      wargearNotes: parts.join(', '),
     });
     onClose();
   };
@@ -352,6 +362,26 @@ function AddUnitModal({ onClose, mode }: { onClose: () => void; mode: 'standard'
                 )}
               </div>
             </div>
+
+            {/* Wargear options — checkboxes from datasheet */}
+            {selected.wargear_options.length > 0 && (
+              <div>
+                <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Wargear Options</label>
+                <div className="mt-2 space-y-2">
+                  {selected.wargear_options.map((opt, i) => (
+                    <label key={i} className="flex items-start gap-2.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={selectedWargear.includes(opt)}
+                        onChange={() => toggleWargear(opt)}
+                        className="mt-0.5 flex-shrink-0 accent-[var(--accent-gold)]"
+                      />
+                      <span className="text-xs text-[var(--text-secondary)] leading-relaxed">{opt}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Custom name (always shown in crusade) */}
             {mode === 'crusade' && (
