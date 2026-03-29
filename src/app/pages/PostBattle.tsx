@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import {
-  ArrowLeft, Trophy, Skull, Minus, Plus, Check, Zap,
+  ArrowLeft, Trophy, Skull, Minus, Plus, Check, Zap, Dices,
 } from 'lucide-react';
 import { useArmy, type ArmyUnit } from '../../lib/ArmyContext';
+import { OFFICIAL_BATTLE_SCARS } from '../../data/crusadeRules';
 import { toast } from 'sonner';
 
 // ---------------------------------------------------------------------------
@@ -109,18 +110,111 @@ function UnitResultRow({
 }
 
 // ---------------------------------------------------------------------------
+// Out of Action test section
+// ---------------------------------------------------------------------------
+
+type OATOutcome = 'pass' | 'devastating_blow' | 'battle_scar' | null;
+
+interface OATState {
+  unitId: string;
+  roll: number | null; // d6 result
+  outcome: OATOutcome;
+  selectedScar: string | null; // id from OFFICIAL_BATTLE_SCARS
+}
+
+function OutOfActionSection({
+  destroyedUnits,
+  oatStates,
+  onRoll,
+  onChooseOutcome,
+  onChooseScar,
+}: {
+  destroyedUnits: ArmyUnit[];
+  oatStates: OATState[];
+  onRoll: (unitId: string) => void;
+  onChooseOutcome: (unitId: string, outcome: 'devastating_blow' | 'battle_scar') => void;
+  onChooseScar: (unitId: string, scarId: string) => void;
+}) {
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center gap-2 mb-1">
+        <Dices className="w-4 h-4 text-red-400" />
+        <p className="text-sm font-semibold text-[var(--text-primary)]">Out of Action Tests</p>
+      </div>
+      <p className="text-xs text-[var(--text-secondary)]">Roll D6 for each destroyed unit. On a 1: choose Devastating Blow or Battle Scar. On 2+: no effect.</p>
+      {destroyedUnits.map(unit => {
+        const state = oatStates.find(s => s.unitId === unit.id);
+        if (!state) return null;
+        return (
+          <div key={unit.id} className="bg-[var(--bg-card)] border border-red-500/30 rounded-lg p-3">
+            <p className="text-sm font-semibold text-[var(--text-primary)] mb-2">{unit.custom_name || unit.datasheet_name}</p>
+            {state.roll === null ? (
+              <button onClick={() => onRoll(unit.id)}
+                className="w-full py-2 text-xs rounded border border-red-500/40 bg-red-500/10 text-red-400 font-semibold flex items-center justify-center gap-1.5">
+                <Dices className="w-3.5 h-3.5" /> Roll D6
+              </button>
+            ) : (
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <div className={`w-8 h-8 rounded border-2 flex items-center justify-center font-bold text-sm ${state.roll === 1 ? 'border-red-500 text-red-400 bg-red-500/10' : 'border-green-500 text-green-400 bg-green-500/10'}`}>
+                    {state.roll}
+                  </div>
+                  <span className="text-xs text-[var(--text-secondary)]">{state.roll === 1 ? 'Failed — choose consequence' : 'Passed — no effect'}</span>
+                </div>
+                {state.roll === 1 && state.outcome === null && (
+                  <div className="flex gap-2">
+                    <button onClick={() => onChooseOutcome(unit.id, 'devastating_blow')}
+                      className="flex-1 py-2 text-xs rounded border border-amber-500/40 bg-amber-500/10 text-amber-400 font-semibold">
+                      Devastating Blow<br/><span className="font-normal">Lose a Battle Honour</span>
+                    </button>
+                    <button onClick={() => onChooseOutcome(unit.id, 'battle_scar')}
+                      className="flex-1 py-2 text-xs rounded border border-red-500/40 bg-red-500/10 text-red-400 font-semibold">
+                      Battle Scar<br/><span className="font-normal">Gain a Battle Scar</span>
+                    </button>
+                  </div>
+                )}
+                {state.roll === 1 && state.outcome === 'battle_scar' && state.selectedScar === null && (
+                  <div className="space-y-1.5 mt-1">
+                    <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Choose Battle Scar</p>
+                    {OFFICIAL_BATTLE_SCARS.filter(s => !unit.battle_scars.some(us => us.name === s.name)).map(scar => (
+                      <button key={scar.id} onClick={() => onChooseScar(unit.id, scar.id)}
+                        className="w-full text-left px-3 py-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] hover:border-red-500/40 transition-colors">
+                        <p className="text-xs font-semibold text-red-300">{scar.name}</p>
+                        <p className="text-[10px] text-[var(--text-secondary)]">{scar.effect}</p>
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {state.roll === 1 && state.outcome !== null && (state.outcome !== 'battle_scar' || state.selectedScar !== null) && (
+                  <div className="flex items-center gap-1.5 text-xs text-green-400">
+                    <Check className="w-3 h-3" />
+                    {state.outcome === 'devastating_blow' ? 'Devastating Blow noted' : `Battle Scar: ${OFFICIAL_BATTLE_SCARS.find(s => s.id === state.selectedScar)?.name}`}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
 
 export default function PostBattle() {
   const navigate = useNavigate();
-  const { army, crusade, recordBattle } = useArmy();
+  const { army, crusade, recordBattle, addBattleScar, removeBattleHonour } = useArmy();
 
   const [battleResult, setBattleResult] = useState<BattleResult>('win');
   const [opponent, setOpponent] = useState('');
   const [missionName, setMissionName] = useState('');
   const [rpGained, setRpGained] = useState(1);
   const [mfgUnitId, setMfgUnitId] = useState<string | null>(null);
+  const [phase, setPhase] = useState<'battle' | 'oat'>('battle');
+  const [oatStates, setOatStates] = useState<OATState[]>([]);
 
   // Only living (non-destroyed) units can be in the post-battle flow
   const activeUnits = army.filter(u => !u.is_destroyed);
@@ -152,6 +246,12 @@ export default function PostBattle() {
     setUnitResults(prev => prev.map(r => r.unitId === unitId ? { ...r, ...updates } : r));
   };
 
+  // Destroyed units = those that survived:false in results
+  const destroyedUnits = activeUnits.filter(u => {
+    const r = unitResults.find(rr => rr.unitId === u.id);
+    return r && !r.survived;
+  });
+
   const handleSave = () => {
     recordBattle({
       result: battleResult,
@@ -164,8 +264,72 @@ export default function PostBattle() {
       })),
     });
     toast.success('Battle recorded!');
-    navigate('/army');
+    if (destroyedUnits.length > 0) {
+      // Proceed to Out of Action tests
+      setOatStates(destroyedUnits.map(u => ({ unitId: u.id, roll: null, outcome: null, selectedScar: null })));
+      setPhase('oat');
+    } else {
+      navigate('/army');
+    }
   };
+
+  const handleOATRoll = (unitId: string) => {
+    const roll = Math.ceil(Math.random() * 6);
+    setOatStates(prev => prev.map(s => s.unitId === unitId ? { ...s, roll, outcome: roll === 1 ? null : 'pass' } : s));
+  };
+
+  const handleOATOutcome = (unitId: string, outcome: 'devastating_blow' | 'battle_scar') => {
+    if (outcome === 'devastating_blow') {
+      // Remove the last battle honour if any
+      const unit = army.find(u => u.id === unitId);
+      if (unit && unit.battle_honours.length > 0) {
+        removeBattleHonour(unitId, unit.battle_honours[unit.battle_honours.length - 1].id);
+      }
+    }
+    setOatStates(prev => prev.map(s => s.unitId === unitId ? { ...s, outcome } : s));
+  };
+
+  const handleOATScar = (unitId: string, scarId: string) => {
+    const scar = OFFICIAL_BATTLE_SCARS.find(s => s.id === scarId);
+    if (scar) addBattleScar(unitId, { name: scar.name, effect: scar.effect });
+    setOatStates(prev => prev.map(s => s.unitId === unitId ? { ...s, selectedScar: scarId } : s));
+  };
+
+  const allOATResolved = oatStates.every(s =>
+    s.roll !== null && (s.outcome === 'pass' || s.outcome === 'devastating_blow' || (s.outcome === 'battle_scar' && s.selectedScar !== null))
+  );
+
+  // OAT phase
+  if (phase === 'oat') {
+    return (
+      <div className="min-h-screen bg-[var(--bg-primary)] pb-10">
+        <div className="px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-4 border-b border-[var(--border-color)]">
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">Out of Action</h1>
+          <p className="text-xs text-[var(--text-secondary)] mt-0.5">{destroyedUnits.length} unit{destroyedUnits.length !== 1 ? 's' : ''} destroyed</p>
+        </div>
+        <div className="px-4 pt-4 space-y-4">
+          <OutOfActionSection
+            destroyedUnits={destroyedUnits}
+            oatStates={oatStates}
+            onRoll={handleOATRoll}
+            onChooseOutcome={handleOATOutcome}
+            onChooseScar={handleOATScar}
+          />
+          <button
+            onClick={() => navigate('/army')}
+            disabled={!allOATResolved}
+            className="w-full py-3 rounded-lg border border-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] font-semibold text-sm flex items-center justify-center gap-2 disabled:opacity-40"
+          >
+            <Check className="w-4 h-4" />
+            Done
+          </button>
+          <button onClick={() => navigate('/army')} className="w-full py-2 text-xs text-[var(--text-secondary)]">
+            Skip OAT Tests
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const resultOptions: { value: BattleResult; label: string; icon: React.ReactNode; style: string }[] = [
     { value: 'win',  label: 'Victory', icon: <Trophy className="w-5 h-5" />, style: 'border-green-500/50 bg-green-500/10 text-green-400' },

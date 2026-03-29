@@ -764,3 +764,104 @@ export function getWeaponEnhancements(
   );
   return [...generic, ...faction];
 }
+
+// ---------------------------------------------------------------------------
+// Weapon Modifications — official stat buffs (confirmed from GW Crusade Rules PDF)
+// Each unit selects TWO different modifications for one weapon.
+// ---------------------------------------------------------------------------
+
+export interface WeaponModification {
+  id: string;
+  name: string;
+  effect: string;       // Short description (e.g. "+1 Strength")
+  rulesText: string;    // Full rules text from the PDF
+}
+
+export const WEAPON_MODIFICATIONS: WeaponModification[] = [
+  {
+    id: 'finely_balanced',
+    name: 'Finely Balanced',
+    effect: '+1 Ballistic Skill or Weapon Skill',
+    rulesText: 'Improve this weapon\'s Ballistic Skill or Weapon Skill characteristic by 1.',
+  },
+  {
+    id: 'brutal',
+    name: 'Brutal',
+    effect: '+1 Strength',
+    rulesText: 'Add 1 to this weapon\'s Strength characteristic.',
+  },
+  {
+    id: 'armour_piercing',
+    name: 'Armour Piercing',
+    effect: '-1 AP (improved)',
+    rulesText: 'Improve this weapon\'s Armour Penetration characteristic by 1.',
+  },
+  {
+    id: 'master_worked',
+    name: 'Master-Worked',
+    effect: '+1 Damage',
+    rulesText: 'Add 1 to this weapon\'s Damage characteristic.',
+  },
+  {
+    id: 'heirloom',
+    name: 'Heirloom',
+    effect: '+1 Attacks',
+    rulesText: 'Add 1 to this weapon\'s Attacks characteristic.',
+  },
+  {
+    id: 'precise',
+    name: 'Precise',
+    effect: 'Critical Wounds gain [PRECISION]',
+    rulesText: 'Each time a Critical Wound is scored for an attack made with this weapon, that attack has the [PRECISION] ability.',
+  },
+];
+
+// ---------------------------------------------------------------------------
+// Official Battle Scars — confirmed from GW Crusade Rules PDF Sep 2024
+// ---------------------------------------------------------------------------
+
+export interface OfficialBattleScar {
+  id: string;
+  name: string;
+  effect: string;
+  rulesText: string;
+}
+
+export const OFFICIAL_BATTLE_SCARS: OfficialBattleScar[] = [
+  {
+    id: 'crippling_damage',
+    name: 'Crippling Damage',
+    effect: 'Cannot Advance; -1" Move',
+    rulesText: 'This unit cannot Advance and you must subtract 1" from the Move characteristic of models in this unit.',
+  },
+  {
+    id: 'battle_weary',
+    name: 'Battle-Weary',
+    effect: '-1 to Battle-shock, Leadership, Desperate Escape & Out of Action tests',
+    rulesText: 'Each time this unit takes a Battle-shock, Leadership, Desperate Escape or Out of Action test, subtract 1 from that test.',
+  },
+  {
+    id: 'fatigued',
+    name: 'Fatigued',
+    effect: '-1 OC; no Charge bonus',
+    rulesText: 'Subtract 1 from the Objective Control characteristic of models in this unit and this unit never receives a Charge bonus.',
+  },
+  {
+    id: 'disgraced',
+    name: 'Disgraced',
+    effect: 'No Stratagems; cannot be Marked for Greatness',
+    rulesText: 'You cannot use any Stratagems to affect this unit and this unit cannot be Marked for Greatness.',
+  },
+  {
+    id: 'mark_of_shame',
+    name: 'Mark of Shame',
+    effect: 'No Attached units; no Aura abilities; cannot be Marked for Greatness',
+    rulesText: 'This unit cannot form an Attached unit, it is unaffected by the Aura abilities of friendly units, and it cannot be Marked for Greatness.',
+  },
+  {
+    id: 'deep_scars',
+    name: 'Deep Scars',
+    effect: 'Critical Hits automatically wound',
+    rulesText: 'Each time a Critical Hit is scored against this unit, that attack automatically wounds this unit.',
+  },
+];

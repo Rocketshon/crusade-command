@@ -74,6 +74,9 @@ export default function ArmyCrusadeSetup() {
   const [detachment, setDetachment] = useState('');
   const [supplyLimit, setSupplyLimitLocal] = useState(1000);
   const [startingRP, setStartingRP] = useState(5);
+  const [startingWins, setStartingWins] = useState(0);
+  const [startingLosses, setStartingLosses] = useState(0);
+  const [startingDraws, setStartingDraws] = useState(0);
   const [oathswornId, setOathswornId] = useState('');
   const [armyName, setArmyName] = useState('');
 
@@ -105,6 +108,9 @@ export default function ArmyCrusadeSetup() {
       detachmentName: detachment,
       supplyLimit,
       startingRP,
+      startingWins,
+      startingLosses,
+      startingDraws,
       oathswornCampaignId: oathswornId || undefined,
       factionPointsLabel: faction.mechanic === 'honour_points' ? 'Honour Points'
         : faction.mechanic === 'skulls' ? 'Skull Points'
@@ -160,12 +166,13 @@ export default function ArmyCrusadeSetup() {
           <DetachmentStep faction={faction} selected={detachment} onSelect={setDetachment} />
         )}
 
-        {/* Supply + RP */}
+        {/* Supply + RP + existing W/L/D */}
         {step === 'supply' && (
           <div>
-            <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1 tracking-wider">Supply Limit</h1>
-            <p className="text-sm text-[var(--text-secondary)] mb-6">Set your starting Supply Limit and Requisition Points</p>
-            <div className="space-y-6">
+            <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-1 tracking-wider">Campaign State</h1>
+            <p className="text-sm text-[var(--text-secondary)] mb-6">New campaign or continuing an existing one?</p>
+            <div className="space-y-5">
+              {/* Supply Limit */}
               <div className="rounded-sm border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
                 <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Supply Limit (pts)</label>
                 <div className="flex gap-2 mt-3 flex-wrap">
@@ -176,19 +183,42 @@ export default function ArmyCrusadeSetup() {
                     </button>
                   ))}
                 </div>
-                <p className="text-xs text-[var(--text-secondary)] mt-2">Recommended: 1000 pts</p>
+                <p className="text-xs text-[var(--text-secondary)] mt-2">Standard start: 1000 pts</p>
               </div>
+              {/* RP counter */}
               <div className="rounded-sm border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
-                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Starting Requisition Points</label>
-                <div className="flex gap-3 mt-3">
-                  {[3, 4, 5].map(v => (
-                    <button key={v} onClick={() => setStartingRP(v)}
-                      className={`flex-1 py-2.5 text-sm rounded border transition-colors ${startingRP === v ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] font-bold' : 'border-[var(--border-color)] text-[var(--text-secondary)]'}`}>
-                      {v} RP
-                    </button>
+                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Current Requisition Points</label>
+                <div className="flex items-center gap-4 mt-3">
+                  <button onClick={() => setStartingRP(v => Math.max(0, v - 1))}
+                    className="w-9 h-9 rounded border border-[var(--border-color)] text-[var(--text-secondary)] flex items-center justify-center text-xl font-bold">−</button>
+                  <span className="text-2xl font-bold text-[var(--accent-gold)] w-8 text-center">{startingRP}</span>
+                  <button onClick={() => setStartingRP(v => Math.min(10, v + 1))}
+                    className="w-9 h-9 rounded border border-[var(--border-color)] text-[var(--text-secondary)] flex items-center justify-center text-xl font-bold">+</button>
+                  <span className="text-xs text-[var(--text-secondary)]">/ 10 RP · Standard start: 5</span>
+                </div>
+              </div>
+              {/* Existing W/L/D — for ongoing campaigns */}
+              <div className="rounded-sm border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
+                <label className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Existing Battle Record</label>
+                <p className="text-xs text-[var(--text-secondary)] mt-1 mb-3">Already in a campaign? Enter your current record.</p>
+                <div className="grid grid-cols-3 gap-3">
+                  {([
+                    ['Wins', startingWins, setStartingWins, 'text-green-400'],
+                    ['Losses', startingLosses, setStartingLosses, 'text-red-400'],
+                    ['Draws', startingDraws, setStartingDraws, 'text-gray-400'],
+                  ] as [string, number, (v: number) => void, string][]).map(([label, val, setter, color]) => (
+                    <div key={label} className="text-center">
+                      <p className={`text-[10px] uppercase tracking-wider mb-2 ${color}`}>{label}</p>
+                      <div className="flex items-center justify-center gap-1">
+                        <button onClick={() => setter(Math.max(0, val - 1))}
+                          className="w-6 h-6 rounded border border-[var(--border-color)] text-[var(--text-secondary)] flex items-center justify-center text-sm font-bold">−</button>
+                        <span className={`text-lg font-bold w-6 text-center ${color}`}>{val}</span>
+                        <button onClick={() => setter(val + 1)}
+                          className="w-6 h-6 rounded border border-[var(--border-color)] text-[var(--text-secondary)] flex items-center justify-center text-sm font-bold">+</button>
+                      </div>
+                    </div>
                   ))}
                 </div>
-                <p className="text-xs text-[var(--text-secondary)] mt-2">Standard start: 5 RP. Max 10 RP.</p>
               </div>
             </div>
           </div>

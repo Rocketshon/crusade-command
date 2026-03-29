@@ -7,6 +7,7 @@ import { useArmy, type BattleHonour } from '../../lib/ArmyContext';
 import {
   getRank, getHonourSlots, getXPProgress, getNextRankXP,
   getWeaponEnhancements, BATTLE_HONOUR_TYPES,
+  OFFICIAL_BATTLE_SCARS,
 } from '../../data/crusadeRules';
 import { searchUnits } from '../../data';
 
@@ -178,13 +179,18 @@ function WeaponEnhancementPicker({
 // Add honour modal (non-weapon-enhancement types)
 // ---------------------------------------------------------------------------
 
-function AddHonourModal({ onAdd, onClose }: {
+function AddHonourModal({ onAdd, onClose, isCharacter }: {
   onAdd: (h: Omit<BattleHonour, 'id'>) => void;
   onClose: () => void;
+  isCharacter: boolean;
 }) {
   const [type, setType] = useState<string>('battle_trait');
   const [name, setName] = useState('');
   const [desc, setDesc] = useState('');
+  // Crusade Relics are character-only
+  const availableTypes = BATTLE_HONOUR_TYPES.filter(t =>
+    t.id !== 'weapon_enhancement' && (t.id !== 'crusade_relic' || isCharacter)
+  );
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-end">
       <div className="w-full bg-[var(--bg-primary)] rounded-t-xl border-t border-[var(--border-color)] p-5">
@@ -196,13 +202,16 @@ function AddHonourModal({ onAdd, onClose }: {
           <div>
             <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-2">Type</p>
             <div className="flex flex-wrap gap-2">
-              {BATTLE_HONOUR_TYPES.filter(t => t.id !== 'weapon_enhancement').map(t => (
+              {availableTypes.map(t => (
                 <button key={t.id} onClick={() => setType(t.id)}
                   className={`px-3 py-1.5 rounded border text-xs transition-colors ${type === t.id ? 'border-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-[var(--accent-gold)]' : 'border-[var(--border-color)] text-[var(--text-secondary)]'}`}>
                   {t.label}
                 </button>
               ))}
             </div>
+            {type === 'crusade_relic' && (
+              <p className="text-xs text-amber-400 mt-1.5">⚠️ Crusade Relics require the Renowned Heroes Requisition (1–3 RP). Character units only.</p>
+            )}
           </div>
           <div>
             <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Name</label>
@@ -446,6 +455,17 @@ export default function ArmyUnitDetail() {
 
               {showAddScar ? (
                 <div className="mt-3 space-y-2">
+                  <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Official Scars</p>
+                  <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                    {OFFICIAL_BATTLE_SCARS.filter(s => !unit.battle_scars.some(us => us.name === s.name)).map(scar => (
+                      <button key={scar.id} onClick={() => { addBattleScar(unit.id, { name: scar.name, effect: scar.effect }); setShowAddScar(false); }}
+                        className="w-full text-left px-3 py-2 rounded border border-[var(--border-color)] bg-[var(--bg-primary)] hover:border-red-500/40 transition-colors">
+                        <p className="text-xs font-semibold text-red-300">{scar.name}</p>
+                        <p className="text-[10px] text-[var(--text-secondary)] mt-0.5">{scar.effect}</p>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mt-2">Custom Scar</p>
                   <input value={addScarName} onChange={e => setAddScarName(e.target.value)} placeholder="Scar name"
                     className="w-full px-3 py-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-red-500" />
                   <input value={addScarEffect} onChange={e => setAddScarEffect(e.target.value)} placeholder="Effect (optional)"
@@ -455,7 +475,7 @@ export default function ArmyUnitDetail() {
                     <button onClick={() => { if (addScarName.trim()) { addBattleScar(unit.id, { name: addScarName.trim(), effect: addScarEffect.trim() }); setAddScarName(''); setAddScarEffect(''); setShowAddScar(false); } }}
                       disabled={!addScarName.trim()}
                       className="flex-1 py-2 text-xs border border-red-500/40 bg-red-500/10 text-red-400 rounded disabled:opacity-40">
-                      Add Scar
+                      Add Custom
                     </button>
                   </div>
                 </div>
@@ -489,7 +509,7 @@ export default function ArmyUnitDetail() {
       </div>
 
       {showAddHonour && (
-        <AddHonourModal onAdd={h => addBattleHonour(unit.id, h)} onClose={() => setShowAddHonour(false)} />
+        <AddHonourModal onAdd={h => addBattleHonour(unit.id, h)} onClose={() => setShowAddHonour(false)} isCharacter={unit.is_character} />
       )}
       {showWeaponEnhancement && (
         <WeaponEnhancementPicker

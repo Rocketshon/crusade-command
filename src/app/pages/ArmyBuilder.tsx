@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import {
   Plus, Trash2, Search, X, ChevronRight, Star, Shield,
-  Skull, Swords, AlertTriangle, Check,
+  Skull, Swords, AlertTriangle, Check, Edit2,
 } from 'lucide-react';
 import { useArmy, type ArmyUnit } from '../../lib/ArmyContext';
 import { useCollection } from '../../lib/CollectionContext';
@@ -29,29 +29,72 @@ function XPBar({ unit }: { unit: ArmyUnit }) {
 // ---------------------------------------------------------------------------
 
 function CrusadeDashboard() {
-  const { crusade, factionId, detachmentName, supplyLimit, army, spendRP, gainRP, updateFactionPoints } = useArmy();
+  const { crusade, factionId, detachmentName, supplyLimit, army, spendRP, gainRP, updateFactionPoints, setCampaignRecord, setSupplyLimit } = useArmy();
+  const [editingRecord, setEditingRecord] = useState(false);
+  const [draftWins, setDraftWins] = useState(0);
+  const [draftLosses, setDraftLosses] = useState(0);
+  const [draftDraws, setDraftDraws] = useState(0);
+
   if (!crusade) return null;
 
   const supplyUsed = army.filter(u => !u.is_destroyed).reduce((s, u) => s + u.points_cost, 0);
   const supplyPct = Math.min(100, Math.round((supplyUsed / supplyLimit) * 100));
+
+  const openEdit = () => {
+    setDraftWins(crusade.wins);
+    setDraftLosses(crusade.losses);
+    setDraftDraws(crusade.draws);
+    setEditingRecord(true);
+  };
+  const saveEdit = () => {
+    setCampaignRecord(draftWins, draftLosses, draftDraws);
+    setEditingRecord(false);
+  };
 
   return (
     <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-xl p-4 mb-4">
       {/* Faction + detachment */}
       <div className="flex items-center justify-between mb-3">
         <div>
-          <p className="text-xs text-[var(--text-secondary)]">{factionId?.replace(/_/g, ' ')}</p>
+          <p className="text-xs text-[var(--text-secondary)] capitalize">{factionId?.replace(/_/g, ' ')}</p>
           {detachmentName && <p className="text-[10px] text-[var(--text-secondary)]/70">{detachmentName}</p>}
         </div>
-        {/* W/L/D */}
-        <div className="flex gap-3 text-center">
-          {[['W', crusade.wins, 'text-green-400'], ['L', crusade.losses, 'text-red-400'], ['D', crusade.draws, 'text-gray-400']].map(([l, v, c]) => (
-            <div key={String(l)}>
-              <p className={`text-sm font-bold ${c}`}>{String(v)}</p>
-              <p className="text-[9px] text-[var(--text-secondary)]">{l}</p>
+        {/* W/L/D with edit */}
+        {editingRecord ? (
+          <div className="flex items-center gap-2">
+            {([
+              ['W', draftWins, setDraftWins, 'text-green-400'],
+              ['L', draftLosses, setDraftLosses, 'text-red-400'],
+              ['D', draftDraws, setDraftDraws, 'text-gray-400'],
+            ] as [string, number, (v: number) => void, string][]).map(([l, v, setter, c]) => (
+              <div key={l} className="flex flex-col items-center gap-0.5">
+                <p className={`text-[9px] ${c}`}>{l}</p>
+                <div className="flex items-center gap-0.5">
+                  <button onClick={() => setter(Math.max(0, v - 1))} className="w-4 h-4 rounded text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold">−</button>
+                  <span className={`text-xs font-bold w-4 text-center ${c}`}>{v}</span>
+                  <button onClick={() => setter(v + 1)} className="w-4 h-4 rounded text-[var(--text-secondary)] flex items-center justify-center text-xs font-bold">+</button>
+                </div>
+              </div>
+            ))}
+            <button onClick={saveEdit} className="ml-1 w-6 h-6 rounded bg-[var(--accent-gold)]/20 border border-[var(--accent-gold)]/40 flex items-center justify-center">
+              <Check className="w-3 h-3 text-[var(--accent-gold)]" />
+            </button>
+          </div>
+        ) : (
+          <div className="flex items-center gap-2">
+            <div className="flex gap-3 text-center">
+              {[['W', crusade.wins, 'text-green-400'], ['L', crusade.losses, 'text-red-400'], ['D', crusade.draws, 'text-gray-400']].map(([l, v, c]) => (
+                <div key={String(l)}>
+                  <p className={`text-sm font-bold ${c}`}>{String(v)}</p>
+                  <p className="text-[9px] text-[var(--text-secondary)]">{l}</p>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+            <button onClick={openEdit} className="text-[var(--text-secondary)] hover:text-[var(--accent-gold)]">
+              <Edit2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* RP pips */}
@@ -75,9 +118,12 @@ function CrusadeDashboard() {
       <div className="mb-3">
         <div className="flex items-center justify-between mb-1">
           <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider">Supply</p>
-          <p className={`text-xs font-bold ${supplyUsed > supplyLimit ? 'text-red-400' : 'text-[var(--accent-gold)]'}`}>
-            {supplyUsed} / {supplyLimit} pts
-          </p>
+          <div className="flex items-center gap-2">
+            <p className={`text-xs font-bold ${supplyUsed > supplyLimit ? 'text-red-400' : 'text-[var(--accent-gold)]'}`}>
+              {supplyUsed} / {supplyLimit} pts
+            </p>
+            <button onClick={() => setSupplyLimit(supplyLimit + 200)} className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-green-400" title="Increase Supply Limit +200 (costs 1 RP)">+200</button>
+          </div>
         </div>
         <div className="h-1.5 bg-[var(--border-color)] rounded-full overflow-hidden">
           <div className={`h-full rounded-full transition-all ${supplyUsed > supplyLimit ? 'bg-red-500' : 'bg-[var(--accent-gold)]'}`}

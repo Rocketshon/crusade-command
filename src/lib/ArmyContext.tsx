@@ -141,9 +141,13 @@ interface ArmyState {
     detachmentName: string;
     supplyLimit: number;
     startingRP: number;
+    startingWins?: number;
+    startingLosses?: number;
+    startingDraws?: number;
     oathswornCampaignId?: string;
     factionPointsLabel: string;
   }) => void;
+  setCampaignRecord: (wins: number, losses: number, draws: number) => void;
   // Multi-army actions
   createArmy: (name: string, armyMode?: ArmyMode) => string;
   deleteArmy: (armyId: string) => void;
@@ -235,10 +239,15 @@ function defaultCrusadeData(params: {
   factionPointsLabel: string;
   oathswornCampaignId?: string;
   startingRP?: number;
+  startingWins?: number;
+  startingLosses?: number;
+  startingDraws?: number;
 }): CrusadeCampaignData {
   return {
     rp: params.startingRP ?? 5,
-    wins: 0, losses: 0, draws: 0,
+    wins: params.startingWins ?? 0,
+    losses: params.startingLosses ?? 0,
+    draws: params.startingDraws ?? 0,
     oathswornCampaignId: params.oathswornCampaignId,
     battles: [],
     factionPoints: 0,
@@ -440,6 +449,9 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
     detachmentName: string;
     supplyLimit: number;
     startingRP: number;
+    startingWins?: number;
+    startingLosses?: number;
+    startingDraws?: number;
     oathswornCampaignId?: string;
     factionPointsLabel: string;
   }) => {
@@ -450,7 +462,14 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
       factionPointsLabel: params.factionPointsLabel,
       oathswornCampaignId: params.oathswornCampaignId,
       startingRP: params.startingRP,
+      startingWins: params.startingWins,
+      startingLosses: params.startingLosses,
+      startingDraws: params.startingDraws,
     }));
+  }, []);
+
+  const setCampaignRecord = useCallback((wins: number, losses: number, draws: number) => {
+    setCrusade(prev => prev ? { ...prev, wins, losses, draws } : prev);
   }, []);
 
   const recordBattle = useCallback((battle: Omit<CrusadeBattleRecord, 'id' | 'date'>) => {
@@ -460,19 +479,24 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
       date: new Date().toISOString(),
     };
 
-    // Apply unit results
+    // Apply unit results (includes Dealers of Death: +1XP per 3 kills total)
     setArmy(prev => prev.map(u => {
       const result = battle.unitResults.find(r => r.unitId === u.id);
       if (!result) return u;
-      const newXP = u.experience_points + result.xpGained;
+      const prevKillThresholds = Math.floor(u.total_kills / 3);
+      const newKills = u.total_kills + result.kills;
+      const newKillThresholds = Math.floor(newKills / 3);
+      const dealersOfDeathXP = newKillThresholds - prevKillThresholds; // +1XP per new multiple of 3
+      const totalXP = result.xpGained + (result.markedForGreatness ? 3 : 0) + dealersOfDeathXP;
+      const newXP = u.experience_points + totalXP;
       return {
         ...u,
         experience_points: newXP,
         rank: getRankFromXP(newXP),
-        crusade_points: u.crusade_points + result.xpGained,
+        crusade_points: u.crusade_points + totalXP,
         battles_played: u.battles_played + 1,
         battles_survived: u.battles_survived + (result.survived ? 1 : 0),
-        total_kills: u.total_kills + result.kills,
+        total_kills: newKills,
       };
     }));
 
@@ -589,7 +613,7 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
     addUnit, removeUnit, updateUnit, clearArmy,
     awardXP, addBattleHonour, removeBattleHonour, addBattleScar, removeBattleScar,
     setWarlord, buyLegendaryVeterans,
-    recordBattle, spendRP, gainRP, updateFactionPoints, updateCSMGlory, initCrusadeCampaign,
+    recordBattle, spendRP, gainRP, updateFactionPoints, updateCSMGlory, initCrusadeCampaign, setCampaignRecord,
     createArmy, deleteArmy, switchArmy, renameArmy,
   }), [
     mode, factionId, detachmentName, supplyLimit, army, crusade,
@@ -598,7 +622,7 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
     addUnit, removeUnit, updateUnit, clearArmy,
     awardXP, addBattleHonour, removeBattleHonour, addBattleScar, removeBattleScar,
     setWarlord, buyLegendaryVeterans,
-    recordBattle, spendRP, gainRP, updateFactionPoints, updateCSMGlory, initCrusadeCampaign,
+    recordBattle, spendRP, gainRP, updateFactionPoints, updateCSMGlory, initCrusadeCampaign, setCampaignRecord,
     createArmy, deleteArmy, switchArmy, renameArmy,
   ]);
 
