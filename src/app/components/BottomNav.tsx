@@ -1,23 +1,23 @@
 import { useLocation, useNavigate } from 'react-router';
-import { Swords, Crosshair, BookOpen, Shield, Package } from 'lucide-react';
+import { Swords, Crosshair, BookOpen, Package, Settings } from 'lucide-react';
 
 const tabs = [
-  { path: '/army', label: 'Army', icon: Swords },
+  { path: '/models', label: 'My Models', icon: Package },
+  { path: '/army',   label: 'Army',      icon: Swords },
   { path: '/battle-aid', label: 'Battle Aid', icon: Crosshair },
-  { path: '/codex', label: 'Codex', icon: BookOpen },
-  { path: '/crusade', label: 'Crusade', icon: Shield },
-  { path: '/collection', label: 'Collection', icon: Package },
+  { path: '/codex',  label: 'Codex',     icon: BookOpen },
+  { path: '/settings', label: 'Settings', icon: Settings },
 ] as const;
 
 function isActiveTab(pathname: string, tabPath: string): boolean {
   if (tabPath === '/army') {
-    return pathname === '/army' || pathname.startsWith('/add-unit') || pathname.startsWith('/unit/') || pathname === '/';
+    return pathname === '/army' || pathname.startsWith('/army/') || pathname.startsWith('/unit/');
   }
-  if (tabPath === '/battle-aid') {
-    return pathname === '/battle-aid';
+  if (tabPath === '/models') {
+    return pathname === '/models';
   }
-  if (tabPath === '/crusade') {
-    return pathname === '/crusade' || pathname.startsWith('/crusade/');
+  if (tabPath === '/codex') {
+    return pathname === '/codex' || pathname.startsWith('/codex/') || pathname.startsWith('/datasheet/') || pathname.startsWith('/space-marines-chapters');
   }
   return pathname.startsWith(tabPath);
 }
@@ -44,7 +44,6 @@ export default function BottomNav() {
                   : 'text-[var(--text-secondary)] active:text-[var(--text-primary)]'
               }`}
             >
-              {/* Active indicator bar */}
               {active && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-8 h-0.5 bg-[var(--accent-gold)] rounded-full" />
               )}

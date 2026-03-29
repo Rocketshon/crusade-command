@@ -42,7 +42,7 @@ export default function DatasheetView() {
     if (datasheet) {
       const pointsCost = datasheet.points.length > 0 ? parseInt(datasheet.points[0].cost, 10) || 0 : 0;
       const role = datasheet.keywords.length > 0 ? datasheet.keywords[0] : '';
-      addUnit(datasheet.name, pointsCost, role);
+      addUnit({ datasheetName: datasheet.name, pointsCost, isCharacter: datasheet.keywords.includes('CHARACTER') });
       setShowAddSuccess(true);
       toast.success(`${datasheet.name} added to army (${pointsCost} pts)`);
       setTimeout(() => setShowAddSuccess(false), 2000);

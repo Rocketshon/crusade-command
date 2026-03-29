@@ -11,7 +11,8 @@ import WeaponStatTable from "../components/WeaponStatTable";
 
 export default function AddUnit() {
   const navigate = useNavigate();
-  const { addUnit, factionId: armyFactionId, army, mode, pointsCap, supplyLimit } = useArmy();
+  const { addUnit, factionId: armyFactionId, army, mode, supplyLimit } = useArmy();
+  const pointsCap = supplyLimit;
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedUnit, setSelectedUnit] = useState<Datasheet | null>(null);
   const [customName, setCustomName] = useState("");
@@ -62,11 +63,15 @@ export default function AddUnit() {
   const handleSubmit = () => {
     if (!selectedUnit) { toast.error("Please select a unit"); return; }
     if (!customName.trim()) { toast.error("Please enter a unit name"); return; }
-    const role = selectedUnit.keywords.length > 0 ? selectedUnit.keywords[0] : '';
-    const cap = mode === 'crusade' ? supplyLimit : pointsCap;
+    const cap = pointsCap;
     const currentTotal = army.reduce((sum, u) => sum + u.points_cost, 0);
     const newTotal = currentTotal + customPoints;
-    addUnit(selectedUnit.name, customPoints, role);
+    addUnit({
+      datasheetName: selectedUnit.name,
+      pointsCost: customPoints,
+      factionId: selectedUnit.faction_id,
+      isCharacter: selectedUnit.keywords.includes('CHARACTER'),
+    });
     if (newTotal > cap && cap > 0) {
       toast.warning(`Adding this unit puts you ${(newTotal - cap).toLocaleString()} pts over budget`, { duration: 4000 });
     } else {

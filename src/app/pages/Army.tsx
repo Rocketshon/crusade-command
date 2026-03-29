@@ -191,8 +191,8 @@ function StandardUnitCard({ unit, onRemove, wouldFixOver, datasheetLookup }: { u
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className="font-medium text-[var(--text-primary)] truncate">{unit.custom_name}</span>
-          {unit.role && (
-            <span className="text-xs px-2 py-0.5 bg-[#12121a] text-[var(--text-tertiary)] rounded-full">{unit.role}</span>
+          {unit.is_character && (
+            <span className="text-xs px-2 py-0.5 bg-[#12121a] text-[var(--text-tertiary)] rounded-full">Character</span>
           )}
           {wouldFixOver && (
             <span className="text-xs px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded font-medium">over</span>
@@ -360,10 +360,11 @@ const ROLE_COLORS: Record<string, string> = {
 export default function Army() {
   const navigate = useNavigate();
   const {
-    mode, factionId, detachmentName, pointsCap, supplyLimit, army,
+    mode, factionId, detachmentName, supplyLimit, army,
     savedArmies, activeArmyId,
-    setFaction, setDetachment, setPointsCap, setSupplyLimit, removeUnit, renameArmy,
+    setFaction, setDetachment, setSupplyLimit, removeUnit, renameArmy,
   } = useArmy();
+  const pointsCap = supplyLimit;
 
   const [editingName, setEditingName] = useState(false);
   const activeArmy = savedArmies.find(a => a.id === activeArmyId);
@@ -444,7 +445,7 @@ export default function Army() {
       <div className="min-h-screen bg-[var(--bg-primary)] px-4 pt-16 pb-24 flex items-start justify-center">
         <PointsSelector
           mode={mode}
-          onSelect={(pts) => mode === 'crusade' ? setSupplyLimit(pts) : setPointsCap(pts)}
+          onSelect={(pts) => setSupplyLimit(pts)}
         />
       </div>
     );

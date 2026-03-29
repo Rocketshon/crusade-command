@@ -68,13 +68,13 @@ function tournamentSection(role: string): string {
 
 export default function ArmyExport() {
   const navigate = useNavigate();
-  const { mode, factionId, detachmentName, pointsCap, supplyLimit, army } = useArmy();
+  const { mode, factionId, detachmentName, supplyLimit, army } = useArmy();
   const textRef = useRef<HTMLPreElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [tournamentFormat, setTournamentFormat] = useState(false);
 
   const factionMeta = factionId ? FACTIONS.find(f => f.id === factionId) : null;
-  const cap = mode === 'crusade' ? supplyLimit : pointsCap;
+  const cap = supplyLimit;
   const totalPoints = army.reduce((sum, u) => sum + u.points_cost, 0);
 
   // Look up datasheets for keyword / weapon info
