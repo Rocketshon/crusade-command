@@ -94,7 +94,7 @@ function ScoreCounter({
       <div className="flex items-center gap-2">
         <button
           onClick={() => onChange(Math.max(0, value - 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#12121a] border border-[var(--border-color)]
+          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)]
                      text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-gold)] transition-colors active:scale-95"
         >
           <Minus className="w-4 h-4" />
@@ -102,7 +102,7 @@ function ScoreCounter({
         <span className={`text-2xl font-bold font-mono w-10 text-center ${accentClass}`}>{value}</span>
         <button
           onClick={() => onChange(Math.min(max, value + 1))}
-          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#12121a] border border-[var(--border-color)]
+          className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)]
                      text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-gold)] transition-colors active:scale-95"
         >
           <Plus className="w-4 h-4" />
@@ -349,7 +349,7 @@ export default function GameTracker() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => updateRound({ cp: Math.max(-5, round.cp - 1) })}
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#12121a] border border-[var(--border-color)]
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)]
                          text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-gold)] transition-colors active:scale-95"
             >
               <Minus className="w-4 h-4" />
@@ -357,7 +357,7 @@ export default function GameTracker() {
             <span className="text-xl font-bold font-mono text-[var(--accent-gold)] w-8 text-center">{round.cp}</span>
             <button
               onClick={() => updateRound({ cp: Math.min(20, round.cp + 1) })}
-              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#12121a] border border-[var(--border-color)]
+              className="w-8 h-8 flex items-center justify-center rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)]
                          text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--accent-gold)] transition-colors active:scale-95"
             >
               <Plus className="w-4 h-4" />
@@ -403,7 +403,7 @@ export default function GameTracker() {
                 className={`px-4 py-3 rounded-lg border transition-colors cursor-pointer ${
                   i + 1 === game.currentRound
                     ? 'bg-[var(--bg-card)] border-[var(--accent-gold)]/40'
-                    : 'bg-[#12121a] border-[var(--border-color)]'
+                    : 'bg-[var(--bg-primary)] border-[var(--border-color)]'
                 }`}
                 onClick={() => setGame((prev) => ({ ...prev, currentRound: i + 1 }))}
               >

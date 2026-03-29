@@ -68,7 +68,7 @@ function YourArmyTab() {
                 {ds.stats && Object.keys(ds.stats).length > 0 && (
                   <div className="flex gap-2 mb-2">
                     {Object.entries(ds.stats).map(([stat, value]) => (
-                      <div key={stat} className="text-center px-2 py-1 bg-[#12121a] rounded">
+                      <div key={stat} className="text-center px-2 py-1 bg-[var(--bg-primary)] rounded">
                         <div className="text-[10px] text-[var(--text-secondary)] uppercase">{stat}</div>
                         <div className="text-xs font-bold text-[var(--text-primary)] font-mono">{value}</div>
                       </div>
@@ -86,7 +86,7 @@ function YourArmyTab() {
                 {ds.abilities.core.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-2">
                     {ds.abilities.core.map((a, i) => (
-                      <span key={i} className="text-[10px] px-2 py-0.5 rounded-full border border-[var(--accent-gold)]/30 text-[var(--accent-gold)] bg-[#c9a84c]/10">
+                      <span key={i} className="text-[10px] px-2 py-0.5 rounded-full border border-[var(--accent-gold)]/30 text-[var(--accent-gold)] bg-[var(--accent-gold)]/10">
                         {a}
                       </span>
                     ))}
@@ -125,7 +125,7 @@ function OpponentDatasheetDetail({ datasheet, onBack }: { datasheet: Datasheet; 
         {datasheet.points.length > 0 && (
           <div className="flex flex-wrap gap-2 mt-2">
             {datasheet.points.map((tier, idx) => (
-              <span key={idx} className="px-2 py-1 text-xs rounded bg-[#12121a] border border-[var(--border-color)] text-[var(--text-primary)]">
+              <span key={idx} className="px-2 py-1 text-xs rounded bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)]">
                 {tier.models}: <span className="text-[var(--accent-gold)] font-bold">{tier.cost} pts</span>
               </span>
             ))}
@@ -137,7 +137,7 @@ function OpponentDatasheetDetail({ datasheet, onBack }: { datasheet: Datasheet; 
       {datasheet.stats && Object.keys(datasheet.stats).length > 0 && (
         <div className="flex flex-wrap gap-2">
           {Object.entries(datasheet.stats).map(([stat, value]) => (
-            <div key={stat} className="flex-1 min-w-[60px] text-center px-3 py-2 bg-[#12121a] border border-[var(--border-color)] rounded-lg">
+            <div key={stat} className="flex-1 min-w-[60px] text-center px-3 py-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg">
               <div className="text-[10px] text-[var(--text-secondary)] font-semibold uppercase">{stat}</div>
               <div className="text-lg font-bold text-[var(--text-primary)] font-mono">{value}</div>
             </div>
@@ -172,7 +172,7 @@ function OpponentDatasheetDetail({ datasheet, onBack }: { datasheet: Datasheet; 
         {datasheet.abilities.core.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {datasheet.abilities.core.map((a, i) => (
-              <span key={i} className="px-2 py-0.5 rounded-full border border-[var(--accent-gold)]/30 text-[var(--accent-gold)] bg-[#c9a84c]/10 text-xs font-semibold">
+              <span key={i} className="px-2 py-0.5 rounded-full border border-[var(--accent-gold)]/30 text-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-xs font-semibold">
                 {a}
               </span>
             ))}
@@ -182,7 +182,7 @@ function OpponentDatasheetDetail({ datasheet, onBack }: { datasheet: Datasheet; 
         {datasheet.abilities.faction.length > 0 && (
           <div className="flex flex-wrap gap-1 mb-3">
             {datasheet.abilities.faction.map((a, i) => (
-              <span key={i} className="px-2 py-0.5 rounded-full border border-[var(--accent-gold)]/20 text-[var(--text-secondary)] bg-[#12121a] text-xs">
+              <span key={i} className="px-2 py-0.5 rounded-full border border-[var(--accent-gold)]/20 text-[var(--text-secondary)] bg-[var(--bg-primary)] text-xs">
                 {a}
               </span>
             ))}
@@ -190,7 +190,7 @@ function OpponentDatasheetDetail({ datasheet, onBack }: { datasheet: Datasheet; 
         )}
 
         {datasheet.abilities.other.map((ability, idx) => (
-          <div key={idx} className="mb-2 bg-[#12121a] border border-[var(--border-color)] rounded-lg p-3">
+          <div key={idx} className="mb-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg p-3">
             <h4 className="text-xs font-bold text-[var(--accent-gold)] mb-1">{ability[0]}</h4>
             <FormattedRuleText text={ability[1]} className="text-xs" />
           </div>
@@ -202,7 +202,7 @@ function OpponentDatasheetDetail({ datasheet, onBack }: { datasheet: Datasheet; 
         <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">Keywords</h3>
         <div className="flex flex-wrap gap-1">
           {datasheet.keywords.map((kw, i) => (
-            <span key={i} className="px-2 py-1 rounded bg-[#12121a] border border-[var(--border-color)] text-[var(--text-primary)] text-xs">
+            <span key={i} className="px-2 py-1 rounded bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--text-primary)] text-xs">
               {toTitleCase(kw)}
             </span>
           ))}
@@ -210,7 +210,7 @@ function OpponentDatasheetDetail({ datasheet, onBack }: { datasheet: Datasheet; 
         {datasheet.faction_keywords.length > 0 && (
           <div className="flex flex-wrap gap-1 mt-1">
             {datasheet.faction_keywords.map((kw, i) => (
-              <span key={i} className="px-2 py-1 rounded bg-[#12121a] border border-[var(--border-color)] text-[var(--accent-gold)] text-xs">
+              <span key={i} className="px-2 py-1 rounded bg-[var(--bg-primary)] border border-[var(--border-color)] text-[var(--accent-gold)] text-xs">
                 {toTitleCase(kw)}
               </span>
             ))}
@@ -222,7 +222,7 @@ function OpponentDatasheetDetail({ datasheet, onBack }: { datasheet: Datasheet; 
       {datasheet.leader && (
         <div>
           <h3 className="text-sm font-semibold text-[var(--text-primary)] mb-2">Leader</h3>
-          <div className="bg-[#12121a] border border-[var(--border-color)] rounded-lg p-3">
+          <div className="bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg p-3">
             <FormattedRuleText text={datasheet.leader} className="text-xs" />
           </div>
         </div>

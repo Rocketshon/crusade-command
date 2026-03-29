@@ -47,7 +47,7 @@ export default function SpaceMarinesChapters() {
         {/* Back button */}
         <button
           onClick={() => navigate("/codex")}
-          className="flex items-center gap-2 text-stone-400 hover:text-[#c9a84c] transition-colors mb-6"
+          className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-gold)] transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm">Back to Codex Library</span>
@@ -63,10 +63,10 @@ export default function SpaceMarinesChapters() {
               </div>
             </div>
           </div>
-          <h1 className="text-2xl font-bold text-stone-100 mb-2 tracking-wider drop-shadow-[0_0_10px_rgba(59,130,246,0.3)]">
+          <h1 className="text-2xl font-bold text-[var(--text-primary)] mb-2 tracking-wider">
             Space Marines
           </h1>
-          <p className="text-stone-400 text-sm">
+          <p className="text-[var(--text-secondary)] text-sm">
             Choose Your Chapter
           </p>
         </div>
@@ -77,22 +77,22 @@ export default function SpaceMarinesChapters() {
             <button
               key={chapter.id}
               onClick={() => handleChapterClick(chapter)}
-              className="w-full rounded-sm border border-stone-700/60 bg-stone-900 hover:border-[#c9a84c]/50 hover:bg-[#c9a84c]/5 transition-all group"
+              className="w-full relative overflow-hidden rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] hover:border-[var(--accent-gold)] transition-all group"
             >
-              <div className={`absolute inset-0 bg-gradient-to-br ${chapter.bgGlow} to-transparent opacity-50`} />
+              <div className={`absolute inset-0 bg-gradient-to-br ${chapter.bgGlow} to-transparent opacity-30`} />
               <div className="relative p-4 flex items-center gap-4">
                 <div className="text-3xl">{chapter.icon}</div>
                 <div className="flex-1 text-left">
-                  <h3 className="text-base font-semibold text-stone-100 mb-1">
+                  <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">
                     {chapter.name}
                   </h3>
-                  <div className="flex items-center gap-3 text-xs text-stone-400">
+                  <div className="flex items-center gap-3 text-xs text-[var(--text-secondary)]">
                     <span>{chapter.datasheets} datasheets</span>
                     <span>•</span>
                     <span>{chapter.detachments} detachments</span>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-stone-500 group-hover:text-[#c9a84c] transition-colors" />
+                <ChevronRight className="w-5 h-5 text-[var(--text-secondary)] group-hover:text-[var(--accent-gold)] transition-colors" />
               </div>
             </button>
           ))}
@@ -100,7 +100,7 @@ export default function SpaceMarinesChapters() {
 
         {/* Footer Note */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-stone-500 leading-relaxed">
+          <p className="text-xs text-[var(--text-secondary)] leading-relaxed">
             Each chapter has access to their own unique datasheets, detachments, and rules.
             Select a chapter to view its full codex.
           </p>

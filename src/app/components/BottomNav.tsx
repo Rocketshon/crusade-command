@@ -1,12 +1,13 @@
 import { useLocation, useNavigate } from 'react-router';
-import { Swords, Crosshair, BookOpen, Package, Settings } from 'lucide-react';
+import { Swords, Crosshair, BookOpen, Package, Settings, ScrollText } from 'lucide-react';
 
 const tabs = [
-  { path: '/models', label: 'My Models', icon: Package },
-  { path: '/army',   label: 'Army',      icon: Swords },
+  { path: '/army',      label: 'Army',      icon: Swords },
   { path: '/battle-aid', label: 'Battle Aid', icon: Crosshair },
-  { path: '/codex',  label: 'Codex',     icon: BookOpen },
-  { path: '/settings', label: 'Settings', icon: Settings },
+  { path: '/codex',     label: 'Codex',     icon: BookOpen },
+  { path: '/rules',     label: 'Rules',     icon: ScrollText },
+  { path: '/models',    label: 'My Models', icon: Package },
+  { path: '/settings',  label: 'Settings',  icon: Settings },
 ] as const;
 
 function isActiveTab(pathname: string, tabPath: string): boolean {
@@ -15,6 +16,9 @@ function isActiveTab(pathname: string, tabPath: string): boolean {
   }
   if (tabPath === '/models') {
     return pathname === '/models';
+  }
+  if (tabPath === '/rules') {
+    return pathname === '/rules' || pathname.startsWith('/rule/');
   }
   if (tabPath === '/codex') {
     return pathname === '/codex' || pathname.startsWith('/codex/') || pathname.startsWith('/datasheet/') || pathname.startsWith('/space-marines-chapters');

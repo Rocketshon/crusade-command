@@ -87,7 +87,7 @@ function ArmyListCard({
                 className="flex-1 px-2 py-1 text-sm bg-[var(--bg-primary)] border border-[var(--border-color)] rounded text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                 autoFocus
               />
-              <button onClick={handleSaveName} className="text-[var(--accent-gold)] hover:text-[#b8960f]">
+              <button onClick={handleSaveName} className="text-[var(--accent-gold)] hover:opacity-70">
                 <Check className="w-4 h-4" />
               </button>
             </div>
@@ -230,7 +230,7 @@ export default function Home() {
           {/* Standard Mode */}
           <button
             onClick={() => handleSelectMode('standard')}
-            className="group relative overflow-hidden flex flex-col items-center gap-3 p-6 bg-black/60 backdrop-blur-sm border border-[var(--border-color)] rounded-xl
+            className="group relative overflow-hidden flex flex-col items-center gap-3 p-6 bg-[var(--bg-card)]/80 backdrop-blur-sm border border-[var(--border-color)] rounded-xl
                        transition-all hover:border-[var(--accent-gold)] hover:shadow-lg hover:shadow-amber-900/20
                        focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)]"
           >
@@ -244,7 +244,7 @@ export default function Home() {
           {/* Crusade Mode */}
           <button
             onClick={() => handleSelectMode('crusade')}
-            className="group relative overflow-hidden flex flex-col items-center gap-3 p-6 bg-black/60 backdrop-blur-sm border border-[var(--border-color)] rounded-xl
+            className="group relative overflow-hidden flex flex-col items-center gap-3 p-6 bg-[var(--bg-card)]/80 backdrop-blur-sm border border-[var(--border-color)] rounded-xl
                        transition-all hover:border-[var(--accent-gold)] hover:shadow-lg hover:shadow-amber-900/20
                        focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)]"
           >

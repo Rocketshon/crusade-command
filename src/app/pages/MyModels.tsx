@@ -49,66 +49,71 @@ function AddModelModal({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-end">
-      <div className="w-full bg-[var(--bg-primary)] rounded-t-xl border-t border-[var(--border-color)] p-5 max-h-[80vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
+    <div className="fixed inset-0 z-[100] bg-black/70 flex items-end">
+      <div className="w-full bg-[var(--bg-primary)] rounded-t-xl border-t border-[var(--border-color)] flex flex-col max-h-[80vh]">
+        {/* Header — fixed */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h2 className="text-base font-bold text-[var(--text-primary)]">Add to Collection</h2>
           <button onClick={onClose} className="text-[var(--text-secondary)]"><X className="w-5 h-5" /></button>
         </div>
 
-        {/* Search */}
-        <div className="relative mb-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
-          <input
-            type="text"
-            value={query}
-            onChange={e => { setQuery(e.target.value); setSelected(null); setShowDropdown(true); }}
-            onFocus={() => setShowDropdown(true)}
-            placeholder="Search any unit…"
-            className="w-full pl-9 pr-9 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
-          />
-          {query && (
-            <button onClick={() => { setQuery(''); setSelected(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]">
-              <X className="w-4 h-4" />
-            </button>
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-5 pb-3">
+          {/* Search */}
+          <div className="relative mb-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+            <input
+              type="text"
+              value={query}
+              onChange={e => { setQuery(e.target.value); setSelected(null); setShowDropdown(true); }}
+              onFocus={() => setShowDropdown(true)}
+              placeholder="Search any unit…"
+              className="w-full pl-9 pr-9 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
+            />
+            {query && (
+              <button onClick={() => { setQuery(''); setSelected(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]">
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
+          {showDropdown && results.length > 0 && (
+            <div className="mb-3 bg-[var(--bg-card)] border border-[var(--border-color)] rounded shadow-xl max-h-52 overflow-y-auto">
+              {results.map(u => (
+                <button key={`${u.faction_id}-${u.name}`} onClick={() => handleSelect(u)}
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[var(--accent-gold)]/10 border-b border-[var(--border-color)] last:border-0">
+                  <div>
+                    <p className="text-sm text-[var(--text-primary)]">{u.name}</p>
+                    <p className="text-xs text-[var(--text-secondary)]">{u.faction}</p>
+                  </div>
+                  {u.points.length > 0 && <span className="text-xs text-[var(--accent-gold)]">{u.points[0].cost} pts</span>}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {selected && (
+            <div className="rounded border border-[var(--accent-gold)]/30 bg-[var(--accent-gold)]/5 p-3 mb-4">
+              <p className="text-sm font-semibold text-[var(--text-primary)]">{selected.name}</p>
+              <p className="text-xs text-[var(--text-secondary)]">{selected.faction}</p>
+            </div>
+          )}
+
+          {selected && (
+            <div className="mb-2">
+              <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Quantity (units / squads)</label>
+              <div className="flex items-center gap-3 mt-2">
+                <button onClick={() => setQuantity(q => Math.max(1, q - 1))}
+                  className="w-8 h-8 rounded border border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center text-lg font-bold">−</button>
+                <span className="text-lg font-bold text-[var(--text-primary)] w-8 text-center">{quantity}</span>
+                <button onClick={() => setQuantity(q => q + 1)}
+                  className="w-8 h-8 rounded border border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center text-lg font-bold">+</button>
+              </div>
+            </div>
           )}
         </div>
-        {showDropdown && results.length > 0 && (
-          <div className="mb-3 bg-[var(--bg-card)] border border-[var(--border-color)] rounded shadow-xl max-h-52 overflow-y-auto">
-            {results.map(u => (
-              <button key={`${u.faction_id}-${u.name}`} onClick={() => handleSelect(u)}
-                className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[var(--accent-gold)]/10 border-b border-[var(--border-color)] last:border-0">
-                <div>
-                  <p className="text-sm text-[var(--text-primary)]">{u.name}</p>
-                  <p className="text-xs text-[var(--text-secondary)]">{u.faction}</p>
-                </div>
-                {u.points.length > 0 && <span className="text-xs text-[var(--accent-gold)]">{u.points[0].cost} pts</span>}
-              </button>
-            ))}
-          </div>
-        )}
 
-        {selected && (
-          <div className="rounded border border-[var(--accent-gold)]/30 bg-[var(--accent-gold)]/5 p-3 mb-4">
-            <p className="text-sm font-semibold text-[var(--text-primary)]">{selected.name}</p>
-            <p className="text-xs text-[var(--text-secondary)]">{selected.faction}</p>
-          </div>
-        )}
-
-        {selected && (
-          <div className="mb-4">
-            <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Quantity (units / squads)</label>
-            <div className="flex items-center gap-3 mt-2">
-              <button onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                className="w-8 h-8 rounded border border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center text-lg font-bold">−</button>
-              <span className="text-lg font-bold text-[var(--text-primary)] w-8 text-center">{quantity}</span>
-              <button onClick={() => setQuantity(q => q + 1)}
-                className="w-8 h-8 rounded border border-[var(--border-color)] text-[var(--text-primary)] flex items-center justify-center text-lg font-bold">+</button>
-            </div>
-          </div>
-        )}
-
-        <div className="flex gap-3">
+        {/* Buttons — always visible at bottom */}
+        <div className="flex gap-3 px-5 py-4 border-t border-[var(--border-color)]">
           <button onClick={onClose} className="flex-1 py-2.5 text-sm border border-[var(--border-color)] text-[var(--text-secondary)] rounded">Cancel</button>
           <button onClick={handleAdd} disabled={!selected}
             className="flex-1 py-2.5 text-sm border border-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] font-semibold rounded disabled:opacity-40">

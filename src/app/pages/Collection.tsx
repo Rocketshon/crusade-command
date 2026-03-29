@@ -52,10 +52,10 @@ function CompletionRing({ percentage }: { percentage: number }) {
   return (
     <div className="relative w-36 h-36 mx-auto">
       <svg className="w-full h-full -rotate-90" viewBox="0 0 128 128">
-        <circle cx="64" cy="64" r={radius} fill="none" stroke="#2a2a35" strokeWidth={stroke} />
+        <circle cx="64" cy="64" r={radius} fill="none" stroke="var(--border-color)" strokeWidth={stroke} />
         <circle
           cx="64" cy="64" r={radius} fill="none"
-          stroke="#c9a84c" strokeWidth={stroke}
+          stroke="var(--accent-gold)" strokeWidth={stroke}
           strokeDasharray={circumference} strokeDashoffset={offset}
           strokeLinecap="round"
           className="transition-all duration-700"
@@ -185,7 +185,7 @@ function AddModal({ onClose }: { onClose: () => void }) {
                       value={unitSearch}
                       onChange={e => setUnitSearch(e.target.value)}
                       placeholder="Search units..."
-                      className="w-full pl-9 pr-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] placeholder-[#8a8690] focus:border-[var(--accent-gold)]/50 outline-none"
+                      className="w-full pl-9 pr-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:border-[var(--accent-gold)]/50 outline-none"
                     />
                   </div>
                   <div className="max-h-[40vh] overflow-y-auto space-y-1">
@@ -224,7 +224,7 @@ function AddModal({ onClose }: { onClose: () => void }) {
                   </div>
                   <button
                     onClick={handleDatasheetAdd}
-                    className="w-full py-3 rounded-lg bg-[var(--accent-gold)] text-[var(--bg-primary)] font-bold text-sm hover:bg-[#d4b65c] transition-colors"
+                    className="w-full py-3 rounded-lg bg-[var(--accent-gold)] text-[var(--bg-primary)] font-bold text-sm hover:opacity-80 transition-colors"
                   >
                     Add to Collection
                   </button>
@@ -241,7 +241,7 @@ function AddModal({ onClose }: { onClose: () => void }) {
                   value={quickName}
                   onChange={e => setQuickName(e.target.value)}
                   placeholder="e.g., Terrain Piece, Extra Bases..."
-                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] placeholder-[#8a8690] focus:border-[var(--accent-gold)]/50 outline-none"
+                  className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:border-[var(--accent-gold)]/50 outline-none"
                 />
               </div>
               <div>
@@ -257,7 +257,7 @@ function AddModal({ onClose }: { onClose: () => void }) {
               <button
                 onClick={handleQuickAdd}
                 disabled={!quickName.trim()}
-                className="w-full py-3 rounded-lg bg-[var(--accent-gold)] text-[var(--bg-primary)] font-bold text-sm hover:bg-[#d4b65c] transition-colors disabled:opacity-40"
+                className="w-full py-3 rounded-lg bg-[var(--accent-gold)] text-[var(--bg-primary)] font-bold text-sm hover:opacity-80 transition-colors disabled:opacity-40"
               >
                 Quick Add
               </button>
@@ -333,7 +333,7 @@ function ItemCard({ item }: { item: CollectionItem }) {
               value={item.notes}
               onChange={e => updateItem(item.id, { notes: e.target.value })}
               rows={2}
-              className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] placeholder-[#8a8690] focus:border-[var(--accent-gold)]/50 outline-none resize-none"
+              className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:border-[var(--accent-gold)]/50 outline-none resize-none"
               placeholder="Add notes..."
             />
           </div>
@@ -345,7 +345,7 @@ function ItemCard({ item }: { item: CollectionItem }) {
               value={item.paintRecipe ?? ''}
               onChange={e => updateItem(item.id, { paintRecipe: e.target.value })}
               rows={2}
-              className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] placeholder-[#8a8690] focus:border-[var(--accent-gold)]/50 outline-none resize-none"
+              className="w-full px-3 py-2 rounded-lg bg-[var(--bg-primary)] border border-[var(--border-color)] text-sm text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:border-[var(--accent-gold)]/50 outline-none resize-none"
               placeholder="e.g., Base: Leadbelcher, Wash: Nuln Oil..."
             />
           </div>
@@ -575,7 +575,7 @@ export default function Collection() {
       {/* FAB */}
       <button
         onClick={() => setShowAdd(true)}
-        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-[var(--accent-gold)] text-[var(--bg-primary)] shadow-lg flex items-center justify-center hover:bg-[#d4b65c] active:scale-95 transition-all"
+        className="fixed bottom-24 right-4 z-40 w-14 h-14 rounded-full bg-[var(--accent-gold)] text-[var(--bg-primary)] shadow-lg flex items-center justify-center hover:opacity-80 active:scale-95 transition-all"
       >
         <Plus className="w-6 h-6" strokeWidth={2.5} />
       </button>

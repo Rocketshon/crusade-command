@@ -88,7 +88,7 @@ export default function RulesBrowser() {
         <button
           key={rule.id}
           onClick={() => handleRuleClick(rule.id)}
-          className={`w-full p-3 pl-4 text-left hover:bg-[#c9a84c]/5 transition-all ${idx !== rules.length - 1 ? "border-b border-[var(--border-color)]/60" : ""}`}
+          className={`w-full p-3 pl-4 text-left hover:bg-[var(--accent-gold)]/5 transition-all ${idx !== rules.length - 1 ? "border-b border-[var(--border-color)]/60" : ""}`}
         >
           <div className="flex items-center justify-between gap-3">
             <div className="flex-1 min-w-0">
@@ -133,7 +133,7 @@ export default function RulesBrowser() {
         <div className="space-y-4">
           {/* Core Rules */}
           <div className="relative overflow-hidden rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)]">
-            <button onClick={() => toggleSection("core")} className="w-full p-4 flex items-center justify-between hover:bg-[#c9a84c]/5 transition-all">
+            <button onClick={() => toggleSection("core")} className="w-full p-4 flex items-center justify-between hover:bg-[var(--accent-gold)]/5 transition-all">
               <div className="flex items-center gap-3">
                 <BookOpen className="w-5 h-5 text-[var(--accent-gold)]" strokeWidth={2} />
                 <div className="text-left">
@@ -148,7 +148,7 @@ export default function RulesBrowser() {
               <div className="border-t border-[var(--accent-gold)]/10">
                 {coreRuleGroups.map(group => (
                   <div key={group.label}>
-                    <div className="px-4 py-2 bg-[#12121a] border-b border-[var(--border-color)]/40">
+                    <div className="px-4 py-2 bg-[var(--bg-primary)] border-b border-[var(--border-color)]/40">
                       <span className="text-[11px] font-bold text-[var(--accent-gold)]/80 uppercase tracking-widest">{group.label}</span>
                     </div>
                     {renderRuleList(group.items)}
@@ -161,7 +161,7 @@ export default function RulesBrowser() {
 
           {/* Crusade Rules */}
           <div className="relative overflow-hidden rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)]">
-            <button onClick={() => toggleSection("crusade")} className="w-full p-4 flex items-center justify-between hover:bg-[#c9a84c]/5 transition-all">
+            <button onClick={() => toggleSection("crusade")} className="w-full p-4 flex items-center justify-between hover:bg-[var(--accent-gold)]/5 transition-all">
               <div className="flex items-center gap-3">
                 <BookOpen className="w-5 h-5 text-[var(--accent-gold)]" strokeWidth={2} />
                 <div className="text-left">
@@ -178,7 +178,7 @@ export default function RulesBrowser() {
                   <button
                     key={rule.id}
                     onClick={() => handleRuleClick(rule.id)}
-                    className={`w-full p-3 text-left hover:bg-[#c9a84c]/5 transition-all ${idx !== filteredCrusadeRules.length - 1 ? "border-b border-[var(--border-color)]/60" : ""}`}
+                    className={`w-full p-3 text-left hover:bg-[var(--accent-gold)]/5 transition-all ${idx !== filteredCrusadeRules.length - 1 ? "border-b border-[var(--border-color)]/60" : ""}`}
                   >
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-sm text-[var(--text-primary)]">{rule.title}</span>

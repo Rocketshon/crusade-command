@@ -72,7 +72,7 @@ export default function FactionCodex() {
   const tabClasses = (isActive: boolean) =>
     `px-4 py-2 rounded-lg font-semibold text-sm whitespace-nowrap transition-all ${
       isActive
-        ? "bg-gradient-to-r from-[var(--accent-gold)] to-[#d4a017] text-[var(--bg-primary)]"
+        ? "bg-[var(--accent-gold)] text-[var(--bg-primary)]"
         : "border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-tertiary)] hover:border-[var(--accent-gold)]"
     }`;
 
@@ -237,7 +237,7 @@ export default function FactionCodex() {
                       </div>
                       <div className="flex flex-wrap gap-1">
                         {unit.keywords.slice(0, 4).map((kw, kwIdx) => (
-                          <span key={kwIdx} className="px-1.5 py-0.5 rounded bg-[#12121a] text-[10px] text-[var(--text-secondary)] border border-[var(--border-color)]/50">{toTitleCase(kw)}</span>
+                          <span key={kwIdx} className="px-1.5 py-0.5 rounded bg-[var(--bg-primary)] text-[10px] text-[var(--text-secondary)] border border-[var(--border-color)]/50">{toTitleCase(kw)}</span>
                         ))}
                       </div>
                     </div>

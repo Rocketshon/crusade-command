@@ -23,7 +23,7 @@ interface CoreStratagem {
 }
 
 const PHASE_LIST: { key: GamePhase; label: string; color: string; activeColor: string }[] = [
-  { key: 'command', label: 'Command', color: 'border-[var(--accent-gold)]/50 text-[var(--accent-gold)]', activeColor: 'bg-[#c9a84c] text-[var(--bg-primary)] border-[var(--accent-gold)]' },
+  { key: 'command', label: 'Command', color: 'border-[var(--accent-gold)]/50 text-[var(--accent-gold)]', activeColor: 'bg-[var(--accent-gold)] text-[var(--bg-primary)] border-[var(--accent-gold)]' },
   { key: 'movement', label: 'Movement', color: 'border-blue-500/50 text-blue-400', activeColor: 'bg-blue-600 text-white border-blue-600' },
   { key: 'shooting', label: 'Shooting', color: 'border-red-500/50 text-red-400', activeColor: 'bg-red-600 text-white border-red-600' },
   { key: 'charge', label: 'Charge', color: 'border-orange-500/50 text-orange-400', activeColor: 'bg-orange-600 text-white border-orange-600' },
@@ -32,7 +32,7 @@ const PHASE_LIST: { key: GamePhase; label: string; color: string; activeColor: s
 
 // Phase top border colors for stratagem cards
 const PHASE_BORDER: Record<GamePhase, string> = {
-  command: 'border-t-[#c9a84c]',
+  command: 'border-t-[var(--accent-gold)]',
   movement: 'border-t-blue-500',
   shooting: 'border-t-red-500',
   charge: 'border-t-orange-500',
@@ -106,12 +106,12 @@ function StratagemCard({ strat, badge, phase }: {
         <h4 className="text-sm font-bold text-[var(--text-primary)]">{strat.name}</h4>
         <div className="flex items-center gap-1.5 shrink-0">
           {badge && (
-            <span className="text-[10px] px-1.5 py-0.5 bg-[#8a8690]/20 text-[var(--text-secondary)] rounded font-semibold uppercase">
+            <span className="text-[10px] px-1.5 py-0.5 bg-[var(--border-color)]/40 text-[var(--text-secondary)] rounded font-semibold uppercase">
               {badge}
             </span>
           )}
           {strat.cp && (
-            <span className="text-xs px-2 py-0.5 bg-[#c9a84c]/15 text-[var(--accent-gold)] font-bold rounded border border-[var(--accent-gold)]/30">
+            <span className="text-xs px-2 py-0.5 bg-[var(--accent-gold)]/15 text-[var(--accent-gold)] font-bold rounded border border-[var(--accent-gold)]/30">
               {strat.cp}
             </span>
           )}
@@ -211,7 +211,7 @@ export default function PhaseNavigator() {
     return (
       <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center px-4">
         <p className="text-[var(--text-secondary)] mb-4">Set up your army first to use Battle Aid.</p>
-        <button onClick={() => navigate('/army')} className="px-6 py-2 bg-[#c9a84c] text-[var(--bg-primary)] rounded-lg hover:bg-[#b8960f] transition-colors">Go to Army</button>
+        <button onClick={() => navigate('/army')} className="px-6 py-2 bg-[var(--accent-gold)] text-[var(--bg-primary)] rounded-lg hover:opacity-80 transition-opacity">Go to Army</button>
       </div>
     );
   }

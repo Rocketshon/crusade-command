@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 export default function Settings() {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const { clearArmy, savedArmies } = useArmy();
+  const { savedArmies } = useArmy();
   const { items: collectionItems } = useCollection();
   const edition = getActiveEdition();
 
@@ -36,8 +36,13 @@ export default function Settings() {
       clearArmiesTimer.current = setTimeout(() => setConfirmClearArmies(false), 3000);
       return;
     }
-    clearArmy();
-    toast.success('All army lists cleared');
+    // Clear all army-related keys directly so all saved armies are wiped
+    const armyKeys = ['army_saved_lists', 'army_active_id', 'army_mode', 'army_faction', 'army_detachment', 'army_supply_limit', 'army_units'];
+    for (const key of armyKeys) {
+      try { localStorage.removeItem(key); } catch {}
+    }
+    toast.success('All army lists cleared — reloading...');
+    setTimeout(() => window.location.reload(), 1000);
     setConfirmClearArmies(false);
   };
 
@@ -47,9 +52,9 @@ export default function Settings() {
       clearCollectionTimer.current = setTimeout(() => setConfirmClearCollection(false), 3000);
       return;
     }
-    // Clear collection from localStorage
     try { localStorage.removeItem('warcaster_collection'); } catch {}
-    toast.success('Collection cleared — reload to take effect');
+    toast.success('Collection cleared — reloading...');
+    setTimeout(() => window.location.reload(), 1000);
     setConfirmClearCollection(false);
   };
 

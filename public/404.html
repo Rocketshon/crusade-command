@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Warcaster</title>
+  <script>
+    // GitHub Pages SPA: save the attempted path and redirect to the app root.
+    // The main page will restore the path via history.replaceState before React mounts.
+    try {
+      sessionStorage.setItem('spa_redirect', window.location.pathname + window.location.search + window.location.hash);
+    } catch (e) {}
+  </script>
+  <meta http-equiv="refresh" content="0;URL='/crusade-command/'">
+</head>
+<body></body>
+</html>

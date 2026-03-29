@@ -34,11 +34,11 @@ function WeaponCard({ weapon, type, compact }: { weapon: WeaponProfile; type: "r
   const bgGlow = isRanged ? "from-emerald-500/5" : "from-red-500/5";
 
   return (
-    <div className={`relative overflow-hidden rounded-sm border ${borderColor} bg-gradient-to-br from-stone-900 to-stone-950`}>
+    <div className={`relative overflow-hidden rounded-sm border ${borderColor} bg-[var(--bg-card)]`}>
       <div className={`absolute inset-0 bg-gradient-to-br ${bgGlow} to-transparent`} />
       <div className="relative p-3">
         {/* Weapon Name */}
-        <h4 className={`text-sm font-semibold text-stone-100 mb-2 ${compact ? 'text-xs' : ''}`}>
+        <h4 className={`text-sm font-semibold text-[var(--text-primary)] mb-2 ${compact ? 'text-xs' : ''}`}>
           {weapon.name}
         </h4>
 
@@ -56,7 +56,7 @@ function WeaponCard({ weapon, type, compact }: { weapon: WeaponProfile; type: "r
               <div className={`text-[10px] ${accentColor} font-semibold uppercase tracking-wider`}>
                 {stat.label}
               </div>
-              <div className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-stone-100 font-mono`}>
+              <div className={`${compact ? 'text-xs' : 'text-sm'} font-bold text-[var(--text-primary)] font-mono`}>
                 {stat.value ?? '-'}
               </div>
             </div>
@@ -86,10 +86,10 @@ export default function WeaponStatTable({ weapons, type, compact }: WeaponStatTa
 
   return (
     <div className="mb-6">
-      <h2 className={`text-sm font-semibold text-stone-300 uppercase tracking-wider mb-3 flex items-center gap-2`}>
+      <h2 className={`text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3 flex items-center gap-2`}>
         <Icon className={`w-4 h-4 ${iconColor}`} />
         {label}
-        <span className="text-stone-600 text-xs font-normal normal-case ml-auto">
+        <span className="text-[var(--text-secondary)] text-xs font-normal normal-case ml-auto">
           {weapons.length} {weapons.length === 1 ? 'weapon' : 'weapons'}
         </span>
       </h2>

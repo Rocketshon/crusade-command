@@ -19,7 +19,7 @@ const COLOR_MAP: Record<string, { color: string; bgGlow: string }> = {
   zinc: { color: 'text-zinc-400', bgGlow: 'from-zinc-400/10' },
   lime: { color: 'text-lime-500', bgGlow: 'from-lime-500/10' },
   rose: { color: 'text-rose-500', bgGlow: 'from-rose-500/10' },
-  stone: { color: 'text-stone-400', bgGlow: 'from-stone-400/10' },
+  stone: { color: 'text-[var(--text-secondary)]', bgGlow: 'from-[var(--border-color)]/10' },
   emerald: { color: 'text-emerald-400', bgGlow: 'from-emerald-400/10' },
   violet: { color: 'text-violet-400', bgGlow: 'from-violet-400/10' },
   sky: { color: 'text-sky-500', bgGlow: 'from-sky-500/10' },
@@ -27,7 +27,7 @@ const COLOR_MAP: Record<string, { color: string; bgGlow: string }> = {
 };
 
 function getFactionColors(colorKey: string) {
-  return COLOR_MAP[colorKey] ?? { color: 'text-stone-400', bgGlow: 'from-stone-400/10' };
+  return COLOR_MAP[colorKey] ?? { color: 'text-[var(--text-secondary)]', bgGlow: 'from-[var(--border-color)]/10' };
 }
 
 export default function CodexHome() {

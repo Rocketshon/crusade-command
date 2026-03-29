@@ -105,10 +105,10 @@ export default function RuleDetail() {
 
   const getSourceColor = () => {
     switch (rule.sourceType) {
-      case "core": return "bg-[#c9a84c]/10 border-[var(--accent-gold)]/30 text-[var(--accent-gold)]";
+      case "core": return "bg-[var(--accent-gold)]/10 border-[var(--accent-gold)]/30 text-[var(--accent-gold)]";
       case "crusade": return "bg-amber-500/10 border-amber-500/30 text-amber-500";
       case "faction": return "bg-blue-500/10 border-blue-500/30 text-blue-500";
-      default: return "bg-[#c9a84c]/10 border-[var(--accent-gold)]/30 text-[var(--accent-gold)]";
+      default: return "bg-[var(--accent-gold)]/10 border-[var(--accent-gold)]/30 text-[var(--accent-gold)]";
     }
   };
 
@@ -128,7 +128,7 @@ export default function RuleDetail() {
           const isExpanded = expandedSubsections.has(key);
           return (
             <div key={idx} className={idx !== validItems.length - 1 ? "border-b border-[var(--border-color)]/60" : ""}>
-              <button onClick={() => toggleSubsection(key)} className="w-full px-4 py-3 flex items-center justify-between hover:bg-[#c9a84c]/5 transition-all">
+              <button onClick={() => toggleSubsection(key)} className="w-full px-4 py-3 flex items-center justify-between hover:bg-[var(--accent-gold)]/5 transition-all">
                 <span className="text-sm text-[var(--accent-gold)] font-medium text-left">{item.title}</span>
                 {isExpanded ? <ChevronDown className="w-4 h-4 text-[var(--accent-gold)] flex-shrink-0" /> : <ChevronRight className="w-4 h-4 text-[var(--text-secondary)] flex-shrink-0" />}
               </button>

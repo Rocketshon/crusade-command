@@ -47,7 +47,7 @@ function renderInlineKeywords(text: string | null | undefined, key: string | num
     <>
       {parts.map((part, i) => {
         if (/^\[[A-Z][A-Z\s\-]+\d*\]$/.test(part)) {
-          return <span key={`${key}-${i}`} className="text-[#c9a84c] font-semibold">{part}</span>;
+          return <span key={`${key}-${i}`} className="text-[var(--accent-gold)] font-semibold">{part}</span>;
         }
         return part;
       })}
@@ -302,7 +302,7 @@ export function parseRuleText(text: string): ReactNode[] {
       elements.push(
         <ol key={keyIdx++} className="list-decimal list-outside ml-6 my-2 space-y-1">
           {bullets.map((b, bi) => (
-            <li key={bi} className="text-stone-300 text-xs leading-relaxed pl-1">
+            <li key={bi} className="text-[var(--text-secondary)] text-xs leading-relaxed pl-1">
               {renderInlineKeywords(b, `${keyIdx}-${bi}`)}
             </li>
           ))}
@@ -313,7 +313,7 @@ export function parseRuleText(text: string): ReactNode[] {
 
     if (item.kind === 'section-header') {
       elements.push(
-        <h3 key={keyIdx++} className="text-sm font-bold text-[#c9a84c] tracking-wide mt-5 mb-2 pt-3 border-t border-stone-700/40">
+        <h3 key={keyIdx++} className="text-sm font-bold text-[var(--accent-gold)] tracking-wide mt-5 mb-2 pt-3 border-t border-[var(--border-color)]/40">
           {toTitleCase(item.text)}
         </h3>
       );
@@ -323,7 +323,7 @@ export function parseRuleText(text: string): ReactNode[] {
 
     if (item.kind === 'heading') {
       elements.push(
-        <h4 key={keyIdx++} className="text-xs font-bold text-[#c9a84c] uppercase tracking-wide mt-3 mb-1">
+        <h4 key={keyIdx++} className="text-xs font-bold text-[var(--accent-gold)] uppercase tracking-wide mt-3 mb-1">
           {toTitleCase(item.text.replace(/:$/, ''))}
         </h4>
       );
@@ -333,7 +333,7 @@ export function parseRuleText(text: string): ReactNode[] {
 
     // paragraph
     elements.push(
-      <p key={keyIdx++} className="text-xs text-stone-300 leading-relaxed mb-2">
+      <p key={keyIdx++} className="text-xs text-[var(--text-secondary)] leading-relaxed mb-2">
         {renderInlineKeywords(item.text, keyIdx)}
       </p>
     );
@@ -361,13 +361,13 @@ export function getBattleSizeColor(size: string): string {
     case 'Combat Patrol':
       return 'bg-blue-500/20 border-blue-500/30 text-blue-400';
     case 'Incursion':
-      return 'bg-emerald-500/20 border-emerald-500/30 text-[#c9a84c]';
+      return 'bg-emerald-500/20 border-emerald-500/30 text-[var(--accent-gold)]';
     case 'Strike Force':
       return 'bg-amber-500/20 border-amber-500/30 text-amber-400';
     case 'Onslaught':
       return 'bg-red-500/20 border-red-500/30 text-red-400';
     default:
-      return 'bg-stone-700 text-stone-300';
+      return 'bg-[var(--bg-card)] text-[var(--text-secondary)]';
   }
 }
 
@@ -376,7 +376,7 @@ export function getBattleSizeColor(size: string): string {
  */
 export function getStratagemTypeColor(type: string): string {
   const t = type.toLowerCase();
-  if (t.includes('battle tactic')) return 'bg-emerald-500/20 border-emerald-500/30 text-[#c9a84c]';
+  if (t.includes('battle tactic')) return 'bg-emerald-500/20 border-emerald-500/30 text-[var(--accent-gold)]';
   if (t.includes('strategic ploy')) return 'bg-blue-500/20 border-blue-500/30 text-blue-400';
   if (t.includes('epic deed')) return 'bg-amber-500/20 border-amber-500/30 text-amber-400';
   if (t.includes('wargear')) return 'bg-orange-500/20 border-orange-500/30 text-orange-400';
@@ -393,23 +393,23 @@ export function getEnhancementCardColors(factionColor: string): {
   costText: string;
 } {
   const map: Record<string, { card: string; nameText: string; costText: string }> = {
-    blue:    { card: 'border-blue-500/20 bg-gradient-to-br from-blue-950/20 to-stone-950',       nameText: 'text-blue-400',    costText: 'text-blue-500' },
-    cyan:    { card: 'border-cyan-400/20 bg-gradient-to-br from-cyan-950/20 to-stone-950',       nameText: 'text-cyan-400',    costText: 'text-cyan-500' },
-    slate:   { card: 'border-slate-400/20 bg-gradient-to-br from-slate-900/30 to-stone-950',     nameText: 'text-slate-300',   costText: 'text-slate-400' },
-    red:     { card: 'border-red-500/20 bg-gradient-to-br from-red-950/20 to-stone-950',         nameText: 'text-red-400',     costText: 'text-red-500' },
-    amber:   { card: 'border-amber-500/20 bg-gradient-to-br from-amber-950/20 to-stone-950',     nameText: 'text-amber-400',   costText: 'text-amber-500' },
-    orange:  { card: 'border-orange-500/20 bg-gradient-to-br from-orange-950/20 to-stone-950',   nameText: 'text-orange-400',  costText: 'text-orange-500' },
-    green:   { card: 'border-green-500/20 bg-gradient-to-br from-green-950/20 to-stone-950',     nameText: 'text-green-400',   costText: 'text-green-500' },
-    yellow:  { card: 'border-yellow-500/20 bg-gradient-to-br from-yellow-950/20 to-stone-950',   nameText: 'text-yellow-400',  costText: 'text-yellow-500' },
-    purple:  { card: 'border-purple-500/20 bg-gradient-to-br from-purple-950/20 to-stone-950',   nameText: 'text-purple-400',  costText: 'text-purple-500' },
-    zinc:    { card: 'border-zinc-400/20 bg-gradient-to-br from-zinc-900/30 to-stone-950',       nameText: 'text-zinc-300',    costText: 'text-zinc-400' },
-    lime:    { card: 'border-lime-500/20 bg-gradient-to-br from-lime-950/20 to-stone-950',       nameText: 'text-lime-400',    costText: 'text-lime-500' },
-    rose:    { card: 'border-rose-500/20 bg-gradient-to-br from-rose-950/20 to-stone-950',       nameText: 'text-rose-400',    costText: 'text-rose-500' },
-    stone:   { card: 'border-stone-500/20 bg-gradient-to-br from-stone-800/30 to-stone-950',     nameText: 'text-stone-300',   costText: 'text-stone-400' },
-    emerald: { card: 'border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 to-stone-950', nameText: 'text-[#c9a84c]', costText: 'text-emerald-500' },
-    violet:  { card: 'border-violet-500/20 bg-gradient-to-br from-violet-950/20 to-stone-950',   nameText: 'text-violet-400',  costText: 'text-violet-500' },
-    sky:     { card: 'border-sky-500/20 bg-gradient-to-br from-sky-950/20 to-stone-950',         nameText: 'text-sky-400',     costText: 'text-sky-500' },
-    indigo:  { card: 'border-indigo-500/20 bg-gradient-to-br from-indigo-950/20 to-stone-950',   nameText: 'text-indigo-400',  costText: 'text-indigo-500' },
+    blue:    { card: 'border-blue-500/20 bg-gradient-to-br from-blue-950/20 to-[var(--bg-card)]',       nameText: 'text-blue-400',    costText: 'text-blue-500' },
+    cyan:    { card: 'border-cyan-400/20 bg-gradient-to-br from-cyan-950/20 to-[var(--bg-card)]',       nameText: 'text-cyan-400',    costText: 'text-cyan-500' },
+    slate:   { card: 'border-slate-400/20 bg-gradient-to-br from-slate-900/30 to-[var(--bg-card)]',     nameText: 'text-[var(--text-primary)]',   costText: 'text-[var(--text-secondary)]' },
+    red:     { card: 'border-red-500/20 bg-gradient-to-br from-red-950/20 to-[var(--bg-card)]',         nameText: 'text-red-400',     costText: 'text-red-500' },
+    amber:   { card: 'border-amber-500/20 bg-gradient-to-br from-amber-950/20 to-[var(--bg-card)]',     nameText: 'text-amber-400',   costText: 'text-amber-500' },
+    orange:  { card: 'border-orange-500/20 bg-gradient-to-br from-orange-950/20 to-[var(--bg-card)]',   nameText: 'text-orange-400',  costText: 'text-orange-500' },
+    green:   { card: 'border-green-500/20 bg-gradient-to-br from-green-950/20 to-[var(--bg-card)]',     nameText: 'text-green-400',   costText: 'text-green-500' },
+    yellow:  { card: 'border-yellow-500/20 bg-gradient-to-br from-yellow-950/20 to-[var(--bg-card)]',   nameText: 'text-yellow-400',  costText: 'text-yellow-500' },
+    purple:  { card: 'border-purple-500/20 bg-gradient-to-br from-purple-950/20 to-[var(--bg-card)]',   nameText: 'text-purple-400',  costText: 'text-purple-500' },
+    zinc:    { card: 'border-zinc-400/20 bg-gradient-to-br from-zinc-900/30 to-[var(--bg-card)]',       nameText: 'text-[var(--text-primary)]',   costText: 'text-[var(--text-secondary)]' },
+    lime:    { card: 'border-lime-500/20 bg-gradient-to-br from-lime-950/20 to-[var(--bg-card)]',       nameText: 'text-lime-400',    costText: 'text-lime-500' },
+    rose:    { card: 'border-rose-500/20 bg-gradient-to-br from-rose-950/20 to-[var(--bg-card)]',       nameText: 'text-rose-400',    costText: 'text-rose-500' },
+    stone:   { card: 'border-stone-500/20 bg-gradient-to-br from-stone-800/30 to-[var(--bg-card)]',     nameText: 'text-[var(--text-primary)]',   costText: 'text-[var(--text-secondary)]' },
+    emerald: { card: 'border-emerald-500/20 bg-gradient-to-br from-emerald-950/20 to-[var(--bg-card)]', nameText: 'text-[var(--accent-gold)]', costText: 'text-emerald-500' },
+    violet:  { card: 'border-violet-500/20 bg-gradient-to-br from-violet-950/20 to-[var(--bg-card)]',   nameText: 'text-violet-400',  costText: 'text-violet-500' },
+    sky:     { card: 'border-sky-500/20 bg-gradient-to-br from-sky-950/20 to-[var(--bg-card)]',         nameText: 'text-sky-400',     costText: 'text-sky-500' },
+    indigo:  { card: 'border-indigo-500/20 bg-gradient-to-br from-indigo-950/20 to-[var(--bg-card)]',   nameText: 'text-indigo-400',  costText: 'text-indigo-500' },
   };
   return map[factionColor] ?? map.emerald;
 }

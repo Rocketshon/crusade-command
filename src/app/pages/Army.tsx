@@ -192,7 +192,7 @@ function StandardUnitCard({ unit, onRemove, wouldFixOver, datasheetLookup }: { u
         <div className="flex items-center gap-2">
           <span className="font-medium text-[var(--text-primary)] truncate">{unit.custom_name}</span>
           {unit.is_character && (
-            <span className="text-xs px-2 py-0.5 bg-[#12121a] text-[var(--text-tertiary)] rounded-full">Character</span>
+            <span className="text-xs px-2 py-0.5 bg-[var(--bg-primary)] text-[var(--text-tertiary)] rounded-full">Character</span>
           )}
           {wouldFixOver && (
             <span className="text-xs px-1.5 py-0.5 bg-amber-500/20 text-amber-400 rounded font-medium">over</span>
@@ -239,7 +239,7 @@ function CrusadeUnitCard({ unit, onRemove, wouldFixOver }: { unit: ArmyUnit; onR
       </div>
 
       {/* XP progress bar */}
-      <div className="w-full h-2 bg-[#12121a] rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-[var(--bg-primary)] rounded-full overflow-hidden">
         <div
           className="h-full bg-green-600 rounded-full transition-all"
           style={{ width: `${xpProgress}%` }}
@@ -292,7 +292,7 @@ function DetachmentRuleCard({ factionId, detachmentName }: { factionId: string; 
           No detachment selected.{' '}
           <button
             onClick={() => navigate('/army')}
-            className="text-[var(--accent-gold)] font-medium underline hover:text-[#b8960f]"
+            className="text-[var(--accent-gold)] font-medium underline hover:opacity-70"
           >
             Pick a detachment
           </button>
@@ -481,7 +481,7 @@ export default function Army() {
                     className="flex-1 px-2 py-1 text-lg font-bold font-serif bg-[var(--bg-primary)] border border-[var(--border-color)] rounded text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]"
                     autoFocus
                   />
-                  <button onClick={handleSaveName} className="text-[var(--accent-gold)] hover:text-[#b8960f]">
+                  <button onClick={handleSaveName} className="text-[var(--accent-gold)] hover:opacity-70">
                     <Check className="w-5 h-5" />
                   </button>
                 </div>
@@ -606,7 +606,7 @@ export default function Army() {
                         <span className="font-medium text-[var(--text-primary)]">{displayName}</span>
                         <span className="text-[var(--text-secondary)]">{pts}pts ({pct}%)</span>
                       </div>
-                      <div className="w-full h-3 bg-[#12121a] rounded-full overflow-hidden">
+                      <div className="w-full h-3 bg-[var(--bg-primary)] rounded-full overflow-hidden">
                         <div
                           className="h-full rounded-full transition-all"
                           style={{ width: `${pct}%`, backgroundColor: color }}
@@ -669,7 +669,7 @@ export default function Army() {
         onClick={() => navigate('/add-unit')}
         className="fixed bottom-28 right-4 w-14 h-14 bg-[var(--accent-gold)] text-[var(--bg-primary)] rounded-full shadow-lg shadow-amber-900/30
                    flex items-center justify-center hover:bg-[var(--accent-gold-hover)] transition-colors
-                   focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)] focus:ring-offset-2 focus:ring-offset-[#0a0a0f]"
+                   focus:outline-none focus:ring-2 focus:ring-[var(--accent-gold)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]"
         aria-label="Add unit"
       >
         <Plus className="w-6 h-6" />

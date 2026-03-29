@@ -371,27 +371,27 @@ export default function ArmyExport() {
         {/* Back button */}
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-2 text-[#8a8690] hover:text-[#c9a84c] transition-colors mb-6"
+          className="flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--accent-gold)] transition-colors mb-6"
         >
           <ArrowLeft className="w-5 h-5" />
           <span className="text-sm">Back</span>
         </button>
 
         {/* Header */}
-        <h1 className="font-serif text-xl font-bold text-[#c9a84c] mb-4">Export Army List</h1>
+        <h1 className="font-serif text-xl font-bold text-[var(--accent-gold)] mb-4">Export Army List</h1>
 
         {/* Tournament format toggle */}
         <button
           onClick={() => setTournamentFormat(!tournamentFormat)}
-          className="flex items-center gap-2 mb-6 px-4 py-2.5 bg-[var(--bg-card)] border border-[#2a2a35] rounded-lg
-                     hover:border-[#c9a84c] transition-colors w-full"
+          className="flex items-center gap-2 mb-6 px-4 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg
+                     hover:border-[var(--accent-gold)] transition-colors w-full"
         >
           {tournamentFormat ? (
-            <ToggleRight className="w-5 h-5 text-[#c9a84c]" />
+            <ToggleRight className="w-5 h-5 text-[var(--accent-gold)]" />
           ) : (
-            <ToggleLeft className="w-5 h-5 text-[#8a8690]" />
+            <ToggleLeft className="w-5 h-5 text-[var(--text-secondary)]" />
           )}
-          <span className={`text-sm font-medium ${tournamentFormat ? 'text-[#c9a84c]' : 'text-[#8a8690]'}`}>
+          <span className={`text-sm font-medium ${tournamentFormat ? 'text-[var(--accent-gold)]' : 'text-[var(--text-secondary)]'}`}>
             Tournament Format (ITC/GT)
           </span>
         </button>
@@ -400,28 +400,28 @@ export default function ArmyExport() {
         <div className="grid grid-cols-2 gap-3 mb-6">
           <button
             onClick={handleCopy}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-[#c9a84c] text-[#0a0a0f] font-semibold rounded-lg hover:bg-[#b8960f] transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--accent-gold)] text-[var(--bg-primary)] font-semibold rounded-lg hover:opacity-80 transition-opacity"
           >
             <Copy className="w-4 h-4" />
             Copy
           </button>
           <button
             onClick={handleShare}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--bg-card)] border border-[#2a2a35] text-[#e8e4de] font-semibold rounded-lg hover:border-[#c9a84c] transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold rounded-lg hover:border-[var(--accent-gold)] transition-colors"
           >
             <Share2 className="w-4 h-4" />
             Share
           </button>
           <button
             onClick={handlePrint}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--bg-card)] border border-[#2a2a35] text-[#e8e4de] font-semibold rounded-lg hover:border-[#c9a84c] transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold rounded-lg hover:border-[var(--accent-gold)] transition-colors"
           >
             <Printer className="w-4 h-4" />
             Print
           </button>
           <button
             onClick={handleGenerateImage}
-            className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--bg-card)] border border-[#2a2a35] text-[#e8e4de] font-semibold rounded-lg hover:border-[#c9a84c] transition-colors"
+            className="flex items-center justify-center gap-2 px-4 py-3 bg-[var(--bg-card)] border border-[var(--border-color)] text-[var(--text-primary)] font-semibold rounded-lg hover:border-[var(--accent-gold)] transition-colors"
           >
             <Image className="w-4 h-4" />
             Save Image
@@ -429,10 +429,10 @@ export default function ArmyExport() {
         </div>
 
         {/* Export text preview */}
-        <div id="print-area" className="bg-[var(--bg-card)] border border-[#2a2a35] rounded-lg p-4 overflow-x-auto">
+        <div id="print-area" className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg p-4 overflow-x-auto">
           <pre
             ref={textRef}
-            className="text-xs text-[#e8e4de] font-mono whitespace-pre-wrap leading-relaxed"
+            className="text-xs text-[var(--text-primary)] font-mono whitespace-pre-wrap leading-relaxed"
           >
             {exportText}
           </pre>

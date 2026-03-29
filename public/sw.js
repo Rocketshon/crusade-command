@@ -33,10 +33,14 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET' || url.origin !== location.origin) return;
 
   // HTML pages: network-first (SPA routing)
+  // On 404 (GitHub Pages), fall back to cached index.html so the SPA handles routing.
   if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
     event.respondWith(
       fetch(request)
         .then((response) => {
+          if (!response.ok) {
+            return caches.match('./index.html').then((cached) => cached || response);
+          }
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
           return response;

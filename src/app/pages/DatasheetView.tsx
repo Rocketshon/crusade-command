@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Shield, Zap, ScrollText } from "lucide-react";
+import { ArrowLeft, Plus, Shield, Zap } from "lucide-react";
 import { getUnitsForFaction } from '../../data';
 import { getFaction, getDataFactionId } from '../../lib/factions';
 import { useArmy } from '../../lib/ArmyContext';
-import { useCrusade } from '../../lib/CrusadeContext';
 import { toTitleCase, FormattedRuleText } from '../../lib/formatText';
 import type { FactionId, Datasheet } from '../../types';
 import WeaponStatTable from '../components/WeaponStatTable';
@@ -14,9 +13,12 @@ export default function DatasheetView() {
   const { factionId, datasheetName } = useParams<{ factionId: string; datasheetName: string }>();
   const navigate = useNavigate();
   const [showAddSuccess, setShowAddSuccess] = useState(false);
-  const [showAddCrusadeSuccess, setShowAddCrusadeSuccess] = useState(false);
+  const addSuccessTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { addUnit, mode } = useArmy();
-  const { campaign, addUnit: addCrusadeUnit } = useCrusade();
+
+  useEffect(() => {
+    return () => { if (addSuccessTimer.current) clearTimeout(addSuccessTimer.current); };
+  }, []);
 
   const units = factionId ? getUnitsForFaction(getDataFactionId(factionId as FactionId)) : [];
   const datasheet: Datasheet | undefined = datasheetName
@@ -41,11 +43,10 @@ export default function DatasheetView() {
     if (!mode) { toast.error("Start building an army first"); return; }
     if (datasheet) {
       const pointsCost = datasheet.points.length > 0 ? parseInt(datasheet.points[0].cost, 10) || 0 : 0;
-      const role = datasheet.keywords.length > 0 ? datasheet.keywords[0] : '';
       addUnit({ datasheetName: datasheet.name, pointsCost, isCharacter: datasheet.keywords.includes('CHARACTER') });
       setShowAddSuccess(true);
       toast.success(`${datasheet.name} added to army (${pointsCost} pts)`);
-      setTimeout(() => setShowAddSuccess(false), 2000);
+      addSuccessTimer.current = setTimeout(() => setShowAddSuccess(false), 2000);
     }
   };
 
@@ -221,7 +222,7 @@ export default function DatasheetView() {
           className={`w-full py-4 rounded-lg font-bold text-base transition-all disabled:opacity-50 disabled:cursor-not-allowed ${
             showAddSuccess
               ? "bg-[var(--accent-gold)] text-[var(--bg-primary)]"
-              : "bg-gradient-to-r from-[var(--accent-gold)] to-[#d4a017] text-[var(--bg-primary)] hover:from-[#d4a017] hover:to-[#c9a84c]"
+              : "bg-[var(--accent-gold)] text-[var(--bg-primary)] hover:opacity-90"
           }`}
         >
           {showAddSuccess ? (
@@ -231,34 +232,6 @@ export default function DatasheetView() {
           )}
         </button>
 
-        {campaign && (
-          <button
-            onClick={() => {
-              if (!datasheet) return;
-              const pointsCost = datasheet.points.length > 0 ? parseInt(datasheet.points[0].cost, 10) || 0 : 0;
-              const isCharacter = datasheet.keywords.includes('CHARACTER');
-              const isBattleline = datasheet.keywords.includes('BATTLELINE');
-              addCrusadeUnit({
-                datasheetName: datasheet.name,
-                customName: datasheet.name,
-                keywords: datasheet.keywords,
-                isCharacter,
-                isBattleline,
-                pointsCost,
-              });
-              setShowAddCrusadeSuccess(true);
-              toast.success(`${datasheet.name} added to Order of Battle`);
-              setTimeout(() => setShowAddCrusadeSuccess(false), 2000);
-            }}
-            disabled={showAddCrusadeSuccess}
-            className="w-full py-4 rounded-lg font-bold text-base border border-[var(--accent-gold)]/50 bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] hover:bg-[var(--accent-gold)]/20 transition-all disabled:opacity-50"
-          >
-            <span className="flex items-center justify-center gap-2">
-              <ScrollText className="w-5 h-5" />
-              {showAddCrusadeSuccess ? 'Added to Order of Battle' : `Add to Order of Battle (${campaign.name})`}
-            </span>
-          </button>
-        )}
       </div>
     </div>
   );

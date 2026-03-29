@@ -122,7 +122,7 @@ function CrusadeDashboard() {
             <p className={`text-xs font-bold ${supplyUsed > supplyLimit ? 'text-red-400' : 'text-[var(--accent-gold)]'}`}>
               {supplyUsed} / {supplyLimit} pts
             </p>
-            <button onClick={() => setSupplyLimit(supplyLimit + 200)} className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-green-400" title="Increase Supply Limit +200 (costs 1 RP)">+200</button>
+            <button onClick={() => { spendRP(1); setSupplyLimit(supplyLimit + 200); }} disabled={crusade.rp < 1} className="text-[10px] px-1.5 py-0.5 rounded border border-[var(--border-color)] text-[var(--text-secondary)] hover:text-green-400 disabled:opacity-40" title="Increase Supply Limit +200 (costs 1 RP)">+200</button>
           </div>
         </div>
         <div className="h-1.5 bg-[var(--border-color)] rounded-full overflow-hidden">
@@ -289,124 +289,129 @@ function AddUnitModal({ onClose, mode }: { onClose: () => void; mode: 'standard'
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-end">
-      <div className="w-full bg-[var(--bg-primary)] rounded-t-xl border-t border-[var(--border-color)] p-5 max-h-[85vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-4">
+    <div className="fixed inset-0 z-[100] bg-black/70 flex items-end">
+      <div className="w-full bg-[var(--bg-primary)] rounded-t-xl border-t border-[var(--border-color)] flex flex-col max-h-[85vh]">
+        {/* Header — fixed */}
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
           <h2 className="text-base font-bold text-[var(--text-primary)]">Add Unit</h2>
           <button onClick={onClose} className="text-[var(--text-secondary)]"><X className="w-5 h-5" /></button>
         </div>
 
-        <div className="relative mb-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
-          <input
-            type="text"
-            value={query}
-            onChange={e => { setQuery(e.target.value); setSelected(null); setShowDropdown(true); }}
-            onFocus={() => setShowDropdown(true)}
-            placeholder="Search units from your collection…"
-            className="w-full pl-9 pr-9 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
-          />
-          {query && (
-            <button onClick={() => { setQuery(''); setSelected(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]">
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-        {showDropdown && results.length > 0 && (
-          <div className="mb-3 bg-[var(--bg-card)] border border-[var(--border-color)] rounded shadow-xl max-h-52 overflow-y-auto">
-            {results.map(u => (
-              <button key={`${u.faction_id}-${u.name}`} onClick={() => handleSelect(u)}
-                className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[var(--accent-gold)]/10 border-b border-[var(--border-color)] last:border-0">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <p className="text-sm text-[var(--text-primary)]">{u.name}</p>
-                    {u.inCollection && <span className="text-[9px] px-1 py-0.5 rounded bg-[var(--accent-gold)]/20 text-[var(--accent-gold)]">Owned</span>}
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)]">{u.faction}</p>
-                </div>
-                {u.points[0] && <span className="text-xs text-[var(--accent-gold)]">{u.points[0].cost} pts</span>}
+        {/* Scrollable content */}
+        <div className="flex-1 overflow-y-auto px-5 pb-3">
+          <div className="relative mb-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-secondary)]" />
+            <input
+              type="text"
+              value={query}
+              onChange={e => { setQuery(e.target.value); setSelected(null); setShowDropdown(true); }}
+              onFocus={() => setShowDropdown(true)}
+              placeholder="Search units from your collection…"
+              className="w-full pl-9 pr-9 py-2.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]"
+            />
+            {query && (
+              <button onClick={() => { setQuery(''); setSelected(null); }} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]">
+                <X className="w-4 h-4" />
               </button>
-            ))}
+            )}
           </div>
-        )}
+          {showDropdown && results.length > 0 && (
+            <div className="mb-3 bg-[var(--bg-card)] border border-[var(--border-color)] rounded shadow-xl max-h-52 overflow-y-auto">
+              {results.map(u => (
+                <button key={`${u.faction_id}-${u.name}`} onClick={() => handleSelect(u)}
+                  className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-[var(--accent-gold)]/10 border-b border-[var(--border-color)] last:border-0">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm text-[var(--text-primary)]">{u.name}</p>
+                      {u.inCollection && <span className="text-[9px] px-1 py-0.5 rounded bg-[var(--accent-gold)]/20 text-[var(--accent-gold)]">Owned</span>}
+                    </div>
+                    <p className="text-xs text-[var(--text-secondary)]">{u.faction}</p>
+                  </div>
+                  {u.points[0] && <span className="text-xs text-[var(--accent-gold)]">{u.points[0].cost} pts</span>}
+                </button>
+              ))}
+            </div>
+          )}
 
-        {selected && (
-          <div className="rounded border border-[var(--accent-gold)]/30 bg-[var(--accent-gold)]/5 p-3 mb-4">
-            <div className="flex items-center gap-2">
-              <Check className="w-4 h-4 text-[var(--accent-gold)]" />
-              <div>
-                <p className="text-sm font-semibold text-[var(--text-primary)]">{selected.name}</p>
-                <p className="text-xs text-[var(--text-secondary)]">{selected.faction}</p>
+          {selected && (
+            <div className="rounded border border-[var(--accent-gold)]/30 bg-[var(--accent-gold)]/5 p-3 mb-4">
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-[var(--accent-gold)]" />
+                <div>
+                  <p className="text-sm font-semibold text-[var(--text-primary)]">{selected.name}</p>
+                  <p className="text-xs text-[var(--text-secondary)]">{selected.faction}</p>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {selected && (
-          <div className="space-y-3 mb-4">
-            {/* Points */}
-            <div>
-              <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Points Cost</label>
-              <div className="flex gap-2 mt-1">
-                <input type="number" value={pointsOverride} onChange={e => setPointsOverride(e.target.value)} min={0}
-                  className="flex-1 px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]" />
-                {selected.points.length > 1 && (
-                  <div className="flex gap-1">
-                    {selected.points.map(p => (
-                      <button key={p.models} onClick={() => setPointsOverride(p.cost)}
-                        className={`px-2 py-1 text-xs rounded border transition-colors ${pointsOverride === p.cost ? 'border-[var(--accent-gold)] text-[var(--accent-gold)]' : 'border-[var(--border-color)] text-[var(--text-secondary)]'}`}>
-                        {p.models}m
-                      </button>
+          {selected && (
+            <div className="space-y-3 mb-2">
+              {/* Points */}
+              <div>
+                <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Points Cost</label>
+                <div className="flex gap-2 mt-1">
+                  <input type="number" value={pointsOverride} onChange={e => setPointsOverride(e.target.value)} min={0}
+                    className="flex-1 px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] focus:outline-none focus:border-[var(--accent-gold)]" />
+                  {selected.points.length > 1 && (
+                    <div className="flex gap-1">
+                      {selected.points.map(p => (
+                        <button key={p.models} onClick={() => setPointsOverride(p.cost)}
+                          className={`px-2 py-1 text-xs rounded border transition-colors ${pointsOverride === p.cost ? 'border-[var(--accent-gold)] text-[var(--accent-gold)]' : 'border-[var(--border-color)] text-[var(--text-secondary)]'}`}>
+                          {p.models}m
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Wargear options — checkboxes from datasheet */}
+              {selected.wargear_options.length > 0 && (
+                <div>
+                  <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Wargear Options</label>
+                  <div className="mt-2 space-y-2">
+                    {selected.wargear_options.map((opt, i) => (
+                      <label key={i} className="flex items-start gap-2.5 cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={selectedWargear.includes(opt)}
+                          onChange={() => toggleWargear(opt)}
+                          className="mt-0.5 flex-shrink-0 accent-[var(--accent-gold)]"
+                        />
+                        <span className="text-xs text-[var(--text-secondary)] leading-relaxed">{opt}</span>
+                      </label>
                     ))}
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* Wargear options — checkboxes from datasheet */}
-            {selected.wargear_options.length > 0 && (
-              <div>
-                <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Wargear Options</label>
-                <div className="mt-2 space-y-2">
-                  {selected.wargear_options.map((opt, i) => (
-                    <label key={i} className="flex items-start gap-2.5 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={selectedWargear.includes(opt)}
-                        onChange={() => toggleWargear(opt)}
-                        className="mt-0.5 flex-shrink-0 accent-[var(--accent-gold)]"
-                      />
-                      <span className="text-xs text-[var(--text-secondary)] leading-relaxed">{opt}</span>
-                    </label>
-                  ))}
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Custom name (always shown in crusade) */}
-            {mode === 'crusade' && (
+              {/* Custom name (always shown in crusade) */}
+              {mode === 'crusade' && (
+                <div>
+                  <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">
+                    Custom Name <span className="normal-case">(optional)</span>
+                  </label>
+                  <input type="text" value={customName} onChange={e => setCustomName(e.target.value)}
+                    placeholder={selected.name}
+                    className="mt-1 w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]" />
+                </div>
+              )}
+
+              {/* Wargear notes */}
               <div>
-                <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">
-                  Custom Name <span className="normal-case">(optional)</span>
-                </label>
-                <input type="text" value={customName} onChange={e => setCustomName(e.target.value)}
-                  placeholder={selected.name}
-                  className="mt-1 w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)]" />
+                <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Wargear / Loadout Notes <span className="normal-case">(optional)</span></label>
+                <textarea value={wargearNotes} onChange={e => setWargearNotes(e.target.value)}
+                  placeholder="e.g. Thunder hammer, Storm shield, 5 models…"
+                  rows={2}
+                  className="mt-1 w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)] resize-none" />
               </div>
-            )}
-
-            {/* Wargear notes */}
-            <div>
-              <label className="text-xs text-[var(--text-secondary)] uppercase tracking-wider">Wargear / Loadout Notes <span className="normal-case">(optional)</span></label>
-              <textarea value={wargearNotes} onChange={e => setWargearNotes(e.target.value)}
-                placeholder="e.g. Thunder hammer, Storm shield, 5 models…"
-                rows={2}
-                className="mt-1 w-full px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded text-sm text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)] resize-none" />
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex gap-3">
+        {/* Buttons — always visible at bottom */}
+        <div className="flex gap-3 px-5 py-4 border-t border-[var(--border-color)]">
           <button onClick={onClose} className="flex-1 py-2.5 text-sm border border-[var(--border-color)] text-[var(--text-secondary)] rounded">Cancel</button>
           <button onClick={handleAdd} disabled={!selected}
             className="flex-1 py-2.5 text-sm border border-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] font-semibold rounded disabled:opacity-40">
@@ -438,7 +443,7 @@ function EditUnitModal({ unit, onClose }: { unit: ArmyUnit; onClose: () => void 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-end">
+    <div className="fixed inset-0 z-[100] bg-black/70 flex items-end">
       <div className="w-full bg-[var(--bg-primary)] rounded-t-xl border-t border-[var(--border-color)] p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-base font-bold text-[var(--text-primary)]">{unit.datasheet_name}</h2>
@@ -484,7 +489,7 @@ export default function ArmyBuilder() {
   const navigate = useNavigate();
   const {
     mode, army, supplyLimit, savedArmies, activeArmyId,
-    removeUnit, switchArmy, createArmy, renameArmy,
+    removeUnit, switchArmy, renameArmy,
   } = useArmy();
 
   const [showAdd, setShowAdd] = useState(false);

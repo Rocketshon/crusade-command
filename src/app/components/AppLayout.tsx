@@ -11,13 +11,18 @@ function SplashOverlay({ onDone }: { onDone: () => void }) {
   const [videoIndex] = useState(() => Math.floor(Math.random() * SPLASH_VIDEOS.length));
   const [fadeOut, setFadeOut] = useState(false);
   const completedRef = useRef(false);
+  const fadeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => { if (fadeTimerRef.current) clearTimeout(fadeTimerRef.current); };
+  }, []);
 
   const handleComplete = useCallback(() => {
     if (completedRef.current) return;
     completedRef.current = true;
     setFadeOut(true);
     sessionStorage.setItem(SPLASH_KEY, '1');
-    setTimeout(onDone, 600);
+    fadeTimerRef.current = setTimeout(onDone, 600);
   }, [onDone]);
 
   useEffect(() => {
@@ -43,7 +48,7 @@ function SplashOverlay({ onDone }: { onDone: () => void }) {
       />
       <button
         onClick={handleComplete}
-        className="absolute bottom-8 right-8 z-10 text-stone-500 hover:text-stone-300 text-sm transition-colors"
+        className="absolute bottom-8 right-8 z-10 text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm transition-colors"
       >
         Skip &rarr;
       </button>

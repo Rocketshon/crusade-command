@@ -12,6 +12,8 @@ import FactionCodex from './pages/FactionCodex';
 import DatasheetView from './pages/DatasheetView';
 import SpaceMarinesChapters from './pages/SpaceMarinesChapters';
 import PhaseNavigator from './pages/PhaseNavigator';
+import RulesBrowser from './pages/RulesBrowser';
+import RuleDetail from './pages/RuleDetail';
 import Settings from './pages/Settings';
 
 const base = import.meta.env.GITHUB_PAGES ? '/crusade-command/' : '/';
@@ -39,6 +41,9 @@ export const router = createBrowserRouter([
       { path: "codex/:factionId", Component: FactionCodex },
       { path: "datasheet/:factionId/:datasheetName", Component: DatasheetView },
       { path: "space-marines-chapters", Component: SpaceMarinesChapters },
+      // Rules
+      { path: "rules", Component: RulesBrowser },
+      { path: "rule/:ruleId", Component: RuleDetail },
       // Settings
       { path: "settings", Component: Settings },
       // 404

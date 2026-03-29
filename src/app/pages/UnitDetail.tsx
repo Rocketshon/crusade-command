@@ -559,7 +559,7 @@ export default function UnitDetail() {
               onClick={() => setShowSpendXP(true)}
               className="w-full relative overflow-hidden group mb-3"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-[#b8860b] to-[#d4a017] rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(184,134,11,0.4)]" />
+              <div className="absolute inset-0 bg-[var(--accent-gold)] rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(184,134,11,0.4)]" />
 
               <div className="relative px-6 py-3 flex items-center justify-center gap-2">
                 <Star className="w-5 h-5 text-white" strokeWidth={2} />
@@ -573,7 +573,7 @@ export default function UnitDetail() {
 
         {/* Divider */}
         <div className="flex items-center gap-2 py-2 mb-6">
-          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#b8860b]/20 to-transparent" />
+          <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--accent-gold)]/20 to-transparent" />
         </div>
 
         {/* Destructive Actions */}
@@ -649,7 +649,7 @@ export default function UnitDetail() {
                 </button>
                 <button
                   onClick={handleSaveEdit}
-                  className="flex-1 px-4 py-2 rounded-lg bg-[var(--accent-gold)] hover:bg-[#d4a017] text-white font-semibold transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg bg-[var(--accent-gold)] hover:opacity-80 text-white font-semibold transition-all"
                 >
                   Save
                 </button>
@@ -720,7 +720,7 @@ export default function UnitDetail() {
               <div className="flex items-center justify-center gap-4 mb-6">
                 <button
                   onClick={() => setXpAmount(Math.max(1, xpAmount - 1))}
-                  className="w-11 h-11 rounded-lg border border-[var(--accent-gold)]/30 bg-[var(--bg-card)] text-[var(--accent-gold)] font-bold text-lg hover:bg-[#e8dcc8] transition-colors"
+                  className="w-11 h-11 rounded-lg border border-[var(--accent-gold)]/30 bg-[var(--bg-card)] text-[var(--accent-gold)] font-bold text-lg hover:bg-[var(--accent-gold)]/20 transition-colors"
                 >
                   -
                 </button>
@@ -729,7 +729,7 @@ export default function UnitDetail() {
                 </div>
                 <button
                   onClick={() => setXpAmount(xpAmount + 1)}
-                  className="w-11 h-11 rounded-lg border border-[var(--accent-gold)]/30 bg-[var(--bg-card)] text-[var(--accent-gold)] font-bold text-lg hover:bg-[#e8dcc8] transition-colors"
+                  className="w-11 h-11 rounded-lg border border-[var(--accent-gold)]/30 bg-[var(--bg-card)] text-[var(--accent-gold)] font-bold text-lg hover:bg-[var(--accent-gold)]/20 transition-colors"
                 >
                   +
                 </button>
@@ -744,7 +744,7 @@ export default function UnitDetail() {
                 </button>
                 <button
                   onClick={handleSpendXP}
-                  className="flex-1 px-4 py-2 rounded-lg bg-[var(--accent-gold)] hover:bg-[#d4a017] text-white font-semibold transition-all"
+                  className="flex-1 px-4 py-2 rounded-lg bg-[var(--accent-gold)] hover:opacity-80 text-white font-semibold transition-all"
                 >
                   Award +{xpAmount} XP
                 </button>

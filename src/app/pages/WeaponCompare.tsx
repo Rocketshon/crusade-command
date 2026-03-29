@@ -48,27 +48,27 @@ function WeaponPicker({ label, weapons, selected, onSelect }: {
   const [open, setOpen] = useState(false);
   return (
     <div className="flex-1 min-w-0">
-      <p className="text-xs font-semibold text-[#8a8690] uppercase tracking-wider mb-1">{label}</p>
+      <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-1">{label}</p>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between gap-1 px-3 py-2 bg-[var(--bg-card)] border border-[#2a2a35] rounded-lg
-                   text-left text-sm text-[#e8e4de] hover:border-[#c9a84c] transition-colors truncate"
+        className="w-full flex items-center justify-between gap-1 px-3 py-2 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg
+                   text-left text-sm text-[var(--text-primary)] hover:border-[var(--accent-gold)] transition-colors truncate"
       >
         <span className="truncate">{selected ? selected.weapon.name : 'Select Weapon'}</span>
-        <ChevronDown className={`w-4 h-4 shrink-0 text-[#8a8690] transition-transform ${open ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 shrink-0 text-[var(--text-secondary)] transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="mt-1 max-h-64 overflow-y-auto bg-[var(--bg-primary)] border border-[#2a2a35] rounded-lg shadow-lg z-10 relative">
-          {weapons.length === 0 && <p className="px-3 py-2 text-xs text-[#8a8690]">No weapons available</p>}
+        <div className="mt-1 max-h-64 overflow-y-auto bg-[var(--bg-primary)] border border-[var(--border-color)] rounded-lg shadow-lg z-10 relative">
+          {weapons.length === 0 && <p className="px-3 py-2 text-xs text-[var(--text-secondary)]">No weapons available</p>}
           {weapons.map((w, i) => (
             <button
               key={`${w.unitName}-${w.weapon.name}-${w.type}-${i}`}
               onClick={() => { onSelect(w); setOpen(false); }}
-              className={`w-full text-left px-3 py-2 text-sm hover:bg-[#22222e] transition-colors border-b border-[#2a2a35]/50 last:border-b-0
+              className={`w-full text-left px-3 py-2 text-sm hover:bg-[#22222e] transition-colors border-b border-[var(--border-color)]/50 last:border-b-0
                 ${selected?.weapon.name === w.weapon.name && selected?.unitName === w.unitName ? 'bg-[#22222e] font-semibold' : ''}`}
             >
-              <span className="text-[#e8e4de]">{w.weapon.name}</span>
-              <span className="ml-2 text-xs text-[#8a8690]">({w.unitName})</span>
+              <span className="text-[var(--text-primary)]">{w.weapon.name}</span>
+              <span className="ml-2 text-xs text-[var(--text-secondary)]">({w.unitName})</span>
               <span className={`ml-1 text-xs ${w.type === 'ranged' ? 'text-blue-400' : 'text-red-400'}`}>
                 {w.type === 'ranged' ? 'Ranged' : 'Melee'}
               </span>
@@ -127,10 +127,10 @@ export default function WeaponCompare() {
   return (
     <div className="min-h-screen bg-[var(--bg-primary)] px-4 pt-6 pb-24">
       <div className="flex items-center gap-3 mb-6">
-        <button onClick={() => navigate(-1)} className="text-[#8a8690] hover:text-[#e8e4de] transition-colors" aria-label="Go back">
+        <button onClick={() => navigate(-1)} className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors" aria-label="Go back">
           <ArrowLeft className="w-5 h-5" />
         </button>
-        <h1 className="font-serif text-xl font-bold text-[#e8e4de]">Compare Weapons</h1>
+        <h1 className="font-serif text-xl font-bold text-[var(--text-primary)]">Compare Weapons</h1>
       </div>
 
       <div className="flex gap-3 mb-6">
@@ -139,45 +139,45 @@ export default function WeaponCompare() {
       </div>
 
       {bothSelected && (
-        <div className="border border-[#2a2a35] rounded-lg overflow-hidden">
+        <div className="border border-[var(--border-color)] rounded-lg overflow-hidden">
           {/* Column headers with gold background */}
-          <div className="grid grid-cols-3 bg-[#c9a84c]/10 border-b border-[#c9a84c]/30">
-            <div className="px-3 py-2 text-xs font-semibold text-[#c9a84c] uppercase">Stat</div>
-            <div className="px-3 py-2 text-xs font-semibold text-[#e8e4de] truncate text-center">{weapon1.weapon.name}</div>
-            <div className="px-3 py-2 text-xs font-semibold text-[#e8e4de] truncate text-center">{weapon2.weapon.name}</div>
+          <div className="grid grid-cols-3 bg-[var(--accent-gold)]/10 border-b border-[var(--accent-gold)]/30">
+            <div className="px-3 py-2 text-xs font-semibold text-[var(--accent-gold)] uppercase">Stat</div>
+            <div className="px-3 py-2 text-xs font-semibold text-[var(--text-primary)] truncate text-center">{weapon1.weapon.name}</div>
+            <div className="px-3 py-2 text-xs font-semibold text-[var(--text-primary)] truncate text-center">{weapon2.weapon.name}</div>
           </div>
 
           {STAT_ROWS.map(({ key, label }) => {
             const val1 = String(weapon1.weapon[key] ?? '-');
             const val2 = String(weapon2.weapon[key] ?? '-');
             const result = compareStat(key, val1, val2);
-            const bg1 = result === 'better' ? 'bg-[#c9a84c]/15' : '';
-            const bg2 = result === 'worse' ? 'bg-[#c9a84c]/15' : '';
-            const fw1 = result === 'better' ? 'font-bold text-[#c9a84c]' : 'text-[#e8e4de]';
-            const fw2 = result === 'worse' ? 'font-bold text-[#c9a84c]' : 'text-[#e8e4de]';
+            const bg1 = result === 'better' ? 'bg-[var(--accent-gold)]/15' : '';
+            const bg2 = result === 'worse' ? 'bg-[var(--accent-gold)]/15' : '';
+            const fw1 = result === 'better' ? 'font-bold text-[var(--accent-gold)]' : 'text-[var(--text-primary)]';
+            const fw2 = result === 'worse' ? 'font-bold text-[var(--accent-gold)]' : 'text-[var(--text-primary)]';
             return (
-              <div key={key} className="grid grid-cols-3 border-t border-[#2a2a35]/60">
-                <div className="px-3 py-2 text-xs font-medium text-[#8a8690]">{label}</div>
+              <div key={key} className="grid grid-cols-3 border-t border-[var(--border-color)]/60">
+                <div className="px-3 py-2 text-xs font-medium text-[var(--text-secondary)]">{label}</div>
                 <div className={`px-3 py-2 text-sm text-center ${bg1} ${fw1}`}>{val1}</div>
                 <div className={`px-3 py-2 text-sm text-center ${bg2} ${fw2}`}>{val2}</div>
               </div>
             );
           })}
 
-          <div className="grid grid-cols-3 border-t border-[#2a2a35]">
-            <div className="px-3 py-2 text-xs font-medium text-[#8a8690]">Traits</div>
+          <div className="grid grid-cols-3 border-t border-[var(--border-color)]">
+            <div className="px-3 py-2 text-xs font-medium text-[var(--text-secondary)]">Traits</div>
             <div className="px-3 py-2">
               <div className="flex flex-wrap gap-1">
                 {weapon1.weapon.traits.length > 0 ? weapon1.weapon.traits.map((t, i) => (
-                  <span key={i} className="text-xs px-1.5 py-0.5 bg-[#c9a84c]/10 text-[#c9a84c] rounded">{t}</span>
-                )) : <span className="text-xs text-[#8a8690]">None</span>}
+                  <span key={i} className="text-xs px-1.5 py-0.5 bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] rounded">{t}</span>
+                )) : <span className="text-xs text-[var(--text-secondary)]">None</span>}
               </div>
             </div>
             <div className="px-3 py-2">
               <div className="flex flex-wrap gap-1">
                 {weapon2.weapon.traits.length > 0 ? weapon2.weapon.traits.map((t, i) => (
-                  <span key={i} className="text-xs px-1.5 py-0.5 bg-[#c9a84c]/10 text-[#c9a84c] rounded">{t}</span>
-                )) : <span className="text-xs text-[#8a8690]">None</span>}
+                  <span key={i} className="text-xs px-1.5 py-0.5 bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] rounded">{t}</span>
+                )) : <span className="text-xs text-[var(--text-secondary)]">None</span>}
               </div>
             </div>
           </div>
@@ -186,7 +186,7 @@ export default function WeaponCompare() {
 
       {!bothSelected && (
         <div className="text-center py-12">
-          <p className="text-[#8a8690] text-sm">Select two weapons above to compare their profiles side by side.</p>
+          <p className="text-[var(--text-secondary)] text-sm">Select two weapons above to compare their profiles side by side.</p>
         </div>
       )}
     </div>

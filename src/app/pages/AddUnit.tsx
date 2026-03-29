@@ -138,7 +138,7 @@ export default function AddUnit() {
                           </div>
                           <div className="flex items-center gap-1.5 flex-wrap">
                             {displayKeywords.map((kw, kidx) => (
-                              <span key={kidx} className="text-xs text-[var(--text-secondary)] bg-[#12121a] px-2 py-0.5 rounded">{toTitleCase(kw)}</span>
+                              <span key={kidx} className="text-xs text-[var(--text-secondary)] bg-[var(--bg-primary)] px-2 py-0.5 rounded">{toTitleCase(kw)}</span>
                             ))}
                           </div>
                         </div>
@@ -159,7 +159,7 @@ export default function AddUnit() {
                   <h3 className="text-base font-semibold text-[var(--text-primary)] mb-1">{selectedUnit.name}</h3>
                   <div className="flex items-center gap-1.5 flex-wrap">
                     {selectedUnit.keywords.filter(k => !["IMPERIUM", "CHAOS", "XENOS"].includes(k.toUpperCase())).slice(0, 4).map((kw, idx) => (
-                      <span key={idx} className="text-xs text-[var(--text-secondary)] bg-[#12121a] px-2 py-0.5 rounded">{toTitleCase(kw)}</span>
+                      <span key={idx} className="text-xs text-[var(--text-secondary)] bg-[var(--bg-primary)] px-2 py-0.5 rounded">{toTitleCase(kw)}</span>
                     ))}
                   </div>
                 </div>
@@ -258,13 +258,13 @@ export default function AddUnit() {
             </div>
 
             <div className="flex items-center gap-2 py-2">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#c9a84c]/20 to-transparent" />
+              <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[var(--accent-gold)]/20 to-transparent" />
             </div>
 
             <div className="flex gap-3">
               <button onClick={handleCancel} className="flex-1 px-6 py-3 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-tertiary)] font-semibold hover:border-[var(--accent-gold)] transition-all">Cancel</button>
               <button onClick={handleSubmit} className="flex-1 relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-r from-[var(--accent-gold)] to-[#d4a017] rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(201,168,76,0.4)]" />
+                <div className="absolute inset-0 bg-[var(--accent-gold)] rounded-lg transition-all duration-300 group-hover:shadow-[0_0_25px_rgba(201,168,76,0.4)]" />
                 <div className="relative px-6 py-3 flex items-center justify-center gap-2">
                   <Plus className="w-5 h-5 text-[var(--bg-primary)]" strokeWidth={2.5} />
                   <span className="text-base font-bold text-[var(--bg-primary)] tracking-wide">Add to Army</span>
