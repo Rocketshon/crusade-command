@@ -114,6 +114,7 @@ interface ArmyState {
   setSupplyLimit: (limit: number) => void;
   addUnit: (params: {
     datasheetName: string;
+    customName?: string;
     pointsCost: number;
     factionId?: string;
     isCharacter?: boolean;
@@ -330,6 +331,7 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
 
   const addUnit = useCallback((params: {
     datasheetName: string;
+    customName?: string;
     pointsCost: number;
     factionId?: string;
     isCharacter?: boolean;
@@ -338,7 +340,7 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
     const unit: ArmyUnit = {
       id: crypto.randomUUID(),
       datasheet_name: params.datasheetName,
-      custom_name: params.datasheetName,
+      custom_name: params.customName?.trim() || params.datasheetName,
       points_cost: params.pointsCost,
       faction_id: params.factionId ?? factionId ?? '',
       wargear_notes: params.wargearNotes ?? '',

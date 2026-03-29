@@ -68,6 +68,7 @@ export default function AddUnit() {
     const newTotal = currentTotal + customPoints;
     addUnit({
       datasheetName: selectedUnit.name,
+      customName: customName.trim(),
       pointsCost: customPoints,
       factionId: selectedUnit.faction_id,
       isCharacter: selectedUnit.keywords.includes('CHARACTER'),

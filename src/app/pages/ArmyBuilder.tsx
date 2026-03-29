@@ -269,6 +269,7 @@ function AddUnitModal({ onClose, mode }: { onClose: () => void; mode: 'standard'
     if (!selected) return;
     addUnit({
       datasheetName: selected.name,
+      customName: customName.trim(),
       pointsCost: parseInt(pointsOverride, 10) || 0,
       factionId: selected.faction_id,
       isCharacter: selected.keywords.includes('CHARACTER'),
