@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import {
   ArrowLeft, Trophy, Skull, Minus, Plus, Check, Zap, Dices,
@@ -331,7 +331,7 @@ export default function PostBattle() {
     );
   }
 
-  const resultOptions: { value: BattleResult; label: string; icon: React.ReactNode; style: string }[] = [
+  const resultOptions: { value: BattleResult; label: string; icon: ReactNode; style: string }[] = [
     { value: 'win',  label: 'Victory', icon: <Trophy className="w-5 h-5" />, style: 'border-green-500/50 bg-green-500/10 text-green-400' },
     { value: 'draw', label: 'Draw',    icon: <Minus className="w-5 h-5" />,  style: 'border-yellow-500/50 bg-yellow-500/10 text-yellow-400' },
     { value: 'loss', label: 'Defeat',  icon: <Skull className="w-5 h-5" />,  style: 'border-red-500/50 bg-red-500/10 text-red-400' },

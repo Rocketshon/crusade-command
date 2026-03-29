@@ -11,7 +11,7 @@ const tabs = [
 
 function isActiveTab(pathname: string, tabPath: string): boolean {
   if (tabPath === '/army') {
-    return pathname === '/army' || pathname.startsWith('/army/') || pathname.startsWith('/unit/');
+    return pathname === '/army' || pathname.startsWith('/army/');
   }
   if (tabPath === '/models') {
     return pathname === '/models';

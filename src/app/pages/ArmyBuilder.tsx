@@ -467,6 +467,16 @@ export default function ArmyBuilder() {
   const activeArmy = savedArmies.find(a => a.id === activeArmyId);
   const totalPoints = army.reduce((s, u) => s + u.points_cost, 0);
 
+  // Must be above early returns — hooks cannot be called conditionally
+  const filtered = useMemo(() => {
+    if (!search.trim()) return army;
+    const q = search.toLowerCase();
+    return army.filter(u =>
+      u.custom_name.toLowerCase().includes(q) ||
+      u.datasheet_name.toLowerCase().includes(q),
+    );
+  }, [army, search]);
+
   // No mode → go to mode picker
   if (!mode) {
     return (
@@ -494,15 +504,6 @@ export default function ArmyBuilder() {
       </div>
     );
   }
-
-  const filtered = useMemo(() => {
-    if (!search.trim()) return army;
-    const q = search.toLowerCase();
-    return army.filter(u =>
-      u.custom_name.toLowerCase().includes(q) ||
-      u.datasheet_name.toLowerCase().includes(q),
-    );
-  }, [army, search]);
 
   const characters = filtered.filter(u => u.is_character);
   const nonCharacters = filtered.filter(u => !u.is_character);
@@ -590,7 +591,7 @@ export default function ArmyBuilder() {
               <div className="mb-4">
                 <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Characters</p>
                 <div className="space-y-2">
-                  {characters.map(u => <CrusadeUnitCard key={u.id} unit={u} onClick={() => navigate(`/unit/${u.id}`)} />)}
+                  {characters.map(u => <CrusadeUnitCard key={u.id} unit={u} onClick={() => navigate(`/army/unit/${u.id}`)} />)}
                 </div>
               </div>
             )}
@@ -598,7 +599,7 @@ export default function ArmyBuilder() {
               <div className="mb-4">
                 <p className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Units</p>
                 <div className="space-y-2">
-                  {nonCharacters.map(u => <CrusadeUnitCard key={u.id} unit={u} onClick={() => navigate(`/unit/${u.id}`)} />)}
+                  {nonCharacters.map(u => <CrusadeUnitCard key={u.id} unit={u} onClick={() => navigate(`/army/unit/${u.id}`)} />)}
                 </div>
               </div>
             )}
