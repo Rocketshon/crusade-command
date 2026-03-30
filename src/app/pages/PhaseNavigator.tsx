@@ -209,9 +209,18 @@ export default function PhaseNavigator() {
 
   if (!factionId) {
     return (
-      <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center px-4">
-        <p className="text-[var(--text-secondary)] mb-4">Set up your army first to use Battle Aid.</p>
-        <button onClick={() => navigate('/army')} className="px-6 py-2 bg-[var(--accent-gold)] text-[var(--bg-primary)] rounded-lg hover:opacity-80 transition-opacity">Go to Army</button>
+      <div className="min-h-screen bg-[var(--bg-primary)] flex flex-col items-center justify-center px-4 pb-24">
+        <p className="text-[var(--text-secondary)] mb-4">Set up your army first to use the phase navigator.</p>
+        <button onClick={() => navigate('/army')} className="px-6 py-2 bg-[var(--accent-gold)] text-[var(--bg-primary)] rounded-lg hover:opacity-80 transition-opacity mb-8">Go to Army</button>
+        <p className="text-xs text-[var(--text-secondary)] uppercase tracking-wider mb-3">Tools</p>
+        <div className="flex gap-3">
+          <button onClick={() => navigate('/dice-calculator')} className="px-4 py-3 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] text-sm hover:border-[var(--accent-gold)] transition-colors">
+            Dice Calculator
+          </button>
+          <button onClick={() => navigate('/lore-quiz')} className="px-4 py-3 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-primary)] text-sm hover:border-[var(--accent-gold)] transition-colors">
+            Lore Quiz
+          </button>
+        </div>
       </div>
     );
   }

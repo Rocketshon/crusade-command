@@ -21,7 +21,7 @@ function isActiveTab(pathname: string, tabPath: string): boolean {
     return pathname === '/rules' || pathname.startsWith('/rule/');
   }
   if (tabPath === '/battle-aid') {
-    return pathname === '/battle-aid' || pathname === '/dice-calculator' || pathname === '/lore-quiz';
+    return pathname === '/battle-aid' || pathname === '/dice-calculator' || pathname === '/lore-quiz' || pathname === '/news';
   }
   if (tabPath === '/codex') {
     return pathname === '/codex' || pathname.startsWith('/codex/') || pathname.startsWith('/datasheet/') || pathname.startsWith('/space-marines-chapters');

@@ -52,10 +52,10 @@ function woundTarget(strength: number, toughness: number): number {
 function withReroll(baseProb: number, reroll: 'ones' | 'all' | undefined): number {
   if (!reroll) return baseProb;
   if (reroll === 'ones') {
-    // Reroll 1s: 1/6 chance of rolling a 1, then baseProb chance on reroll
-    return baseProb + (1 / 6) * (1 - baseProb) * baseProb;
+    // Reroll 1s: 1/6 chance of rolling a 1, on the reroll you have baseProb chance
+    return baseProb + (1 / 6) * baseProb;
   }
-  // Reroll all failures
+  // Reroll all failures: fail prob is (1 - baseProb), on reroll you have baseProb chance
   return baseProb + (1 - baseProb) * baseProb;
 }
 
