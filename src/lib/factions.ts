@@ -82,7 +82,22 @@ export const SPACE_MARINE_CHAPTERS: ChapterMeta[] = [
   { id: 'white_scars', name: 'White Scars', icon: '🏇', parentFactionId: 'space_marines', uniqueDatasheets: 2, detachments: 1 },
 ];
 
-// Populate chapter -> data faction mapping
+// Populate chapter -> data faction mapping AND add chapters to FACTION_MAP
+// so getFaction/getFactionName/getFactionIcon work for chapter codex pages
+const CHAPTER_COLORS: Record<string, string> = {
+  space_wolves: 'cyan', blood_angels: 'red', dark_angels: 'green',
+  black_templars: 'stone', deathwatch: 'slate', ultramarines: 'blue',
+  imperial_fists: 'yellow', iron_hands: 'slate', salamanders: 'orange',
+  raven_guard: 'slate', white_scars: 'red',
+};
+
 for (const ch of SPACE_MARINE_CHAPTERS) {
   CHAPTER_DATA_MAP.set(ch.id, ch.parentFactionId);
+  FACTION_MAP.set(ch.id as FactionId, {
+    id: ch.id as FactionId,
+    name: ch.name,
+    icon: ch.icon,
+    category: 'imperium',
+    color: CHAPTER_COLORS[ch.id] ?? 'blue',
+  });
 }
