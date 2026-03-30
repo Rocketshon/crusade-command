@@ -206,7 +206,7 @@ function OutOfActionSection({
                         <Text style={{ fontSize: 10, color: '#fbbf24', marginBottom: 6 }}>Unit already has 3 scars -- must take Devastating Blow.</Text>
                         <TouchableOpacity
                           onPress={() => onChooseOutcome(unit.id, 'devastating_blow')}
-                          style={{ paddingVertical: 8, borderWidth: 1, borderColor: '#f59e0b66', backgroundColor: '#f59e0b1A', borderRadius: 4, alignItems: 'center' }}
+                          style={{ paddingVertical: 8, borderWidth: 1, borderColor: colors.accentGold + '66', backgroundColor: colors.accentGold + '1A', borderRadius: 4, alignItems: 'center' }}
                         >
                           <Text style={{ color: '#fbbf24', fontSize: 12, fontWeight: '600' }}>Devastating Blow -- Lose a Battle Honour</Text>
                         </TouchableOpacity>
@@ -216,7 +216,7 @@ function OutOfActionSection({
                   return (
                     <View style={{ flexDirection: 'row', gap: 8 }}>
                       <TouchableOpacity
-                        style={{ flex: 1, paddingVertical: 8, borderWidth: 1, borderColor: '#f59e0b66', backgroundColor: '#f59e0b1A', borderRadius: 4, alignItems: 'center' }}
+                        style={{ flex: 1, paddingVertical: 8, borderWidth: 1, borderColor: colors.accentGold + '66', backgroundColor: colors.accentGold + '1A', borderRadius: 4, alignItems: 'center' }}
                         onPress={() => onChooseOutcome(unit.id, 'devastating_blow')}
                       >
                         <Text style={{ color: '#fbbf24', fontSize: 11, fontWeight: '600' }}>Devastating Blow</Text>
@@ -437,19 +437,19 @@ export default function PostBattleScreen() {
               paddingVertical: 14,
               paddingHorizontal: 24,
               borderWidth: 1,
-              borderColor: '#f59e0b66',
-              backgroundColor: '#f59e0b1A',
+              borderColor: colors.accentGold + '66',
+              backgroundColor: colors.accentGold + '1A',
               borderRadius: 8,
               marginTop: 16,
               opacity: bggLoading ? 0.5 : 1,
             }}
           >
             {bggLoading ? (
-              <ActivityIndicator size="small" color="#f59e0b" />
+              <ActivityIndicator size="small" color="${colors.accentGold}" />
             ) : (
               <Text style={{ fontSize: 18 }}>{'\uD83C\uDFB2'}</Text>
             )}
-            <Text style={{ color: '#f59e0b', fontSize: 14, fontWeight: '600' }}>Log to BoardGameGeek</Text>
+            <Text style={{ color: colors.accentGold, fontSize: 14, fontWeight: '600' }}>Log to BoardGameGeek</Text>
           </TouchableOpacity>
 
           <TouchableOpacity

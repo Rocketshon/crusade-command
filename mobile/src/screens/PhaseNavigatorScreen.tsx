@@ -278,7 +278,7 @@ export default function PhaseNavigatorScreen() {
     return (
       <SafeAreaView style={[styles.emptyContainer, { backgroundColor: colors.bgPrimary }]} edges={['top']}>
         <Text style={[styles.emptyText, { color: colors.textSecondary }]}>
-          Set up your army first to use Battle Aid.
+          Set up your army first to use the phase navigator.
         </Text>
         <TouchableOpacity
           style={[styles.goToArmyBtn, { backgroundColor: colors.accentGold }]}
@@ -287,6 +287,23 @@ export default function PhaseNavigatorScreen() {
         >
           <Text style={[styles.goToArmyText, { color: colors.bgPrimary }]}>Go to Army</Text>
         </TouchableOpacity>
+        <Text style={{ color: colors.textSecondary, fontSize: 11, letterSpacing: 1, marginTop: 24, marginBottom: 8 }}>TOOLS</Text>
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('DiceCalculator')}
+            style={{ paddingHorizontal: 16, paddingVertical: 12, borderRadius: 8, borderWidth: 1, borderColor: colors.borderColor, backgroundColor: colors.bgCard }}
+            activeOpacity={0.7}
+          >
+            <Text style={{ color: colors.textPrimary, fontSize: 13 }}>Dice Calculator</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('LoreQuiz')}
+            style={{ paddingHorizontal: 16, paddingVertical: 12, borderRadius: 8, borderWidth: 1, borderColor: colors.borderColor, backgroundColor: colors.bgCard }}
+            activeOpacity={0.7}
+          >
+            <Text style={{ color: colors.textPrimary, fontSize: 13 }}>Lore Quiz</Text>
+          </TouchableOpacity>
+        </View>
       </SafeAreaView>
     );
   }

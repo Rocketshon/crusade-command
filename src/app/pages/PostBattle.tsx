@@ -495,18 +495,6 @@ export default function PostBattle() {
           Save Battle Record
         </button>
 
-        {/* BGG Log */}
-        <button
-          onClick={handleBGGLog}
-          disabled={bggLoading}
-          className="w-full py-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-secondary)] text-sm font-medium hover:border-[var(--accent-gold)]/40 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-        >
-          {bggLoading ? (
-            <><Loader2 className="w-4 h-4 animate-spin" /> Searching BGG...</>
-          ) : (
-            <><ExternalLink className="w-4 h-4" /> Log to BoardGameGeek</>
-          )}
-        </button>
       </div>
     </div>
   );
