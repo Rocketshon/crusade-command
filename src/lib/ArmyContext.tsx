@@ -19,6 +19,7 @@ export interface BattleHonour {
   id: string;
   name: string;
   type: string; // 'battle_trait' | 'weapon_enhancement' | 'crusade_relic'
+  description?: string;       // User-entered effect / notes
   // Weapon enhancement fields (populated when type === 'weapon_enhancement')
   weaponName?: string;        // Which weapon is enhanced (from datasheet)
   weaponType?: 'ranged' | 'melee';
@@ -408,7 +409,7 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
       return {
         ...u,
         battle_honours: u.battle_honours.filter(h => h.id !== honourId),
-        crusade_points: u.crusade_points - 1,
+        crusade_points: Math.max(0, u.crusade_points - 1),
       };
     }));
   }, []);
@@ -419,7 +420,7 @@ export function ArmyProvider({ children }: { children: ReactNode }) {
       return {
         ...u,
         battle_scars: [...u.battle_scars, { id: crypto.randomUUID(), ...scar }],
-        crusade_points: u.crusade_points - 1,
+        crusade_points: Math.max(0, u.crusade_points - 1),
       };
     }));
   }, []);

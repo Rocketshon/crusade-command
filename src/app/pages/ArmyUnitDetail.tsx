@@ -231,7 +231,7 @@ function AddHonourModal({ onAdd, onClose, isCharacter, existingHonourNames }: {
         </div>
         <div className="flex gap-3">
           <button onClick={onClose} className="flex-1 py-2.5 text-sm border border-[var(--border-color)] text-[var(--text-secondary)] rounded">Cancel</button>
-          <button onClick={() => { if (name.trim() && !isDuplicate) { onAdd({ type, name: name.trim() }); onClose(); } }}
+          <button onClick={() => { if (name.trim() && !isDuplicate) { onAdd({ type, name: name.trim(), description: desc.trim() }); onClose(); } }}
             disabled={!name.trim() || isDuplicate}
             className="flex-1 py-2.5 text-sm border border-[var(--accent-gold)] bg-[var(--accent-gold)]/10 text-[var(--accent-gold)] font-semibold rounded disabled:opacity-40">
             Add Honour
@@ -335,10 +335,11 @@ export default function ArmyUnitDetail() {
               )}
               <div className="flex gap-2 mt-1">
                 <button onClick={() => {
+                  const changed = wargearInput.trim() !== unit.wargear_notes;
                   updateUnit(unit.id, { wargear_notes: wargearInput.trim() });
-                  if (crusade) spendRP(1);
+                  if (crusade && changed) spendRP(1);
                   setEditingWargear(false);
-                }} className="text-xs text-[var(--accent-gold)]">Save (−1 RP)</button>
+                }} className="text-xs text-[var(--accent-gold)]">{crusade ? 'Save (−1 RP)' : 'Save'}</button>
                 <button onClick={() => setEditingWargear(false)} className="text-xs text-[var(--text-secondary)]">Cancel</button>
               </div>
             </div>
@@ -403,6 +404,7 @@ export default function ArmyUnitDetail() {
                       </span>
                     </div>
                     <p className="text-sm font-medium text-[var(--text-primary)] mt-0.5">{h.name}</p>
+                    {h.description && <p className="text-xs text-[var(--text-secondary)]">{h.description}</p>}
                     {h.enhancementEffect && <p className="text-xs text-[var(--accent-gold)]">{h.enhancementEffect}</p>}
                     {h.weaponName && <p className="text-xs text-[var(--text-secondary)]">on {h.weaponName}</p>}
                   </div>
