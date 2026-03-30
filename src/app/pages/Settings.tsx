@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft, Sun, Moon, Trash2, Info, Database, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Sun, Moon, Trash2, Info, Database, AlertTriangle, Key } from 'lucide-react';
 import { useTheme } from '../../lib/ThemeContext';
 import { useArmy } from '../../lib/ArmyContext';
 import { useCollection } from '../../lib/CollectionContext';
 import { getActiveEdition } from '../../lib/editionManager';
+import { setApiKey } from '../../lib/apiServices';
 import { toast } from 'sonner';
 
 export default function Settings() {
@@ -17,6 +18,30 @@ export default function Settings() {
   const [confirmClearArmies, setConfirmClearArmies] = useState(false);
   const [confirmClearCollection, setConfirmClearCollection] = useState(false);
   const [confirmResetAll, setConfirmResetAll] = useState(false);
+
+  // API key states — initialize from localStorage
+  const [apiKeys, setApiKeys] = useState(() => {
+    const keys: Record<string, string> = {};
+    for (const name of ['gnews', 'wolfram', 'pixelaUser', 'pixelaToken', 'cloudmersive']) {
+      try { keys[name] = localStorage.getItem(`warcaster_api_${name}`) ?? ''; } catch { keys[name] = ''; }
+    }
+    return keys;
+  });
+
+  const handleApiKeyChange = (name: string, value: string) => {
+    setApiKeys(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleApiKeySave = (name: string) => {
+    const val = apiKeys[name]?.trim() ?? '';
+    if (val) {
+      setApiKey(name, val);
+      toast.success(`${name} key saved`);
+    } else {
+      try { localStorage.removeItem(`warcaster_api_${name}`); } catch {}
+      toast.success(`${name} key cleared`);
+    }
+  };
 
   const clearArmiesTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const clearCollectionTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -202,6 +227,38 @@ export default function Settings() {
                 <p className="text-xs text-[var(--text-secondary)]">localStorage + IndexedDB backup</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* API Integrations */}
+        <section className="mb-8">
+          <h2 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-3">API Integrations</h2>
+          <div className="rounded-sm border border-[var(--border-color)] bg-[var(--bg-card)] divide-y divide-[var(--border-color)]">
+            {([
+              { keyName: 'gnews', label: 'GNews API Key', description: '40K news feed' },
+              { keyName: 'wolfram', label: 'WolframAlpha App ID', description: 'Advanced dice queries' },
+              { keyName: 'pixelaUser', label: 'Pixela Username', description: 'Painting streak graph' },
+              { keyName: 'pixelaToken', label: 'Pixela Token', description: 'Pixela authentication' },
+              { keyName: 'cloudmersive', label: 'Cloudmersive API Key', description: 'Image recognition' },
+            ] as const).map(({ keyName, label, description }) => (
+              <div key={keyName} className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <Key className="w-3.5 h-3.5 text-[var(--accent-gold)]" />
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">{label}</p>
+                    <p className="text-[10px] text-[var(--text-secondary)]">{description}</p>
+                  </div>
+                </div>
+                <input
+                  type="text"
+                  value={apiKeys[keyName]}
+                  onChange={e => handleApiKeyChange(keyName, e.target.value)}
+                  onBlur={() => handleApiKeySave(keyName)}
+                  placeholder="Not configured"
+                  className="w-full px-3 py-2 bg-[var(--bg-primary)] border border-[var(--border-color)] rounded text-xs text-[var(--text-primary)] placeholder:text-[var(--text-secondary)] focus:outline-none focus:border-[var(--accent-gold)] font-mono"
+                />
+              </div>
+            ))}
           </div>
         </section>
 

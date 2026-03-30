@@ -1,0 +1,33 @@
+{
+  "expo": {
+    "name": "Warcaster",
+    "slug": "Warcaster-App",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "owner": "obelus-labs-llc",
+    "icon": "./assets/icons/icon-512.png",
+    "splash": {
+      "backgroundColor": "#000000",
+      "resizeMode": "contain"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.warcaster.app"
+    },
+    "android": {
+      "package": "com.warcaster.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#000000"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "updates": {
+      "url": "https://u.expo.dev/PLACEHOLDER"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
+}

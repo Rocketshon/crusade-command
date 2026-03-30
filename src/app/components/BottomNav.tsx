@@ -20,6 +20,9 @@ function isActiveTab(pathname: string, tabPath: string): boolean {
   if (tabPath === '/rules') {
     return pathname === '/rules' || pathname.startsWith('/rule/');
   }
+  if (tabPath === '/battle-aid') {
+    return pathname === '/battle-aid' || pathname === '/dice-calculator' || pathname === '/lore-quiz';
+  }
   if (tabPath === '/codex') {
     return pathname === '/codex' || pathname.startsWith('/codex/') || pathname.startsWith('/datasheet/') || pathname.startsWith('/space-marines-chapters');
   }

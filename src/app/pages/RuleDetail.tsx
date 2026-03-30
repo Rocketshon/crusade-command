@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
-import { ArrowLeft, BookOpen, Shield, Award, ChevronDown, ChevronRight } from "lucide-react";
+import { ArrowLeft, BookOpen, Shield, Award, ChevronDown, ChevronRight, Globe, Loader2 } from "lucide-react";
 import { CORE_RULES, CRUSADE_RULES } from '../../data/general';
 import { getRulesForFaction } from '../../data';
 import { getFaction, getFactionName, getDataFactionId } from '../../lib/factions';
 import { FormattedRuleText, getStratagemTypeColor, getEnhancementCardColors } from '../../lib/formatText';
+import { translateText, SUPPORTED_LANGUAGES } from '../../lib/apiServices';
+import { toast } from 'sonner';
 import type { RulesSection, DetachmentEnhancement, DetachmentStratagem, DetachmentData, CrusadeRule, FactionId } from '../../types';
 
 type FactionData =
@@ -67,7 +69,45 @@ export default function RuleDetail() {
 
   const rule = ruleId ? lookupRule(ruleId) : null;
 
-  useEffect(() => { setExpandedSubsections(new Set()); }, [ruleId]);
+  // Translation state
+  const [showLangPicker, setShowLangPicker] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translatedText, setTranslatedText] = useState<string | null>(null);
+  const [translationLang, setTranslationLang] = useState<string | null>(null);
+
+  const handleTranslate = async (langCode: string) => {
+    setShowLangPicker(false);
+    if (!rule) return;
+    setTranslating(true);
+    setTranslationLang(langCode);
+    try {
+      // Collect translatable text
+      let textToTranslate = '';
+      if (rule.section) {
+        textToTranslate = rule.section.text || rule.section.accordion?.map(a => `${a.title}: ${a.text}`).join('\n') || '';
+      } else if (rule.factionData?.type === 'army_rules') {
+        textToTranslate = rule.factionData.rules.join('\n\n');
+      } else if (rule.factionData?.type === 'detachment') {
+        textToTranslate = rule.factionData.detachment.rule.text;
+      }
+      if (!textToTranslate.trim()) {
+        toast.error('No translatable text found');
+        setTranslating(false);
+        return;
+      }
+      // Truncate if too long for free API
+      const truncated = textToTranslate.slice(0, 3000);
+      const result = await translateText(truncated, langCode);
+      setTranslatedText(result);
+      if (!result) toast.error('Translation failed');
+    } catch {
+      toast.error('Translation failed');
+    } finally {
+      setTranslating(false);
+    }
+  };
+
+  useEffect(() => { setExpandedSubsections(new Set()); setTranslatedText(null); }, [ruleId]);
 
   const toggleSubsection = (key: string) => {
     setExpandedSubsections(prev => {
@@ -259,9 +299,33 @@ export default function RuleDetail() {
         </button>
 
         <div className="mb-6">
-          <div className="mb-3">
+          <div className="mb-3 flex items-center justify-between">
             <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border ${getSourceColor()} text-xs font-semibold uppercase tracking-wider`}>
               {getSourceIcon()}{rule.source}
+            </div>
+            {/* Translate button */}
+            <div className="relative">
+              <button
+                onClick={() => setShowLangPicker(v => !v)}
+                disabled={translating}
+                className="w-9 h-9 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] flex items-center justify-center text-[var(--text-secondary)] hover:border-[var(--accent-gold)]/40 transition-colors disabled:opacity-50"
+                aria-label="Translate"
+              >
+                {translating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
+              </button>
+              {showLangPicker && (
+                <div className="absolute right-0 top-full mt-1 w-44 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
+                  {SUPPORTED_LANGUAGES.map(lang => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleTranslate(lang.code)}
+                      className="w-full text-left px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--accent-gold)]/10 transition-colors"
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-wider mb-4">{rule.title}</h1>
@@ -270,6 +334,26 @@ export default function RuleDetail() {
         <div className="space-y-6">
           {rule.section && renderSection(rule.section)}
           {rule.factionData && renderFactionData()}
+
+          {/* Translated text */}
+          {translatedText && (
+            <div className="rounded-lg border border-[var(--accent-gold)]/20 bg-[var(--accent-gold)]/5 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-xs font-semibold text-[var(--accent-gold)] uppercase tracking-wider">
+                  {SUPPORTED_LANGUAGES.find(l => l.code === translationLang)?.name ?? 'Translation'}
+                </p>
+                <button
+                  onClick={() => setTranslatedText(null)}
+                  className="text-xs text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                >
+                  Dismiss
+                </button>
+              </div>
+              <p className="text-sm text-[var(--text-tertiary)] leading-relaxed whitespace-pre-line italic">
+                {translatedText}
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -1,0 +1,603 @@
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, type ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+// ---------------------------------------------------------------------------
+// UUID generator (replaces crypto.randomUUID() which is unavailable in RN)
+// ---------------------------------------------------------------------------
+
+function generateUUID(): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Inline rank calculation
+// ---------------------------------------------------------------------------
+
+function getRankFromXP(xp: number): string {
+  if (xp >= 51) return 'Legendary';
+  if (xp >= 31) return 'Heroic';
+  if (xp >= 16) return 'Battle-hardened';
+  if (xp >= 6) return 'Blooded';
+  return 'Battle-ready';
+}
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export type ArmyMode = 'standard' | 'crusade' | null;
+
+export interface BattleHonour {
+  id: string;
+  name: string;
+  type: string; // 'battle_trait' | 'weapon_enhancement' | 'crusade_relic'
+  description?: string;
+  weaponName?: string;
+  weaponType?: 'ranged' | 'melee';
+  enhancementId?: string;
+  enhancementEffect?: string;
+}
+
+export interface BattleScar {
+  id: string;
+  name: string;
+  effect: string;
+}
+
+export interface ArmyUnit {
+  id: string;
+  datasheet_name: string;
+  custom_name: string;
+  points_cost: number;
+  faction_id: string;
+  wargear_notes: string;
+  is_character: boolean;
+  is_warlord: boolean;
+  // Crusade fields
+  experience_points: number;
+  crusade_points: number;
+  battles_played: number;
+  battles_survived: number;
+  total_kills: number;
+  legendary_veterans: boolean;
+  rank: string;
+  battle_honours: BattleHonour[];
+  battle_scars: BattleScar[];
+  is_destroyed: boolean;
+}
+
+export interface CrusadeBattleRecord {
+  id: string;
+  date: string;
+  result: 'win' | 'loss' | 'draw';
+  opponent?: string;
+  missionName?: string;
+  rpGained: number;
+  notes?: string;
+  unitResults: {
+    unitId: string;
+    survived: boolean;
+    kills: number;
+    xpGained: number;
+    markedForGreatness: boolean;
+  }[];
+}
+
+export interface CrusadeCampaignData {
+  rp: number;
+  wins: number;
+  losses: number;
+  draws: number;
+  oathswornCampaignId?: string;
+  battles: CrusadeBattleRecord[];
+  factionPoints: number;
+  factionPointsLabel: string;
+  csmGlory?: { personal: number; darkGod: number; warfleet: number };
+}
+
+export interface SavedArmy {
+  id: string;
+  name: string;
+  mode: ArmyMode;
+  factionId: string | null;
+  detachmentName: string | null;
+  supplyLimit: number;
+  units: ArmyUnit[];
+  crusade?: CrusadeCampaignData;
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ArmyState {
+  loaded: boolean;
+  mode: ArmyMode;
+  factionId: string | null;
+  detachmentName: string | null;
+  supplyLimit: number;
+  army: ArmyUnit[];
+  crusade: CrusadeCampaignData | undefined;
+  // Multi-army
+  savedArmies: SavedArmy[];
+  activeArmyId: string | null;
+  setMode: (mode: ArmyMode) => void;
+  setFaction: (factionId: string | null) => void;
+  setDetachment: (name: string | null) => void;
+  setSupplyLimit: (limit: number) => void;
+  addUnit: (params: {
+    datasheetName: string;
+    customName?: string;
+    pointsCost: number;
+    factionId?: string;
+    isCharacter?: boolean;
+    wargearNotes?: string;
+  }) => void;
+  removeUnit: (unitId: string) => void;
+  updateUnit: (unitId: string, updates: Partial<ArmyUnit>) => void;
+  clearArmy: () => void;
+  // Crusade -- unit actions
+  awardXP: (unitId: string, xp: number) => void;
+  addBattleHonour: (unitId: string, honour: Omit<BattleHonour, 'id'>) => void;
+  removeBattleHonour: (unitId: string, honourId: string) => void;
+  addBattleScar: (unitId: string, scar: Omit<BattleScar, 'id'>) => void;
+  removeBattleScar: (unitId: string, scarId: string) => void;
+  setWarlord: (unitId: string) => void;
+  buyLegendaryVeterans: (unitId: string) => void;
+  // Crusade -- campaign actions
+  recordBattle: (battle: Omit<CrusadeBattleRecord, 'id' | 'date'>) => void;
+  spendRP: (amount: number) => void;
+  gainRP: (amount: number) => void;
+  updateFactionPoints: (delta: number) => void;
+  updateCSMGlory: (category: 'personal' | 'darkGod' | 'warfleet', delta: number) => void;
+  initCrusadeCampaign: (params: {
+    factionId: string;
+    detachmentName: string;
+    supplyLimit: number;
+    startingRP: number;
+    startingWins?: number;
+    startingLosses?: number;
+    startingDraws?: number;
+    oathswornCampaignId?: string;
+    factionPointsLabel: string;
+  }) => void;
+  setCampaignRecord: (wins: number, losses: number, draws: number) => void;
+  // Multi-army actions
+  createArmy: (name: string, armyMode?: ArmyMode) => string;
+  deleteArmy: (armyId: string) => void;
+  switchArmy: (armyId: string) => void;
+  renameArmy: (armyId: string, name: string) => void;
+}
+
+// ---------------------------------------------------------------------------
+// AsyncStorage keys
+// ---------------------------------------------------------------------------
+
+const KEYS = {
+  savedArmies: 'army_saved_lists',
+  activeArmyId: 'army_active_id',
+} as const;
+
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
+
+function defaultCrusadeData(params: {
+  factionPointsLabel: string;
+  oathswornCampaignId?: string;
+  startingRP?: number;
+  startingWins?: number;
+  startingLosses?: number;
+  startingDraws?: number;
+}): CrusadeCampaignData {
+  return {
+    rp: params.startingRP ?? 5,
+    wins: params.startingWins ?? 0,
+    losses: params.startingLosses ?? 0,
+    draws: params.startingDraws ?? 0,
+    oathswornCampaignId: params.oathswornCampaignId,
+    battles: [],
+    factionPoints: 0,
+    factionPointsLabel: params.factionPointsLabel,
+    csmGlory: { personal: 0, darkGod: 0, warfleet: 0 },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Context
+// ---------------------------------------------------------------------------
+
+const ArmyContext = createContext<ArmyState | null>(null);
+
+export function ArmyProvider({ children }: { children: ReactNode }) {
+  const [loaded, setLoaded] = useState(false);
+  const [savedArmies, setSavedArmies] = useState<SavedArmy[]>([]);
+  const [activeArmyId, setActiveArmyId] = useState<string | null>(null);
+
+  const [mode, setModeState] = useState<ArmyMode>(null);
+  const [factionId, setFactionState] = useState<string | null>(null);
+  const [detachmentName, setDetachmentState] = useState<string | null>(null);
+  const [supplyLimit, setSupplyLimitState] = useState<number>(1000);
+  const [army, setArmy] = useState<ArmyUnit[]>([]);
+  const [crusade, setCrusade] = useState<CrusadeCampaignData | undefined>(undefined);
+
+  // ---- Hydrate from AsyncStorage on mount ----
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const [rawArmies, rawActiveId] = await Promise.all([
+          AsyncStorage.getItem(KEYS.savedArmies),
+          AsyncStorage.getItem(KEYS.activeArmyId),
+        ]);
+
+        if (cancelled) return;
+
+        const armies: SavedArmy[] = rawArmies ? JSON.parse(rawArmies) : [];
+        const activeId: string | null = rawActiveId ? JSON.parse(rawActiveId) : null;
+
+        setSavedArmies(armies);
+        setActiveArmyId(activeId);
+
+        const active = armies.find(a => a.id === activeId);
+        if (active) {
+          setModeState(active.mode);
+          setFactionState(active.factionId);
+          setDetachmentState(active.detachmentName);
+          setSupplyLimitState(active.supplyLimit);
+          setArmy(active.units);
+          setCrusade(active.crusade);
+        }
+      } catch {
+        // AsyncStorage unavailable -- stay with defaults
+      } finally {
+        if (!cancelled) setLoaded(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // ---- Persist savedArmies to AsyncStorage ----
+  useEffect(() => {
+    if (!loaded) return;
+    AsyncStorage.setItem(KEYS.savedArmies, JSON.stringify(savedArmies)).catch(() => {});
+  }, [savedArmies, loaded]);
+
+  // ---- Persist activeArmyId to AsyncStorage ----
+  useEffect(() => {
+    if (!loaded) return;
+    AsyncStorage.setItem(KEYS.activeArmyId, JSON.stringify(activeArmyId)).catch(() => {});
+  }, [activeArmyId, loaded]);
+
+  // ---- Sync active army state back to savedArmies ----
+  useEffect(() => {
+    if (!activeArmyId || !loaded) return;
+    setSavedArmies(prev => prev.map(a =>
+      a.id === activeArmyId
+        ? { ...a, mode, factionId, detachmentName, supplyLimit, units: army, crusade, updatedAt: new Date().toISOString() }
+        : a
+    ));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, factionId, detachmentName, supplyLimit, army, crusade, activeArmyId]);
+
+  // ---- Setters ----
+
+  const setMode = useCallback((m: ArmyMode) => setModeState(m), []);
+  const setFaction = useCallback((id: string | null) => setFactionState(id), []);
+  const setDetachment = useCallback((name: string | null) => setDetachmentState(name), []);
+  const setSupplyLimit = useCallback((limit: number) => setSupplyLimitState(limit), []);
+
+  // ---- Unit actions ----
+
+  const addUnit = useCallback((params: {
+    datasheetName: string;
+    customName?: string;
+    pointsCost: number;
+    factionId?: string;
+    isCharacter?: boolean;
+    wargearNotes?: string;
+  }) => {
+    const unit: ArmyUnit = {
+      id: generateUUID(),
+      datasheet_name: params.datasheetName,
+      custom_name: params.customName?.trim() || params.datasheetName,
+      points_cost: params.pointsCost,
+      faction_id: params.factionId ?? factionId ?? '',
+      wargear_notes: params.wargearNotes ?? '',
+      is_character: params.isCharacter ?? false,
+      is_warlord: false,
+      experience_points: 0,
+      crusade_points: 0,
+      battles_played: 0,
+      battles_survived: 0,
+      total_kills: 0,
+      legendary_veterans: false,
+      rank: 'Battle-ready',
+      battle_honours: [],
+      battle_scars: [],
+      is_destroyed: false,
+    };
+    setArmy(prev => [...prev, unit]);
+  }, [factionId]);
+
+  const removeUnit = useCallback((unitId: string) => {
+    setArmy(prev => prev.filter(u => u.id !== unitId));
+  }, []);
+
+  const updateUnit = useCallback((unitId: string, updates: Partial<ArmyUnit>) => {
+    setArmy(prev => prev.map(u => u.id === unitId ? { ...u, ...updates } : u));
+  }, []);
+
+  const clearArmy = useCallback(() => {
+    if (activeArmyId) {
+      setSavedArmies(prev => prev.filter(a => a.id !== activeArmyId));
+    }
+    setActiveArmyId(null);
+    setModeState(null);
+    setFactionState(null);
+    setDetachmentState(null);
+    setSupplyLimitState(1000);
+    setArmy([]);
+    setCrusade(undefined);
+  }, [activeArmyId]);
+
+  // ---- Crusade: unit actions ----
+
+  const awardXP = useCallback((unitId: string, xp: number) => {
+    setArmy(prev => prev.map(u => {
+      if (u.id !== unitId) return u;
+      const newXP = u.experience_points + xp;
+      return { ...u, experience_points: newXP, rank: getRankFromXP(newXP) };
+    }));
+  }, []);
+
+  const addBattleHonour = useCallback((unitId: string, honour: Omit<BattleHonour, 'id'>) => {
+    setArmy(prev => prev.map(u => {
+      if (u.id !== unitId) return u;
+      return {
+        ...u,
+        battle_honours: [...u.battle_honours, { id: generateUUID(), ...honour }],
+        crusade_points: u.crusade_points + 1,
+      };
+    }));
+  }, []);
+
+  const removeBattleHonour = useCallback((unitId: string, honourId: string) => {
+    setArmy(prev => prev.map(u => {
+      if (u.id !== unitId) return u;
+      return {
+        ...u,
+        battle_honours: u.battle_honours.filter(h => h.id !== honourId),
+        crusade_points: Math.max(0, u.crusade_points - 1),
+      };
+    }));
+  }, []);
+
+  const addBattleScar = useCallback((unitId: string, scar: Omit<BattleScar, 'id'>) => {
+    setArmy(prev => prev.map(u => {
+      if (u.id !== unitId) return u;
+      return {
+        ...u,
+        battle_scars: [...u.battle_scars, { id: generateUUID(), ...scar }],
+        crusade_points: Math.max(0, u.crusade_points - 1),
+      };
+    }));
+  }, []);
+
+  const removeBattleScar = useCallback((unitId: string, scarId: string) => {
+    setArmy(prev => prev.map(u => {
+      if (u.id !== unitId) return u;
+      return {
+        ...u,
+        battle_scars: u.battle_scars.filter(s => s.id !== scarId),
+        crusade_points: u.crusade_points + 1,
+      };
+    }));
+  }, []);
+
+  const setWarlord = useCallback((unitId: string) => {
+    setArmy(prev => prev.map(u => ({ ...u, is_warlord: u.id === unitId })));
+  }, []);
+
+  const buyLegendaryVeterans = useCallback((unitId: string) => {
+    setArmy(prev => prev.map(u => u.id === unitId ? { ...u, legendary_veterans: true } : u));
+    setCrusade(prev => prev ? { ...prev, rp: Math.max(0, prev.rp - 3) } : prev);
+  }, []);
+
+  // ---- Crusade: campaign actions ----
+
+  const initCrusadeCampaign = useCallback((params: {
+    factionId: string;
+    detachmentName: string;
+    supplyLimit: number;
+    startingRP: number;
+    startingWins?: number;
+    startingLosses?: number;
+    startingDraws?: number;
+    oathswornCampaignId?: string;
+    factionPointsLabel: string;
+  }) => {
+    setFactionState(params.factionId);
+    setDetachmentState(params.detachmentName);
+    setSupplyLimitState(params.supplyLimit);
+    setCrusade(defaultCrusadeData({
+      factionPointsLabel: params.factionPointsLabel,
+      oathswornCampaignId: params.oathswornCampaignId,
+      startingRP: params.startingRP,
+      startingWins: params.startingWins,
+      startingLosses: params.startingLosses,
+      startingDraws: params.startingDraws,
+    }));
+  }, []);
+
+  const setCampaignRecord = useCallback((wins: number, losses: number, draws: number) => {
+    setCrusade(prev => prev ? { ...prev, wins, losses, draws } : prev);
+  }, []);
+
+  const recordBattle = useCallback((battle: Omit<CrusadeBattleRecord, 'id' | 'date'>) => {
+    const record: CrusadeBattleRecord = {
+      ...battle,
+      id: generateUUID(),
+      date: new Date().toISOString(),
+    };
+
+    // Apply unit results (includes Dealers of Death: +1XP per 3 kills total)
+    setArmy(prev => prev.map(u => {
+      const result = battle.unitResults.find(r => r.unitId === u.id);
+      if (!result) return u;
+      const prevKillThresholds = Math.floor(u.total_kills / 3);
+      const newKills = u.total_kills + result.kills;
+      const newKillThresholds = Math.floor(newKills / 3);
+      const dealersOfDeathXP = newKillThresholds - prevKillThresholds;
+      const totalXP = result.xpGained + (result.markedForGreatness ? 3 : 0) + dealersOfDeathXP;
+      const newXP = u.experience_points + totalXP;
+      return {
+        ...u,
+        experience_points: newXP,
+        rank: getRankFromXP(newXP),
+        battles_played: u.battles_played + 1,
+        battles_survived: u.battles_survived + (result.survived ? 1 : 0),
+        total_kills: newKills,
+      };
+    }));
+
+    setCrusade(prev => {
+      if (!prev) return prev;
+      return {
+        ...prev,
+        rp: Math.min(10, prev.rp + battle.rpGained),
+        wins: prev.wins + (battle.result === 'win' ? 1 : 0),
+        losses: prev.losses + (battle.result === 'loss' ? 1 : 0),
+        draws: prev.draws + (battle.result === 'draw' ? 1 : 0),
+        battles: [record, ...prev.battles],
+      };
+    });
+  }, []);
+
+  const spendRP = useCallback((amount: number) => {
+    setCrusade(prev => prev ? { ...prev, rp: Math.max(0, prev.rp - amount) } : prev);
+  }, []);
+
+  const gainRP = useCallback((amount: number) => {
+    setCrusade(prev => prev ? { ...prev, rp: Math.min(10, prev.rp + amount) } : prev);
+  }, []);
+
+  const updateFactionPoints = useCallback((delta: number) => {
+    setCrusade(prev => prev ? { ...prev, factionPoints: Math.max(0, prev.factionPoints + delta) } : prev);
+  }, []);
+
+  const updateCSMGlory = useCallback((category: 'personal' | 'darkGod' | 'warfleet', delta: number) => {
+    setCrusade(prev => {
+      if (!prev?.csmGlory) return prev;
+      return {
+        ...prev,
+        csmGlory: { ...prev.csmGlory, [category]: Math.max(0, prev.csmGlory[category] + delta) },
+      };
+    });
+  }, []);
+
+  // ---- Multi-army actions ----
+
+  const createArmy = useCallback((name: string, armyMode?: ArmyMode): string => {
+    const id = generateUUID();
+    const now = new Date().toISOString();
+    const newArmy: SavedArmy = {
+      id, name,
+      mode: armyMode ?? null,
+      factionId: null, detachmentName: null,
+      supplyLimit: 1000, units: [],
+      createdAt: now, updatedAt: now,
+    };
+    setSavedArmies(prev => [...prev, newArmy]);
+    setActiveArmyId(id);
+    setModeState(newArmy.mode);
+    setFactionState(null);
+    setDetachmentState(null);
+    setSupplyLimitState(1000);
+    setArmy([]);
+    setCrusade(undefined);
+    return id;
+  }, []);
+
+  const deleteArmy = useCallback((armyId: string) => {
+    setSavedArmies(prev => {
+      const remaining = prev.filter(a => a.id !== armyId);
+      if (armyId === activeArmyId) {
+        if (remaining.length > 0) {
+          const next = remaining[0];
+          setActiveArmyId(next.id);
+          setModeState(next.mode);
+          setFactionState(next.factionId);
+          setDetachmentState(next.detachmentName);
+          setSupplyLimitState(next.supplyLimit);
+          setArmy(next.units);
+          setCrusade(next.crusade);
+        } else {
+          setActiveArmyId(null);
+          setModeState(null);
+          setFactionState(null);
+          setDetachmentState(null);
+          setSupplyLimitState(1000);
+          setArmy([]);
+          setCrusade(undefined);
+        }
+      }
+      return remaining;
+    });
+  }, [activeArmyId]);
+
+  const switchArmy = useCallback((armyId: string) => {
+    setSavedArmies(prev => {
+      const target = prev.find(a => a.id === armyId);
+      if (!target) return prev;
+      setActiveArmyId(target.id);
+      setModeState(target.mode);
+      setFactionState(target.factionId);
+      setDetachmentState(target.detachmentName);
+      setSupplyLimitState(target.supplyLimit);
+      setArmy(target.units);
+      setCrusade(target.crusade);
+      return prev;
+    });
+  }, []);
+
+  const renameArmy = useCallback((armyId: string, name: string) => {
+    setSavedArmies(prev => prev.map(a =>
+      a.id === armyId ? { ...a, name, updatedAt: new Date().toISOString() } : a
+    ));
+  }, []);
+
+  const value = useMemo<ArmyState>(() => ({
+    loaded, mode, factionId, detachmentName, supplyLimit, army, crusade,
+    savedArmies, activeArmyId,
+    setMode, setFaction, setDetachment, setSupplyLimit,
+    addUnit, removeUnit, updateUnit, clearArmy,
+    awardXP, addBattleHonour, removeBattleHonour, addBattleScar, removeBattleScar,
+    setWarlord, buyLegendaryVeterans,
+    recordBattle, spendRP, gainRP, updateFactionPoints, updateCSMGlory, initCrusadeCampaign, setCampaignRecord,
+    createArmy, deleteArmy, switchArmy, renameArmy,
+  }), [
+    loaded, mode, factionId, detachmentName, supplyLimit, army, crusade,
+    savedArmies, activeArmyId,
+    setMode, setFaction, setDetachment, setSupplyLimit,
+    addUnit, removeUnit, updateUnit, clearArmy,
+    awardXP, addBattleHonour, removeBattleHonour, addBattleScar, removeBattleScar,
+    setWarlord, buyLegendaryVeterans,
+    recordBattle, spendRP, gainRP, updateFactionPoints, updateCSMGlory, initCrusadeCampaign, setCampaignRecord,
+    createArmy, deleteArmy, switchArmy, renameArmy,
+  ]);
+
+  return (
+    <ArmyContext.Provider value={value}>
+      {children}
+    </ArmyContext.Provider>
+  );
+}
+
+export function useArmy(): ArmyState {
+  const ctx = useContext(ArmyContext);
+  if (!ctx) throw new Error('useArmy must be used within ArmyProvider');
+  return ctx;
+}

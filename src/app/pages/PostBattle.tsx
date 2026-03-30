@@ -1,10 +1,11 @@
 import { useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import {
-  ArrowLeft, Trophy, Skull, Minus, Plus, Check, Zap, Dices,
+  ArrowLeft, Trophy, Skull, Minus, Plus, Check, Zap, Dices, ExternalLink, Loader2,
 } from 'lucide-react';
 import { useArmy, type ArmyUnit } from '../../lib/ArmyContext';
 import { OFFICIAL_BATTLE_SCARS } from '../../data/crusadeRules';
+import { bggSearchGame, bggGameUrl } from '../../lib/apiServices';
 import { toast } from 'sonner';
 
 // ---------------------------------------------------------------------------
@@ -235,6 +236,7 @@ export default function PostBattle() {
   const [mfgUnitId, setMfgUnitId] = useState<string | null>(null);
   const [phase, setPhase] = useState<'battle' | 'oat'>('battle');
   const [oatStates, setOatStates] = useState<OATState[]>([]);
+  const [bggLoading, setBggLoading] = useState(false);
 
   // Only living (non-destroyed) units can be in the post-battle flow
   const activeUnits = army.filter(u => !u.is_destroyed);
@@ -319,6 +321,22 @@ export default function PostBattle() {
     s.roll !== null && (s.outcome === 'pass' || s.outcome === 'devastating_blow' || (s.outcome === 'battle_scar' && s.selectedScar !== null))
   );
 
+  const handleBGGLog = async () => {
+    setBggLoading(true);
+    try {
+      const game = await bggSearchGame('warhammer 40000');
+      if (game) {
+        window.open(bggGameUrl(game.id), '_blank');
+      } else {
+        toast.error('Could not find game on BoardGameGeek');
+      }
+    } catch {
+      toast.error('BoardGameGeek search failed');
+    } finally {
+      setBggLoading(false);
+    }
+  };
+
   // OAT phase
   if (phase === 'oat') {
     return (
@@ -342,6 +360,18 @@ export default function PostBattle() {
           >
             <Check className="w-4 h-4" />
             Done
+          </button>
+          {/* BGG Log button */}
+          <button
+            onClick={handleBGGLog}
+            disabled={bggLoading}
+            className="w-full py-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-secondary)] text-sm font-medium hover:border-[var(--accent-gold)]/40 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            {bggLoading ? (
+              <><Loader2 className="w-4 h-4 animate-spin" /> Searching BGG...</>
+            ) : (
+              <><ExternalLink className="w-4 h-4" /> Log to BoardGameGeek</>
+            )}
           </button>
           <button onClick={() => navigate('/army')} className="w-full py-2 text-xs text-[var(--text-secondary)]">
             Skip OAT Tests
@@ -463,6 +493,19 @@ export default function PostBattle() {
         >
           <Check className="w-4 h-4" />
           Save Battle Record
+        </button>
+
+        {/* BGG Log */}
+        <button
+          onClick={handleBGGLog}
+          disabled={bggLoading}
+          className="w-full py-2.5 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] text-[var(--text-secondary)] text-sm font-medium hover:border-[var(--accent-gold)]/40 transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+        >
+          {bggLoading ? (
+            <><Loader2 className="w-4 h-4 animate-spin" /> Searching BGG...</>
+          ) : (
+            <><ExternalLink className="w-4 h-4" /> Log to BoardGameGeek</>
+          )}
         </button>
       </div>
     </div>

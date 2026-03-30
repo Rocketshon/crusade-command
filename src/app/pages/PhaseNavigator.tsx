@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Dices, Brain, Newspaper } from 'lucide-react';
 import { useArmy } from '../../lib/ArmyContext';
 import { getRulesForFaction, getUnitsForFaction } from '../../data';
 import { getDataFactionId } from '../../lib/factions';
@@ -278,6 +278,34 @@ export default function PhaseNavigator() {
         {detachmentStratagems.length === 0 && coreStratagems.length === 0 && unitAbilities.length === 0 && (
           <div className="text-center py-12"><p className="text-[var(--text-secondary)] text-sm">No content for this phase.</p></div>
         )}
+
+        {/* Tools navigation */}
+        <section>
+          <h3 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2">Tools</h3>
+          <div className="grid grid-cols-3 gap-2">
+            <button
+              onClick={() => navigate('/dice-calculator')}
+              className="flex flex-col items-center gap-2 p-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg hover:border-[var(--accent-gold)]/40 transition-all"
+            >
+              <Dices className="w-6 h-6 text-[var(--accent-gold)]" />
+              <span className="text-xs font-medium text-[var(--text-primary)]">Dice Calc</span>
+            </button>
+            <button
+              onClick={() => navigate('/lore-quiz')}
+              className="flex flex-col items-center gap-2 p-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg hover:border-[var(--accent-gold)]/40 transition-all"
+            >
+              <Brain className="w-6 h-6 text-[var(--accent-gold)]" />
+              <span className="text-xs font-medium text-[var(--text-primary)]">Lore Quiz</span>
+            </button>
+            <button
+              onClick={() => navigate('/news')}
+              className="flex flex-col items-center gap-2 p-4 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg hover:border-[var(--accent-gold)]/40 transition-all"
+            >
+              <Newspaper className="w-6 h-6 text-[var(--accent-gold)]" />
+              <span className="text-xs font-medium text-[var(--text-primary)]">40K News</span>
+            </button>
+          </div>
+        </section>
       </div>
 
       <style>{`

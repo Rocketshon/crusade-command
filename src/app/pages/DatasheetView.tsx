@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router";
 import { toast } from "sonner";
-import { ArrowLeft, Plus, Shield, Zap } from "lucide-react";
+import { ArrowLeft, Plus, Shield, Zap, Globe, Loader2, ChevronDown } from "lucide-react";
 import { getUnitsForFaction } from '../../data';
 import { getFaction, getDataFactionId } from '../../lib/factions';
 import { useArmy } from '../../lib/ArmyContext';
 import { toTitleCase, FormattedRuleText } from '../../lib/formatText';
+import { translateText, SUPPORTED_LANGUAGES } from '../../lib/apiServices';
 import type { FactionId, Datasheet } from '../../types';
 import WeaponStatTable from '../components/WeaponStatTable';
 
@@ -15,6 +16,39 @@ export default function DatasheetView() {
   const [showAddSuccess, setShowAddSuccess] = useState(false);
   const addSuccessTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { addUnit, mode } = useArmy();
+
+  // Translation state
+  const [showLangPicker, setShowLangPicker] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translatedAbilities, setTranslatedAbilities] = useState<Record<string, string>>({});
+  const [translationLang, setTranslationLang] = useState<string | null>(null);
+
+  const handleTranslate = async (langCode: string) => {
+    setShowLangPicker(false);
+    setTranslating(true);
+    setTranslationLang(langCode);
+    try {
+      const textsToTranslate: Record<string, string> = {};
+      if (datasheet) {
+        datasheet.abilities.other.forEach(([name, text], idx) => {
+          textsToTranslate[`ability-${idx}`] = `${name}: ${text}`;
+        });
+      }
+      const results: Record<string, string> = {};
+      for (const [key, text] of Object.entries(textsToTranslate)) {
+        const translated = await translateText(text, langCode);
+        if (translated) results[key] = translated;
+      }
+      setTranslatedAbilities(results);
+      if (Object.keys(results).length === 0) {
+        toast.error('Translation failed');
+      }
+    } catch {
+      toast.error('Translation failed');
+    } finally {
+      setTranslating(false);
+    }
+  };
 
   useEffect(() => {
     return () => { if (addSuccessTimer.current) clearTimeout(addSuccessTimer.current); };
@@ -59,7 +93,33 @@ export default function DatasheetView() {
 
         {/* Unit Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-wider mb-2">{datasheet.name}</h1>
+          <div className="flex items-start justify-between gap-2">
+            <h1 className="text-3xl font-bold text-[var(--text-primary)] tracking-wider mb-2">{datasheet.name}</h1>
+            {/* Translate button */}
+            <div className="relative flex-shrink-0">
+              <button
+                onClick={() => setShowLangPicker(v => !v)}
+                disabled={translating}
+                className="w-9 h-9 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] flex items-center justify-center text-[var(--text-secondary)] hover:border-[var(--accent-gold)]/40 transition-colors disabled:opacity-50"
+                aria-label="Translate"
+              >
+                {translating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Globe className="w-4 h-4" />}
+              </button>
+              {showLangPicker && (
+                <div className="absolute right-0 top-full mt-1 w-44 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg shadow-xl z-50 max-h-60 overflow-y-auto">
+                  {SUPPORTED_LANGUAGES.map(lang => (
+                    <button
+                      key={lang.code}
+                      onClick={() => handleTranslate(lang.code)}
+                      className="w-full text-left px-3 py-2 text-sm text-[var(--text-primary)] hover:bg-[var(--accent-gold)]/10 transition-colors"
+                    >
+                      {lang.name}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
           <p className="text-[var(--accent-gold)] text-sm mb-3">{datasheet.faction}</p>
 
           {/* Points Costs */}
@@ -137,6 +197,14 @@ export default function DatasheetView() {
             <div key={idx} className="mb-3 rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] p-4">
               <h3 className="text-sm font-bold text-[var(--accent-gold)] mb-2">{ability[0]}</h3>
               <FormattedRuleText text={ability[1]} className="text-xs" />
+              {translatedAbilities[`ability-${idx}`] && (
+                <div className="mt-2 pt-2 border-t border-[var(--border-color)]/50">
+                  <p className="text-[10px] text-[var(--text-secondary)] uppercase tracking-wider mb-1">
+                    {SUPPORTED_LANGUAGES.find(l => l.code === translationLang)?.name ?? 'Translation'}
+                  </p>
+                  <p className="text-xs text-[var(--text-tertiary)] italic">{translatedAbilities[`ability-${idx}`]}</p>
+                </div>
+              )}
             </div>
           ))}
         </div>

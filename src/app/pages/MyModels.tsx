@@ -1,5 +1,7 @@
-import { useState, useMemo } from 'react';
-import { Search, Plus, X, ChevronDown, Trash2, Package } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { Search, Plus, X, ChevronDown, Trash2, Package, Paintbrush } from 'lucide-react';
+import { pixelaGetGraph, getConfiguredApis } from '../../lib/apiServices';
 import { useCollection, PAINTING_STAGES } from '../../lib/CollectionContext';
 import { searchUnits } from '../../data';
 import { getFactionName } from '../../lib/factions';
@@ -199,8 +201,18 @@ function ModelCard({ item }: { item: CollectionItem }) {
 
 export default function MyModels() {
   const { items, totalModels, paintedCount } = useCollection();
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [showAdd, setShowAdd] = useState(false);
+  const [pixelaUrl, setPixelaUrl] = useState<string | null>(null);
+  const hasPixela = getConfiguredApis().pixela;
+
+  useEffect(() => {
+    if (!hasPixela) { setPixelaUrl(null); return; }
+    let cancelled = false;
+    pixelaGetGraph().then(url => { if (!cancelled) setPixelaUrl(url); });
+    return () => { cancelled = true; };
+  }, [hasPixela]);
 
   const filtered = useMemo(() => {
     if (!search.trim()) return items;
@@ -249,8 +261,36 @@ export default function MyModels() {
         </div>
       </div>
 
+      {/* Pixela Painting Activity */}
+      <div className="px-4 pt-4">
+        <div className="mb-4">
+          <h2 className="text-xs font-semibold text-[var(--text-secondary)] uppercase tracking-wider mb-2 flex items-center gap-1.5">
+            <Paintbrush className="w-3.5 h-3.5" />
+            Painting Activity
+          </h2>
+          {pixelaUrl ? (
+            <div className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] p-3 overflow-hidden">
+              <img
+                src={pixelaUrl}
+                alt="Painting activity heatmap"
+                className="w-full h-auto"
+                loading="lazy"
+              />
+            </div>
+          ) : (
+            <div className="rounded-lg border border-[var(--border-color)] bg-[var(--bg-card)] p-4 text-center">
+              <p className="text-xs text-[var(--text-secondary)]">
+                Set up Pixela in{' '}
+                <button onClick={() => navigate('/settings')} className="text-[var(--accent-gold)] underline">Settings</button>
+                {' '}for painting streak tracking
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* List */}
-      <div className="px-4 pt-4 space-y-2">
+      <div className="px-4 pt-0 space-y-2">
         {filtered.map(item => <ModelCard key={item.id} item={item} />)}
 
         {filtered.length === 0 && items.length === 0 && (

@@ -15,6 +15,9 @@ import PhaseNavigator from './pages/PhaseNavigator';
 import RulesBrowser from './pages/RulesBrowser';
 import RuleDetail from './pages/RuleDetail';
 import Settings from './pages/Settings';
+import News from './pages/News';
+import DiceCalculator from './pages/DiceCalculator';
+import LoreQuiz from './pages/LoreQuiz';
 
 const base = import.meta.env.BASE_URL;
 
@@ -44,6 +47,10 @@ export const router = createBrowserRouter([
       // Rules
       { path: "rules", Component: RulesBrowser },
       { path: "rule/:ruleId", Component: RuleDetail },
+      // News / Tools
+      { path: "news", Component: News },
+      { path: "dice-calculator", Component: DiceCalculator },
+      { path: "lore-quiz", Component: LoreQuiz },
       // Settings
       { path: "settings", Component: Settings },
       // 404
